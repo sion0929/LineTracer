@@ -184,7 +184,7 @@ mission_manager (20초 대기·상태·완주 판정) ──► /mission/state �
 - [`docs/line_detection_rules.md`](docs/line_detection_rules.md) — 라인 검출 성능 테스트·성능 개선 규칙
 - [`docs/test_plan.md`](docs/test_plan.md) — 테스트 계획
 - [`docs/deployment.md`](docs/deployment.md) — 배포 노트
-- [`docs/checkpoint_a_evidence.md`](docs/checkpoint_a_evidence.md), [`docs/d05_evidence.md`](docs/d05_evidence.md), [`docs/d06_evidence.md`](docs/d06_evidence.md), [`docs/d07_evidence.md`](docs/d07_evidence.md), [`docs/d0809_evidence.md`](docs/d0809_evidence.md), [`docs/r3_evidence.md`](docs/r3_evidence.md), [`docs/d10_evidence.md`](docs/d10_evidence.md) — 단계별 검증 기록
+- [`docs/checkpoint_a_evidence.md`](docs/checkpoint_a_evidence.md), [`docs/d05_evidence.md`](docs/d05_evidence.md), [`docs/d06_evidence.md`](docs/d06_evidence.md), [`docs/d07_evidence.md`](docs/d07_evidence.md), [`docs/d0809_evidence.md`](docs/d0809_evidence.md), [`docs/r3_evidence.md`](docs/r3_evidence.md) — 단계별 검증 기록 (D-10 기록 `docs/d10_evidence.md`는 `wip/d10-finish` 브랜치)
 - [`docs/gcs_stage1_evidence.md`](docs/gcs_stage1_evidence.md), [`docs/gcs_stage2_evidence.md`](docs/gcs_stage2_evidence.md) — GCS/ROS Bag 검증 기록
 - [`docs/components_evidence.md`](docs/components_evidence.md) — 컴포저블 노드 성능 측정
 - [`실행방법_README.md`](실행방법_README.md) — 제출용 실행 방법 요약(국문)
