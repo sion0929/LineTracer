@@ -46,6 +46,11 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: ros:jazzy
+    defaults:
+      run:
+        # The container's default step shell is POSIX sh (no `source` builtin); bash is
+        # needed to source the ROS/workspace setup scripts below.
+        shell: bash
     env:
       DEBIAN_FRONTEND: noninteractive
       # Unique per job so a self-hosted/concurrent runner never shares a DDS domain with
@@ -128,6 +133,9 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: ros:jazzy
+    defaults:
+      run:
+        shell: bash
     env:
       DEBIAN_FRONTEND: noninteractive
       ROS_DOMAIN_ID: '92'
@@ -165,9 +173,14 @@ jobs:
           rosdep update
 
       - name: rosdep install (src only, matching the Dockerfile's COPY src)
+        # --skip-keys line_follower_gcs: line_follower_tests' test_depend on the dev-only
+        # GCS package only resolves when tools/gcs is also in --from-paths. It is irrelevant
+        # here since this job builds --packages-up-to line_follower_bringup with tests off,
+        # exactly like the Dockerfile (which never copies tools/ at all).
         run: |
           apt-get update
-          rosdep install --from-paths src --ignore-src -y --rosdistro jazzy
+          rosdep install --from-paths src --ignore-src -y --rosdistro jazzy \
+            --skip-keys line_follower_gcs
 
       - name: Install packages rosdep could not resolve on this base image
         run: |
