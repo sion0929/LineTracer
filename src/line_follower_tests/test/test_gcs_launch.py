@@ -21,20 +21,26 @@ from rclpy.qos import qos_profile_sensor_data
 # See test_pipeline_launch.py: nodes.launch.py's default compose:=true path starts
 # perception_container with thread_num=4, which component_container_mt rejects (and
 # aborts on) when the host reports fewer CPUs. GitHub's hosted Linux runners for this
-# private repo report fewer than 4 CPUs. Skipped in CI only; runs normally in the lab
-# container / on developer machines with >=4 CPUs.
+# private repo report fewer than 4 CPUs. Skipped in CI only (via skipTest, not a
+# module-level exception: the launch_testing.launch_test runner used by add_launch_test
+# loads this file directly, not through pytest, and does not honour
+# pytest.skip(allow_module_level=True)); runs normally in the lab container / on
+# developer machines with >=4 CPUs.
 _CPU_COUNT = len(os.sched_getaffinity(0)) if hasattr(os, 'sched_getaffinity') else (os.cpu_count() or 0)
+_SKIP_REASON = None
 if os.environ.get('GITHUB_ACTIONS') == 'true' and _CPU_COUNT < 4:
-    pytest.skip(
+    _SKIP_REASON = (
         f'perception_container thread_num=4 (nodes.launch.py) exceeds this CI runner\'s '
         f'hardware_concurrency ({_CPU_COUNT}); component_container_mt rejects it as an '
         'out-of-range parameter and aborts. Environment-dependent (runner CPU count), '
-        'not a code defect; exercised in the lab container instead.',
-        allow_module_level=True)
+        'not a code defect; exercised in the lab container instead.')
 
 
 @pytest.mark.launch_test
 def generate_test_description():
+    if _SKIP_REASON:
+        # Do not start perception_container at all on this CI runner (see _SKIP_REASON above).
+        return LaunchDescription([launch_testing.actions.ReadyToTest()])
     path = os.path.join(get_package_share_directory('line_follower_bringup'), 'launch', 'nodes.launch.py')
     return LaunchDescription([
         IncludeLaunchDescription(PythonLaunchDescriptionSource(path), launch_arguments={
@@ -48,6 +54,8 @@ def generate_test_description():
 
 class TestGcsProtocol(unittest.TestCase):
     def test_manual_lifecycle_and_broker(self):
+        if _SKIP_REASON:
+            self.skipTest(_SKIP_REASON)
         rclpy.init()
         node = rclpy.create_node('gcs_protocol_test')
         snapshots, events = [], []
