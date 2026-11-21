@@ -1,0 +1,181 @@
+name: CI
+
+# Scope note: this workflow validates static policy/asset integrity, a full ROS 2 Jazzy
+# colcon build + test (including tools/gcs), and a from-scratch build of the exact
+# competition package subset the submitted Docker image builds. It does NOT drive Gazebo:
+# the tools/lab_env.sh check-* acceptance checks (sensors/motion/start-stop/guard-exit/
+# D-05.. D-10/check-drive/check-gcs/check-bag, etc.) require a real Gazebo Harmonic session
+# and are run manually / in the lab container, not here.
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: static (no ROS)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pytest
+        run: python3 -m pip install --user pytest
+
+      - name: Verify provided Gazebo assets (world/models) against recorded SHA256
+        working-directory: src/line_follower_bringup
+        run: sha256sum -c SHA256SUMS
+
+      - name: Run static-policy and asset-integrity tests (no ROS required)
+        run: |
+          python3 -m pytest -q \
+            src/line_follower_tests/test/test_static_policy.py \
+            src/line_follower_tests/test/test_asset_integrity.py
+
+  build-test:
+    name: build-test (ros:jazzy)
+    runs-on: ubuntu-24.04
+    container:
+      image: ros:jazzy
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      # Unique per job so a self-hosted/concurrent runner never shares a DDS domain with
+      # another CI job or a developer's lab container (which uses domains 77-85).
+      ROS_DOMAIN_ID: '91'
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      # The ros:jazzy base image does not ship git; install it before actions/checkout
+      # needs to fetch the repository contents inside the container.
+      - name: Install git (required for checkout inside the container)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache apt archives
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-jazzy-${{ runner.os }}-${{ hashFiles('src/**/package.xml', 'tools/gcs/package.xml') }}
+          restore-keys: |
+            apt-jazzy-${{ runner.os }}-
+
+      - name: Cache rosdep database
+        uses: actions/cache@v4
+        with:
+          path: ~/.ros/rosdep
+          key: rosdep-jazzy-${{ hashFiles('src/**/package.xml', 'tools/gcs/package.xml') }}
+          restore-keys: |
+            rosdep-jazzy-
+
+      - name: Install build tooling and pytest
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential cmake \
+            python3-pip python3-pytest python3-numpy \
+            python3-rosdep python3-colcon-common-extensions
+
+      - name: rosdep init/update
+        run: |
+          if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then rosdep init; fi
+          rosdep update
+
+      - name: rosdep install (src + tools/gcs)
+        run: |
+          apt-get update
+          rosdep install --from-paths src tools/gcs --ignore-src -y --rosdistro jazzy
+
+      - name: Install packages rosdep could not resolve on this base image
+        # ros-jazzy-ros-gz: ros_gz_sim / ros_gz_bridge / ros_gz_image are sometimes split
+        # out of the base rosdep keys on a minimal image; python3-pyqt5 and libopencv-dev
+        # are plain apt packages referenced directly as rosdep keys in package.xml. These
+        # installs are idempotent no-ops if rosdep already pulled them in above.
+        run: |
+          apt-get install -y --no-install-recommends \
+            ros-jazzy-ros-gz python3-pyqt5 libopencv-dev ros-jazzy-rosbag2-storage-mcap
+
+      - name: colcon build (all packages, including tools/gcs)
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          colcon build --event-handlers console_direct+
+
+      - name: colcon test
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          colcon test --return-code-on-test-failure
+
+      - name: colcon test-result
+        if: always()
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          colcon test-result --verbose
+
+  competition-image-build:
+    name: competition package build (no dev tools)
+    runs-on: ubuntu-24.04
+    container:
+      image: ros:jazzy
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      ROS_DOMAIN_ID: '92'
+    steps:
+      # The real submission base image `rp/ros2:jazzy-lab` is a local course image that is
+      # not published on any registry CI can pull. Instead we reproduce the Dockerfile's
+      # build step (COPY src, colcon build --packages-up-to line_follower_bringup,
+      # BUILD_TESTING=OFF) on top of the public ros:jazzy image, to prove the competition
+      # package set builds cleanly without dev/test tooling.
+      - name: Install git (required for checkout inside the container)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache apt archives
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-jazzy-comp-${{ runner.os }}-${{ hashFiles('src/**/package.xml') }}
+          restore-keys: |
+            apt-jazzy-comp-${{ runner.os }}-
+
+      - name: Install build tooling
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential cmake python3-rosdep python3-colcon-common-extensions
+
+      - name: rosdep init/update
+        run: |
+          if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then rosdep init; fi
+          rosdep update
+
+      - name: rosdep install (src only, matching the Dockerfile's COPY src)
+        run: |
+          apt-get update
+          rosdep install --from-paths src --ignore-src -y --rosdistro jazzy
+
+      - name: Install packages rosdep could not resolve on this base image
+        run: |
+          apt-get install -y --no-install-recommends \
+            ros-jazzy-ros-gz libopencv-dev
+
+      - name: colcon build --packages-up-to line_follower_bringup (Release, BUILD_TESTING=OFF)
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          colcon build --packages-up-to line_follower_bringup \
+            --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
