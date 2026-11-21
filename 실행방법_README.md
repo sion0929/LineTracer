@@ -1,7 +1,9 @@
 # Project #1 Line Follower 로버 — 실행 방법 (제출용)
 
-- 과목: Robot Programming 개인 프로젝트 #1 · 충북대학교 지능로봇공학과
+- 과목: Robot Programming 프로젝트 #1 · 충북대학교 지능로봇공학과
 - 학번/이름: 2022042036 천시온
+- 학번/이름:  이진혁
+- 학번/이름:  유하린
 - 환경: ROS 2 Jazzy, Gazebo Harmonic, 기반 이미지 `rp/ros2:jazzy-lab`
 
 ## 실행 명령어 (한 줄)
