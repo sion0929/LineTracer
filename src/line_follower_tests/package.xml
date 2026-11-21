@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>line_follower_tests</name>
+  <version>0.1.0</version>
+  <description>Integration, policy and regression tests (design v1.2 §11)</description>
+  <maintainer email="202042036@cbnu.ac.kr">sion</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>composition_interfaces</test_depend>
+  <test_depend>rcl_interfaces</test_depend>
+  <test_depend>rclcpp_components</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>python3-numpy</test_depend>
+  <test_depend>line_follower_gcs</test_depend>
+  <test_depend>launch_testing_ament_cmake</test_depend>
+  <test_depend>launch_testing</test_depend>
+  <test_depend>rclpy</test_depend>
+  <test_depend>geometry_msgs</test_depend>
+  <test_depend>nav_msgs</test_depend>
+  <test_depend>sensor_msgs</test_depend>
+  <test_depend>line_follower_interfaces</test_depend>
+  <test_depend>line_follower_bringup</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

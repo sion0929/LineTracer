@@ -1,0 +1,14 @@
+build/
+install/
+log/
+__pycache__/
+*.pyc
+rosbag2_*/
+build_lab/
+install_lab/
+log_lab/
+
+bags/
+tmp_debug/
+.pytest_cache/
+*.zip

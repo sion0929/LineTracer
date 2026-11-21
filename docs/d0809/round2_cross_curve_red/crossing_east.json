@@ -1,0 +1,200 @@
+{
+  "run": "crossing_east",
+  "pass": false,
+  "full": false,
+  "progress_m": 10.83331674023659,
+  "progress_percent": 69.0081955522175,
+  "goal_m": 11.33102687390125,
+  "track_length_m": 15.698594425700026,
+  "stop_true_pose": [
+    2.6923330796426974,
+    2.30025374768802,
+    -0.8785910181881584
+  ],
+  "wall_sec": 75.07699109206442,
+  "lateral_p95_m": 0.003144452879321895,
+  "lateral_max_m": 0.003918199486635299,
+  "reason": "stalled: image line lost/ambiguous or image tracking budget exhausted",
+  "events": [
+    {
+      "stamp": 0.18000000000000002,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 0.24000000000000002,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 0.54,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 0.68,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 0.768,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 2.26,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 2.2880000000000003,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 2.508,
+      "mode": 5,
+      "reason": "local memory reset"
+    },
+    {
+      "stamp": 2.52,
+      "mode": 3,
+      "reason": "trusted current observation; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.144,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.24,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.28,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.372,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.5120000000000005,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.74,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.916,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.136,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.364,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.6,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.768,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 9.12,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 9.268,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 9.384,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 10.116,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 10.216,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 10.28,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 10.38,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.92,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 19.948,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 23.312,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 28.0,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 28.132,
+      "mode": 4,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 50.928,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 52.12,
+      "mode": 4,
+      "reason": "stopped look turn toward observed memory tangent; no unobserved translation"
+    },
+    {
+      "stamp": 53.18,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    }
+  ],
+  "bag": "/ws/bags/drive/crossing_east-194475",
+  "candidate_reasons": [
+    "confirmed forward polyline; observed branch rules evaluated",
+    "locked straight-through line continuity"
+  ]
+}

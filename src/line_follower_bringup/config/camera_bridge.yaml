@@ -1,0 +1,12 @@
+# This component has exactly one bridge. Other rover topics stay in parameter_bridge.
+- ros_topic_name: "/camera/image_raw"
+  gz_topic_name: "/camera/image_raw"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+  # SERVICES is the SDK preset for RELIABLE / VOLATILE / KEEP_LAST; depth overridden below.
+  # Reliable external readers (recorder) repair fragmented image losses; SensorData readers still match.
+  qos_profile: SERVICES
+  publisher_queue: 5
+  subscriber_queue: 5
+  lazy: false

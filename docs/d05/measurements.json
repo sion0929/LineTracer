@@ -1,0 +1,280 @@
+{
+  "start_t": {
+    "pose": [
+      0.33000001311302185,
+      0.8499999982118607,
+      0.01,
+      -1.5707963267948966
+    ],
+    "frames": 121,
+    "line_hz": 30.24656895045235,
+    "line_found_fraction": 1.0,
+    "projection_valid_fraction": 1.0,
+    "median_m": 0.0008888716167874122,
+    "p95_m": 0.007288884586758026,
+    "max_m": 0.007999997138977033,
+    "recall": 1.0,
+    "segments": 3,
+    "candidates": [
+      {
+        "world": [
+          0.3300000131130219,
+          0.32999999821186066
+        ],
+        "legs": 3
+      }
+    ],
+    "candidate_ok": true,
+    "range_min": 0.4320000112056732,
+    "range_max": 0.6079999804496765,
+    "quality": 0.8999999761581421,
+    "projection_valid": true,
+    "processing_p50_ms": 5.275751113891602,
+    "processing_p95_ms": 6.930151605606079,
+    "capture_stamp": [
+      7,
+      196000000
+    ],
+    "imu_pitch": -0.005652344078682354,
+    "flat_gate_pass": true
+  },
+  "straight": {
+    "pose": [
+      0.9900000095367432,
+      2.309999942779541,
+      0.01,
+      0.0
+    ],
+    "frames": 122,
+    "line_hz": 30.48974370720005,
+    "line_found_fraction": 1.0,
+    "projection_valid_fraction": 1.0,
+    "median_m": 0.004418351530201868,
+    "p95_m": 0.00800013542175293,
+    "max_m": 0.02066654699641081,
+    "recall": 1.0,
+    "segments": 7,
+    "candidates": [
+      {
+        "world": [
+          2.0700000095367432,
+          2.721999942779541
+        ],
+        "legs": 2
+      },
+      {
+        "world": [
+          2.0980000095367433,
+          2.309999942779541
+        ],
+        "legs": 4
+      },
+      {
+        "world": [
+          1.9020000100135803,
+          2.7859999537467957
+        ],
+        "legs": 2
+      }
+    ],
+    "candidate_ok": true,
+    "range_min": 0.3160000145435333,
+    "range_max": 1.373398780822754,
+    "quality": 0.8999999761581421,
+    "projection_valid": true,
+    "processing_p50_ms": 6.692198991775513,
+    "processing_p95_ms": 8.453745222091674,
+    "capture_stamp": [
+      13,
+      664000000
+    ],
+    "imu_pitch": -0.005676524338535488,
+    "flat_gate_pass": true
+  },
+  "corner": {
+    "pose": [
+      0.9900000095367432,
+      1.129999976158142,
+      0.01,
+      1.5707963267948966
+    ],
+    "frames": 121,
+    "line_hz": 30.219652412970316,
+    "line_found_fraction": 1.0,
+    "projection_valid_fraction": 1.0,
+    "median_m": 0.00550564723068403,
+    "p95_m": 0.007723596203192962,
+    "max_m": 0.007999997138977033,
+    "recall": 1.0,
+    "segments": 3,
+    "candidates": [
+      {
+        "world": [
+          0.9900000095367432,
+          1.6499999570846557
+        ],
+        "legs": 2
+      }
+    ],
+    "candidate_ok": true,
+    "range_min": 0.3160000145435333,
+    "range_max": 1.3629262447357178,
+    "quality": 0.8999999761581421,
+    "projection_valid": true,
+    "processing_p50_ms": 6.51591682434082,
+    "processing_p95_ms": 8.324345588684082,
+    "capture_stamp": [
+      20,
+      164000000
+    ],
+    "imu_pitch": -0.005684646312000055,
+    "flat_gate_pass": true
+  },
+  "curve": {
+    "pose": [
+      2.379999895095825,
+      0.32999999821186066,
+      0.01,
+      0.0
+    ],
+    "frames": 121,
+    "line_hz": 30.22845221484254,
+    "line_found_fraction": 1.0,
+    "projection_valid_fraction": 1.0,
+    "median_m": 0.001999874114990252,
+    "p95_m": 0.005443039674581665,
+    "max_m": 0.006695710557644976,
+    "recall": 1.0,
+    "segments": 1,
+    "candidates": [],
+    "candidate_ok": true,
+    "range_min": 0.3160000145435333,
+    "range_max": 0.6618761420249939,
+    "quality": 0.8999999761581421,
+    "projection_valid": true,
+    "processing_p50_ms": 4.786337852478027,
+    "processing_p95_ms": 8.000470161437988,
+    "capture_stamp": [
+      26,
+      764000000
+    ],
+    "imu_pitch": -0.005682274727123063,
+    "flat_gate_pass": true
+  },
+  "crossing": {
+    "pose": [
+      2.0899999141693115,
+      1.789999942779541,
+      0.01,
+      1.5707963267948966
+    ],
+    "frames": 121,
+    "line_hz": 30.247213294040936,
+    "line_found_fraction": 1.0,
+    "projection_valid_fraction": 1.0,
+    "median_m": 0.0039999890327453436,
+    "p95_m": 0.00799990773200987,
+    "max_m": 0.018364263563823965,
+    "recall": 1.0,
+    "segments": 5,
+    "candidates": [
+      {
+        "world": [
+          2.0899999141693115,
+          2.313999942779541
+        ],
+        "legs": 4
+      },
+      {
+        "world": [
+          1.8266284763813019,
+          2.9696570444107055
+        ],
+        "legs": 2
+      }
+    ],
+    "candidate_ok": true,
+    "range_min": 0.3160000145435333,
+    "range_max": 1.3629262447357178,
+    "quality": 0.8999999761581421,
+    "projection_valid": true,
+    "processing_p50_ms": 5.121024131774902,
+    "processing_p95_ms": 8.2356538772583,
+    "capture_stamp": [
+      33,
+      300000000
+    ],
+    "imu_pitch": -0.005718486217994968,
+    "flat_gate_pass": true
+  },
+  "finish_t": {
+    "pose": [
+      0.8499999982118607,
+      2.96999990940094,
+      0.01,
+      3.141592653589793
+    ],
+    "frames": 121,
+    "line_hz": 30.247572836517712,
+    "line_found_fraction": 1.0,
+    "projection_valid_fraction": 1.0,
+    "median_m": 1.1920928955078125e-07,
+    "p95_m": 0.0030333204070726798,
+    "max_m": 0.0039999890327453436,
+    "recall": 1.0,
+    "segments": 3,
+    "candidates": [
+      {
+        "world": [
+          0.32999999821186066,
+          2.96999990940094
+        ],
+        "legs": 3
+      }
+    ],
+    "candidate_ok": true,
+    "range_min": 0.3160000145435333,
+    "range_max": 0.5313379168510437,
+    "quality": 0.8999999761581421,
+    "projection_valid": true,
+    "processing_p50_ms": 4.973280906677246,
+    "processing_p95_ms": 8.093141555786133,
+    "capture_stamp": [
+      39,
+      736000000
+    ],
+    "imu_pitch": -0.005691725149191229,
+    "flat_gate_pass": true
+  },
+  "hill_entry": {
+    "pose": [
+      0.7600000262260437,
+      0.32999999821186066,
+      0.03,
+      0.0
+    ],
+    "frames": 121,
+    "line_hz": 30.232365272506055,
+    "line_found_fraction": 1.0,
+    "projection_valid_fraction": 0.0,
+    "median_m": 0.0,
+    "p95_m": 0.08266003340482715,
+    "max_m": 0.08400003612041473,
+    "recall": 0.0,
+    "segments": 2,
+    "candidates": [],
+    "candidate_ok": true,
+    "range_min": 0.3479999899864197,
+    "range_max": 1.32027268409729,
+    "quality": 0.25,
+    "projection_valid": false,
+    "processing_p50_ms": 5.471498966217041,
+    "processing_p95_ms": 8.554869651794434,
+    "capture_stamp": [
+      46,
+      168000000
+    ],
+    "imu_pitch": -0.04691095583121132,
+    "flat_gate_pass": null
+  }
+}

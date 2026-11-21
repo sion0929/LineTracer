@@ -1,0 +1,434 @@
+{
+  "run": "curve",
+  "pass": true,
+  "full": false,
+  "progress_m": 2.9922928752427285,
+  "progress_percent": 19.060896753559494,
+  "goal_m": 2.9900000631809234,
+  "track_length_m": 15.698594425700026,
+  "stop_true_pose": [
+    2.9672222442264164,
+    0.729536121256419,
+    1.574625695462858
+  ],
+  "wall_sec": 40.04040664306376,
+  "lateral_p95_m": 0.012130565426929342,
+  "lateral_max_m": 0.014638326160725152,
+  "reason": "section traversed",
+  "events": [
+    {
+      "stamp": 0.64,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 1.1,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 1.2,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 1.8,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 1.824,
+      "mode": 0,
+      "reason": "trusted current observation; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 1.86,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 1.9,
+      "mode": 0,
+      "reason": "trusted current observation; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 2.024,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 2.06,
+      "mode": 0,
+      "reason": "trusted current observation; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 2.22,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 2.848,
+      "mode": 5,
+      "reason": "local memory reset"
+    },
+    {
+      "stamp": 2.884,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 2.948,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 4.2,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 4.504,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 4.6,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 5.3,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 5.46,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 5.724,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 5.824,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 6.28,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 6.384,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 6.78,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 6.944,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 7.34,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.372,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.44,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.472,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.5,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.54,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.84,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 7.968,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 9.62,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 13.22,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 13.54,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 13.68,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 16.02,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 16.52,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 16.548000000000002,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 16.612,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 32.42,
+      "mode": 4,
+      "reason": "stopped look turn toward observed memory tangent; no unobserved translation"
+    },
+    {
+      "stamp": 33.48,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 35.488,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 36.02,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 36.12,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 36.344,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 36.64,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 36.708,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 36.804,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 37.104,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 37.204,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 37.564,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 38.16,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 38.2,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 38.3,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 38.388,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 38.884,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 38.92,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 39.048,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 39.708,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 39.812,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 40.368,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 40.668,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 40.704,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 40.804,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 40.9,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 41.228,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 41.36,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 41.46,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 41.624,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 41.728,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 41.92,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 42.12,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 42.26,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 42.348,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 42.68,
+      "mode": 2,
+      "reason": "checking position heading and connectivity"
+    },
+    {
+      "stamp": 42.744,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 42.92,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 43.08,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 43.14,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 43.244,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 43.42,
+      "mode": 5,
+      "reason": "mission memory reset"
+    }
+  ],
+  "bag": "/ws/bags/drive/curve-219833",
+  "candidate_reasons": [
+    "confirmed forward polyline; observed branch rules evaluated"
+  ]
+}

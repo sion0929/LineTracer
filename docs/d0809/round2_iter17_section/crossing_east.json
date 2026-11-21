@@ -1,0 +1,636 @@
+{
+  "run": "crossing_east",
+  "pass": false,
+  "full": false,
+  "progress_m": 11.107851820752508,
+  "progress_percent": 70.75698320206263,
+  "goal_m": 11.33102687390125,
+  "track_length_m": 15.698594425700026,
+  "stop_true_pose": [
+    2.7412455758315897,
+    2.045934194736325,
+    -1.4011305464271229
+  ],
+  "wall_sec": 81.80618902796414,
+  "lateral_p95_m": 0.01263872428919308,
+  "lateral_max_m": 0.01733954909495343,
+  "reason": "stalled: image line lost/ambiguous or image tracking budget exhausted",
+  "events": [
+    {
+      "stamp": 0.14400000000000002,
+      "mode": 7,
+      "reason": "bounded single-line image steering; no confirmed 3D geometry"
+    },
+    {
+      "stamp": 0.18000000000000002,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 0.24400000000000002,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 0.40800000000000003,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 1.36,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 1.464,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 2.368,
+      "mode": 5,
+      "reason": "local memory reset"
+    },
+    {
+      "stamp": 2.388,
+      "mode": 3,
+      "reason": "trusted current observation; locked straight-through line continuity"
+    },
+    {
+      "stamp": 6.22,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 6.32,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 6.62,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 6.708,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.08,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.18,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.464,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 7.604,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.26,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.46,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.688,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 8.788,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 9.72,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 9.82,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 9.88,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 9.98,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 10.48,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 10.668,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 10.864,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 11.04,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 11.364,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 11.5,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 11.56,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 11.724,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 11.9,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 11.988,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 12.46,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 12.56,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 12.652,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 12.752,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 13.244,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 13.344,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 13.54,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 13.64,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 14.168,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 14.3,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 14.44,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 14.54,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 14.6,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 14.8,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 14.832,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.128,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.26,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.36,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.46,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.56,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.588000000000001,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.824,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.86,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 15.952,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 16.18,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 16.52,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 16.78,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 16.88,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 16.908,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.044,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.14,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.24,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.34,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.44,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.54,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.64,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 17.964,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.064,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.264,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.36,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.628,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.724,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.764,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.96,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 18.984,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 19.084,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 19.248,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 19.352,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 20.308,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 20.508,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 20.54,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 20.64,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 25.46,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 29.844,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 31.328,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 31.66,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 31.888,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 31.988,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 32.384,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 32.52,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 32.752,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 32.848,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 32.92,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 33.02,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 34.428,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 53.708,
+      "mode": 4,
+      "reason": "stopped look turn toward observed memory tangent; no unobserved translation"
+    },
+    {
+      "stamp": 55.224,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: no sufficiently certain stoppable observed path"
+    },
+    {
+      "stamp": 57.9,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 58.024,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 58.128,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 58.16,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 58.296,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 58.324,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 58.36,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 59.544,
+      "mode": 5,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 59.684,
+      "mode": 2,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 60.08,
+      "mode": 5,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 60.116,
+      "mode": 2,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 60.708,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 60.868,
+      "mode": 2,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 60.936,
+      "mode": 5,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 61.0,
+      "mode": 2,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 61.164,
+      "mode": 5,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 61.2,
+      "mode": 2,
+      "reason": "no feasible candidate"
+    },
+    {
+      "stamp": 61.66,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 84.728,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 84.8,
+      "mode": 5,
+      "reason": "mission memory reset"
+    },
+    {
+      "stamp": 84.824,
+      "mode": 0,
+      "reason": "trusted current observation"
+    }
+  ],
+  "bag": "/ws/bags/drive/crossing_east-200015",
+  "candidate_reasons": [
+    "confirmed forward polyline; observed branch rules evaluated",
+    "locked lowest-cost observed feasible turn",
+    "locked straight-through line continuity"
+  ]
+}

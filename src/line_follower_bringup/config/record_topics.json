@@ -1,0 +1,23 @@
+[
+  "/camera/image_raw",
+  "/camera/camera_info",
+  "/clock",
+  "/imu",
+  "/odom",
+  "/localization/estimate",
+  "/perception/line",
+  "/perception/status",
+  "/path/observed_graph",
+  "/path/memory",
+  "/path/local",
+  "/path/candidates",
+  "/path/status",
+  "/control/cmd_vel_candidate",
+  "/cmd_vel",
+  "/mission/state",
+  "/safety/status",
+  "/perception/obstacles",
+  "/mission/gcs_snapshot",
+  "/gcs/command_events",
+  "/gcs/recording_status"
+]

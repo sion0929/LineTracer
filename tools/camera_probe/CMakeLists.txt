@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.8)
+project(camera_probe)
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(line_follower_interfaces REQUIRED)
+add_executable(camera_probe main.cpp)
+target_link_libraries(camera_probe rclcpp::rclcpp ${sensor_msgs_TARGETS} ${line_follower_interfaces_TARGETS})

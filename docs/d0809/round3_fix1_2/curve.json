@@ -1,0 +1,204 @@
+{
+  "run": "curve",
+  "pass": false,
+  "full": false,
+  "progress_m": 2.9245335898049962,
+  "progress_percent": 18.629270305991653,
+  "goal_m": 2.9600000631809236,
+  "track_length_m": 15.698594425700026,
+  "stop_true_pose": [
+    2.939638232328142,
+    0.6642534217761825,
+    1.6287301359011863
+  ],
+  "wall_sec": 51.645870497915894,
+  "lateral_p95_m": 0.032476024220572594,
+  "lateral_max_m": 0.04130183728012499,
+  "reason": "stalled: near path retraces; outgoing direction is not established",
+  "events": [
+    {
+      "stamp": 0.18000000000000002,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 0.24400000000000002,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 0.772,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 0.8720000000000001,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 1.34,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 1.4,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 1.528,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 2.472,
+      "mode": 5,
+      "reason": "local memory reset"
+    },
+    {
+      "stamp": 2.488,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 3.8440000000000003,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 4.072,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 6.088,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 6.32,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 6.352,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 6.916,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 6.944,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 6.98,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.012,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.044,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.08,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 7.108,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 8.364,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 8.464,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 8.86,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 12.62,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 13.544,
+      "mode": 4,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 15.1,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 20.74,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 20.772,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: no sufficiently certain stoppable observed path"
+    },
+    {
+      "stamp": 20.84,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 20.904,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: no sufficiently certain stoppable observed path"
+    },
+    {
+      "stamp": 20.94,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 29.252,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 29.548000000000002,
+      "mode": 5,
+      "reason": "near path retraces; outgoing direction is not established"
+    },
+    {
+      "stamp": 29.584,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: metric planner rejected: near path retraces; outgoing direction is not established"
+    },
+    {
+      "stamp": 29.648,
+      "mode": 5,
+      "reason": "near path retraces; outgoing direction is not established"
+    }
+  ],
+  "bag": "/ws/bags/drive/curve-224106",
+  "candidate_reasons": [
+    "confirmed forward polyline; observed branch rules evaluated"
+  ]
+}

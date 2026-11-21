@@ -1,0 +1,2597 @@
+{
+  "run": "full_1",
+  "pass": false,
+  "full": true,
+  "progress_m": 10.693688813659449,
+  "progress_percent": 68.11876607343207,
+  "goal_m": 15.578594425700027,
+  "track_length_m": 15.698594425700026,
+  "stop_true_pose": [
+    2.555402764855454,
+    2.3249933302036023,
+    0.029561414348293683
+  ],
+  "wall_sec": 339.8480050250655,
+  "lateral_p95_m": 0.032476380910059034,
+  "lateral_max_m": 0.08363399765193058,
+  "reason": "stalled: image line lost/ambiguous or image tracking budget exhausted",
+  "events": [
+    {
+      "stamp": 0.14400000000000002,
+      "mode": 7,
+      "reason": "bounded single-line image steering; no confirmed 3D geometry"
+    },
+    {
+      "stamp": 0.18000000000000002,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 0.24400000000000002,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 22.46,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 30.508,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 50.444,
+      "mode": 7,
+      "reason": "bounded single-line image steering; no confirmed 3D geometry"
+    },
+    {
+      "stamp": 59.292,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 59.352,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 60.628,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 60.736,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 62.132,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 62.228,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 62.896,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 62.98,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 63.02,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 63.144,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 63.24,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 63.368,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 65.704,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 65.864,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 66.232,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 66.324,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 66.364,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 66.716,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 66.784,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 66.988,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 67.22,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 67.32,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 69.292,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 73.116,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 75.732,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 76.216,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 92.24,
+      "mode": 4,
+      "reason": "stopped look turn toward observed memory tangent; no unobserved translation"
+    },
+    {
+      "stamp": 93.42,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 95.244,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 95.296,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 95.464,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 96.004,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 96.092,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 97.044,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 97.14,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 97.372,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 97.62,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 97.648,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 97.744,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 97.852,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 97.936,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 97.968,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 98.108,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 98.128,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 98.296,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 98.436,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 98.536,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 98.596,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 98.688,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 98.728,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 98.756,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 99.064,
+      "mode": 2,
+      "reason": "checking position heading and connectivity"
+    },
+    {
+      "stamp": 100.444,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 100.504,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 102.16,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 102.252,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 103.18,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 103.276,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 103.544,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 103.576,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 103.708,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 103.848,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 104.076,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 104.108,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 104.504,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 104.64,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 105.0,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 105.948,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 106.12,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 106.584,
+      "mode": 4,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 109.388,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 109.552,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 113.848,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 113.948,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 115.76,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 116.252,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 116.468,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 116.684,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 116.812,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 116.876,
+      "mode": 3,
+      "reason": "trusted current observation; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 117.176,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 117.272,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 117.34,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 117.376,
+      "mode": 3,
+      "reason": "trusted current observation; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 117.636,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 117.836,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 117.908,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 118.068,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 118.128,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 118.5,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 118.564,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 118.656,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 118.764,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 118.856,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 118.9,
+      "mode": 3,
+      "reason": "trusted current observation; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 119.456,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 119.548,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 119.72,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 119.784,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 119.888,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 120.152,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 120.24,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 120.54,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 120.816,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 120.84,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 121.072,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 121.164,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 121.428,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 121.536,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 128.628,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 128.66,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 128.864,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 128.9,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 129.292,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 129.356,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 131.5,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 131.788,
+      "mode": 2,
+      "reason": "checking position heading and connectivity"
+    },
+    {
+      "stamp": 131.856,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 135.596,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 135.668,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 135.772,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 136.192,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 136.424,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 136.48,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 136.808,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 137.516,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 137.748,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 137.992,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 138.5,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 138.584,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 138.736,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 138.92,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 139.22,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 139.516,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 139.708,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 139.872,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 140.012,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 140.04,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 140.268,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 141.5,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 141.68,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 142.224,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 142.448,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 142.716,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 142.884,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 142.916,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 143.016,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 143.376,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 143.508,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 143.672,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 143.768,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 147.304,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 147.568,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 149.672,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 149.844,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 152.384,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 152.548,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 152.576,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 152.776,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 153.684,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 153.764,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 154.624,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 154.728,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 154.82,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 154.856,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 154.92,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 155.052,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 155.188,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 155.212,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 155.648,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 155.744,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 155.78,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 155.848,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 155.98,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 156.004,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 156.044,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 156.552,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 156.64,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 156.908,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 157.164,
+      "mode": 2,
+      "reason": "checking position heading and connectivity"
+    },
+    {
+      "stamp": 157.232,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 159.9,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 160.004,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 160.4,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 160.504,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 161.324,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 161.424,
+      "mode": 4,
+      "reason": "checking position heading and connectivity"
+    },
+    {
+      "stamp": 168.56,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 168.684,
+      "mode": 4,
+      "reason": "checking position heading and connectivity; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 169.804,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 169.94,
+      "mode": 4,
+      "reason": "checking position heading and connectivity; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 170.96,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 171.024,
+      "mode": 4,
+      "reason": "checking position heading and connectivity; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 171.056,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 171.224,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 171.356,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 172.496,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 172.592,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 172.852,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.008,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.104,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.332,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.44,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.464,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.564,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.728,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 173.832,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 174.188,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 174.296,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 174.456,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 174.552,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 174.756,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 174.888,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 175.14,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 175.216,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 175.5,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 175.588,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 175.656,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 175.812,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 175.872,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 176.576,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 176.712,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 177.1,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 177.204,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 177.568,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 177.608,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 177.732,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 177.856,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 178.208,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 178.32,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 178.7,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 178.852,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 180.14,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 180.188,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 180.288,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 180.648,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 181.488,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 181.568,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 182.304,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 182.32,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 183.148,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 183.228,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 183.904,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 184.124,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 184.28,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 184.608,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 184.768,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 184.992,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 185.108,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 185.148,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 185.908,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 186.024,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 186.16,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 186.192,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 186.624,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 186.728,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 186.816,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 186.924,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 187.04,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 187.088,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 187.556,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 187.576,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 187.748,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 191.072,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 191.488,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 193.352,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 193.652,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 193.68,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 193.884,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 194.184,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 194.42,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 195.224,
+      "mode": 2,
+      "reason": "checking position heading and connectivity; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 195.488,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 197.04,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 197.132,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 200.14,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 200.244,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 200.784,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 200.868,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 202.764,
+      "mode": 4,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 206.608,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 208.144,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 210.24,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 212.472,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 212.568,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 213.032,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 213.132,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 213.164,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 213.2,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 215.668,
+      "mode": 2,
+      "reason": "checking position heading and connectivity"
+    },
+    {
+      "stamp": 215.8,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 215.84,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 216.012,
+      "mode": 2,
+      "reason": "checking position heading and connectivity"
+    },
+    {
+      "stamp": 216.064,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 216.136,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 216.232,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 216.5,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 216.592,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 216.692,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 216.816,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 216.932,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 217.12,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 217.164,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 217.256,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 217.38,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 217.484,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 217.52,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 217.688,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 218.22,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 218.404,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 218.44,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 218.644,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 218.68,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 218.772,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 218.84,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 219.332,
+      "mode": 3,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 219.36,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 219.464,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 219.5,
+      "mode": 4,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 222.44,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 222.84,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 222.932,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 227.152,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 227.28,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 228.472,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 228.808,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 229.364,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 229.572,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 230.492,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 230.72,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 231.74,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 231.872,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 232.168,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 232.352,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 239.6,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 239.688,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 248.504,
+      "mode": 4,
+      "reason": "stopped look turn toward observed memory tangent; no unobserved translation"
+    },
+    {
+      "stamp": 250.88,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 253.68,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 253.988,
+      "mode": 3,
+      "reason": "trusted current observation; locked straight-through line continuity"
+    },
+    {
+      "stamp": 254.084,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 254.28,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 255.18,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 255.264,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 255.508,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 255.604,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 256.1,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 256.192,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 256.328,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 256.588,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 256.66,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 256.984,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 257.028,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 257.12,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 257.188,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 257.284,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 257.484,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 257.908,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 257.952,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 258.404,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 258.44,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 258.672,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 258.772,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 259.232,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 259.36,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 259.84,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 259.9,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 260.544,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 260.624,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 260.884,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 260.916,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 261.064,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 261.152,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 261.284,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 261.416,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 261.648,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 261.848,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 261.94,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 263.32,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 263.42,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 272.472,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 272.932,
+      "mode": 2,
+      "reason": "checking position heading and connectivity; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 273.0,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 274.148,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 274.244,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 274.312,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 274.508,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 274.58,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 274.672,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 275.24,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 275.468,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 275.564,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 275.672,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 275.732,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 275.832,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 276.956,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 277.1,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 277.38,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 277.488,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 277.58,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 277.68,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 278.048,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 278.172,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 281.804,
+      "mode": 2,
+      "reason": "checking position heading and connectivity; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 281.868,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 283.16,
+      "mode": 2,
+      "reason": "checking position heading and connectivity; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 283.224,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 283.288,
+      "mode": 4,
+      "reason": "stopped look turn toward observed memory tangent; no unobserved translation"
+    },
+    {
+      "stamp": 284.616,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 285.76,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 285.864,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 286.068,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 286.16,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 286.988,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 287.08,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 287.312,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 287.412,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 287.652,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 287.74,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 288.412,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 288.508,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 288.764,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: no sufficiently certain stoppable observed path"
+    },
+    {
+      "stamp": 289.1,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 292.492,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 292.596,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 292.964,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 293.068,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 293.288,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 293.388,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 294.208,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 294.312,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 294.468,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 294.576,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 295.728,
+      "mode": 3,
+      "reason": "trusted current observation; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 295.792,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 295.864,
+      "mode": 3,
+      "reason": "trusted current observation; locked straight-through line continuity"
+    },
+    {
+      "stamp": 296.92,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 297.108,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 297.212,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 297.416,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 297.448,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 297.716,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 297.908,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 298.112,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 298.168,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 298.3,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 298.436,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 298.6,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 298.636,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 298.9,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 299.064,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 299.164,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 299.56,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 299.66,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 300.284,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: no sufficiently certain stoppable observed path"
+    },
+    {
+      "stamp": 300.68,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 301.276,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 301.372,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 301.672,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 301.772,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 302.428,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 302.52,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 302.592,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 302.692,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 302.724,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 302.828,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 303.032,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 303.124,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 303.224,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 303.32,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 303.944,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 304.056,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 309.984,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 310.088,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 310.316,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 310.44,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 310.752,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 310.884,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 311.632,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 311.736,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 312.396,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 312.492,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 312.76,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 312.864,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 313.124,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 313.22,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 313.452,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 313.56,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 314.112,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 314.212,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 314.708,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; locked straight-through line continuity"
+    },
+    {
+      "stamp": 314.8,
+      "mode": 3,
+      "reason": "consistent re-observation verified; locked straight-through line continuity"
+    },
+    {
+      "stamp": 316.32,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 316.42,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 318.404,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 318.628,
+      "mode": 3,
+      "reason": "consistent re-observation verified; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 320.324,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 320.416,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 320.944,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 321.056,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 323.912,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 323.944,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 324.012,
+      "mode": 3,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 324.04,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 324.74,
+      "mode": 3,
+      "reason": "trusted current observation; locked lowest-cost observed feasible turn"
+    },
+    {
+      "stamp": 325.336,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 326.156,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 330.504,
+      "mode": 5,
+      "reason": "no feasible candidate"
+    }
+  ],
+  "bag": "/ws/bags/drive/full_1-194073",
+  "candidate_reasons": [
+    "confirmed forward polyline; observed branch rules evaluated",
+    "locked lowest-cost observed feasible turn",
+    "locked straight-through line continuity"
+  ],
+  "change": "correct premature turn lock with newly observed straight crossing exit; reject invalid roots"
+}

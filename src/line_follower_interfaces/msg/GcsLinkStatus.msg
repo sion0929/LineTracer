@@ -1,0 +1,5 @@
+std_msgs/Header header
+string state
+float64 last_received_age
+float64 snapshot_rate_hz
+uint64 received_count

@@ -1,0 +1,10 @@
+build/
+install/
+log/
+docs/
+tools/
+build_lab/
+install_lab/
+log_lab/
+
+bags/

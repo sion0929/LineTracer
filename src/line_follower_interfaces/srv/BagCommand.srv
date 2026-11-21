@@ -1,0 +1,10 @@
+# Dev recorder contract, served at /gcs/recorder/command.
+uint8 START=0
+uint8 STOP=1
+string request_id
+string run_id
+builtin_interfaces/Time sent_stamp
+uint8 command
+---
+bool accepted
+string reason

@@ -1,0 +1,293 @@
+[
+  {
+    "raw_mapped_frames": 231,
+    "raw_mapped_points": 5877,
+    "raw_map_spread_m": 0.017878143145554973,
+    "mapped_observed_points": 3280,
+    "observed_p95_m": 0.03666322540731286,
+    "true_yaw_min_max": [
+      -0.4684554155572251,
+      0.5000715108355634
+    ],
+    "rate": 0.25,
+    "imu_yaw": false,
+    "heading_error_p95_rad": 0.04076920557392951,
+    "map_spread_m": 0.004566190481087426,
+    "max_memory_edge_m": 0.07726658635134863,
+    "localization_samples": 596,
+    "truth_samples": 617
+  },
+  {
+    "raw_mapped_frames": 126,
+    "raw_mapped_points": 3230,
+    "raw_map_spread_m": 0.06681247899188093,
+    "mapped_observed_points": 456,
+    "observed_p95_m": 0.05367459462594855,
+    "true_yaw_min_max": [
+      -0.4014057383772215,
+      0.4948226905935809
+    ],
+    "rate": 0.5,
+    "imu_yaw": false,
+    "heading_error_p95_rad": 0.16387482344012833,
+    "map_spread_m": 0.017501911328305433,
+    "max_memory_edge_m": 0.06730022601217717,
+    "localization_samples": 322,
+    "truth_samples": 427
+  },
+  {
+    "raw_mapped_frames": 241,
+    "raw_mapped_points": 6046,
+    "raw_map_spread_m": 0.001926437015951966,
+    "mapped_observed_points": 2177,
+    "observed_p95_m": 0.01051176589423548,
+    "true_yaw_min_max": [
+      -0.46186528376717007,
+      0.5140180896674614
+    ],
+    "rate": 0.25,
+    "imu_yaw": true,
+    "heading_error_p95_rad": 0.0005448897201516423,
+    "map_spread_m": 0.0020919878511882982,
+    "max_memory_edge_m": 0.06912805665311357,
+    "localization_samples": 617,
+    "truth_samples": 640
+  },
+  {
+    "raw_mapped_frames": 126,
+    "raw_mapped_points": 3117,
+    "raw_map_spread_m": 0.003871116530759523,
+    "mapped_observed_points": 1102,
+    "observed_p95_m": 0.010067335878072427,
+    "true_yaw_min_max": [
+      -0.38766341351078,
+      0.5159557698453259
+    ],
+    "rate": 0.5,
+    "imu_yaw": true,
+    "heading_error_p95_rad": 0.0011502950804102602,
+    "map_spread_m": 0.0030296614295341234,
+    "max_memory_edge_m": 0.05552122650957699,
+    "localization_samples": 322,
+    "truth_samples": 426
+  },
+  {
+    "scenario": "hill",
+    "confirmed_error_m": {
+      "median": 0.0006665108075054741,
+      "p95": 0.00779928940599719,
+      "max": 0.02668150162839167
+    },
+    "memory_error_m": {
+      "median": 1.1097827295525331e-05,
+      "p95": 0.025119567666519682,
+      "max": 0.03976572623800134
+    },
+    "mode_timeline": [
+      {
+        "t": 3.904,
+        "mode": 0,
+        "remaining": 0.8639999628067017,
+        "uncertainty": 0.00800000037997961,
+        "detail": "trusted current observation"
+      },
+      {
+        "t": 6.98,
+        "mode": 1,
+        "remaining": 1.1366455554962158,
+        "uncertainty": 0.015398654155433178,
+        "detail": "trusted memory; projection or near line lost"
+      },
+      {
+        "t": 13.744,
+        "mode": 3,
+        "remaining": 0.48840799927711487,
+        "uncertainty": 0.02504824288189411,
+        "detail": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+      },
+      {
+        "t": 17.968,
+        "mode": 7,
+        "remaining": 0.0,
+        "uncertainty": 0.0,
+        "detail": "bounded single-line image steering; no confirmed 3D geometry"
+      },
+      {
+        "t": 22.06,
+        "mode": 2,
+        "remaining": 0.0,
+        "uncertainty": 0.0,
+        "detail": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+      },
+      {
+        "t": 22.124,
+        "mode": 0,
+        "remaining": 0.9728301763534546,
+        "uncertainty": 0.00800000037997961,
+        "detail": "consistent re-observation verified"
+      },
+      {
+        "t": 22.388,
+        "mode": 3,
+        "remaining": 0.9862581491470337,
+        "uncertainty": 0.03615003079175949,
+        "detail": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+      },
+      {
+        "t": 22.752,
+        "mode": 0,
+        "remaining": 0.9640383720397949,
+        "uncertainty": 0.009514116682112217,
+        "detail": "trusted current observation"
+      },
+      {
+        "t": 22.852,
+        "mode": 2,
+        "remaining": 0.9624518752098083,
+        "uncertainty": 0.009764130227267742,
+        "detail": "re-observation mismatch; memory retained"
+      },
+      {
+        "t": 22.948,
+        "mode": 0,
+        "remaining": 0.9610978960990906,
+        "uncertainty": 0.010014143772423267,
+        "detail": "consistent re-observation verified"
+      },
+      {
+        "t": 23.28,
+        "mode": 2,
+        "remaining": 0.9599393010139465,
+        "uncertainty": 0.01086424570530653,
+        "detail": "re-observation mismatch; memory retained"
+      },
+      {
+        "t": 23.444,
+        "mode": 0,
+        "remaining": 0.9617974758148193,
+        "uncertainty": 0.011264285072684288,
+        "detail": "consistent re-observation verified"
+      }
+    ],
+    "unknown_points": 0,
+    "max_continuous_loss_sec": 15.083999999999998,
+    "samples": {
+      "line": 662,
+      "memory": 132,
+      "path": 132,
+      "status": 662
+    },
+    "observation_regions": {
+      "flat": {
+        "frames": 102,
+        "valid_frames": 93,
+        "nearest": 0.3160000145435333,
+        "farthest": 1.180006742477417,
+        "max_error": 0.004011080340440898
+      },
+      "entry_uphill": {
+        "frames": 137,
+        "valid_frames": 0,
+        "nearest": null,
+        "farthest": null,
+        "max_error": null
+      },
+      "top": {
+        "frames": 133,
+        "valid_frames": 0,
+        "nearest": null,
+        "farthest": null,
+        "max_error": null
+      },
+      "downhill_exit": {
+        "frames": 290,
+        "valid_frames": 112,
+        "nearest": 0.30399999022483826,
+        "farthest": 0.9899494647979736,
+        "max_error": 0.02668150162839167
+      }
+    }
+  },
+  {
+    "scenario": "blind",
+    "confirmed_error_m": {
+      "median": 0.0003756299568923316,
+      "p95": 0.004937429341449584,
+      "max": 0.009097215834397043
+    },
+    "memory_error_m": {
+      "median": 3.061268773585368e-05,
+      "p95": 0.004724525910476189,
+      "max": 0.005883865726463933
+    },
+    "mode_timeline": [
+      {
+        "t": 3.904,
+        "mode": 3,
+        "remaining": 0.3839999735355377,
+        "uncertainty": 0.00800000037997961,
+        "detail": "trusted current observation"
+      },
+      {
+        "t": 10.58,
+        "mode": 1,
+        "remaining": 0.30795207619667053,
+        "uncertainty": 0.01906328648328781,
+        "detail": "trusted memory; projection or near line lost"
+      },
+      {
+        "t": 11.428,
+        "mode": 3,
+        "remaining": 0.24613186717033386,
+        "uncertainty": 0.018669262528419495,
+        "detail": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+      },
+      {
+        "t": 14.86,
+        "mode": 5,
+        "remaining": 0.0,
+        "uncertainty": 0.0,
+        "detail": "image line lost/ambiguous or image tracking budget exhausted"
+      }
+    ],
+    "unknown_points": 0,
+    "max_continuous_loss_sec": 9.008,
+    "samples": {
+      "line": 476,
+      "memory": 65,
+      "path": 94,
+      "status": 476
+    },
+    "observation_regions": {
+      "flat": {
+        "frames": 287,
+        "valid_frames": 283,
+        "nearest": 0.31204384565353394,
+        "farthest": 0.3445112407207489,
+        "max_error": 0.007651880907410258
+      },
+      "entry_uphill": {
+        "frames": 189,
+        "valid_frames": 189,
+        "nearest": 0.3160000145435333,
+        "farthest": 0.7094786763191223,
+        "max_error": 0.009097215834397043
+      },
+      "top": {
+        "frames": 0,
+        "valid_frames": 0,
+        "nearest": null,
+        "farthest": null,
+        "max_error": null
+      },
+      "downhill_exit": {
+        "frames": 0,
+        "valid_frames": 0,
+        "nearest": null,
+        "farthest": null,
+        "max_error": null
+      }
+    },
+    "stop_margin_m": 0.0
+  }
+]

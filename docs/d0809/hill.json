@@ -1,0 +1,134 @@
+{
+  "run": "hill",
+  "pass": true,
+  "full": false,
+  "progress_m": 1.9028526370487922,
+  "progress_percent": 12.121165662663719,
+  "goal_m": 1.9,
+  "track_length_m": 15.698594425700026,
+  "stop_true_pose": [
+    2.232852650161814,
+    0.3292433607180562,
+    0.001554807524582802
+  ],
+  "wall_sec": 46.57285766804125,
+  "lateral_p95_m": 0.0007541313506145703,
+  "lateral_max_m": 0.0007785482513260056,
+  "reason": "section traversed",
+  "events": [
+    {
+      "stamp": 0.0,
+      "mode": 5,
+      "reason": "mission memory reset"
+    },
+    {
+      "stamp": 0.048,
+      "mode": 7,
+      "reason": "bounded single-line image steering; no confirmed 3D geometry"
+    },
+    {
+      "stamp": 0.18000000000000002,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 0.24000000000000002,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 1.992,
+      "mode": 5,
+      "reason": "local memory reset"
+    },
+    {
+      "stamp": 2.024,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 2.088,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 7.704,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 15.76,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 35.72,
+      "mode": 7,
+      "reason": "bounded single-line image steering; no confirmed 3D geometry"
+    },
+    {
+      "stamp": 40.74,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 40.768,
+      "mode": 7,
+      "reason": "bounded single-line image steering; no confirmed 3D geometry"
+    },
+    {
+      "stamp": 42.352,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 42.388,
+      "mode": 7,
+      "reason": "bounded single-line image steering; no confirmed 3D geometry"
+    },
+    {
+      "stamp": 44.368,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: checking position heading and connectivity"
+    },
+    {
+      "stamp": 44.432,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 44.928,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 47.964,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 49.052,
+      "mode": 5,
+      "reason": "mission memory reset"
+    },
+    {
+      "stamp": 49.084,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 49.152,
+      "mode": 5,
+      "reason": "mission memory reset"
+    },
+    {
+      "stamp": 49.184,
+      "mode": 0,
+      "reason": "trusted current observation"
+    }
+  ],
+  "bag": "/ws/bags/drive/hill-219833",
+  "candidate_reasons": [
+    "confirmed forward polyline; observed branch rules evaluated"
+  ]
+}

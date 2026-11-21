@@ -1,0 +1,140 @@
+[
+  {
+    "scenario": "straight",
+    "imu_odom_yaw_max_difference": 2.484275917110324e-05,
+    "observed_error_m": [
+      6.577624039615573e-05,
+      0.011775693643805816,
+      0.027755366965497387
+    ],
+    "memory_error_m": [
+      0.0037679519972326075,
+      0.012187422875298675,
+      0.03312977714535759
+    ],
+    "memory_peak_points": 219,
+    "memory_end_points": 206,
+    "memory_peak_segments": 32,
+    "normal_spread_max_m": 7.46403184220937e-06,
+    "unknown_points": 0,
+    "localization_max_error": [
+      0.0,
+      4.587589354224667e-05
+    ],
+    "snapshot_max_error": [
+      0.0,
+      0.0
+    ],
+    "displacement_m": 0.6979679929370949,
+    "observed_samples": 64,
+    "memory_samples": 64,
+    "path_samples": 64,
+    "memory_source_points": 1025,
+    "spawn_world": [
+      0.6900000095367431,
+      2.309999942779541,
+      0.01,
+      0.0
+    ],
+    "odom_to_world": [
+      0.6900000095371279,
+      2.309999942779541,
+      -9.628323494716435e-14
+    ],
+    "blind_memory_range_m": [
+      0.0008158726434013878,
+      0.24723964647933291
+    ]
+  },
+  {
+    "scenario": "corner",
+    "imu_odom_yaw_max_difference": 1.8263291329700948e-05,
+    "observed_error_m": [
+      0.00919994793891421,
+      0.017825363190274834,
+      0.024115100038717863
+    ],
+    "memory_error_m": [
+      0.0098591216472661,
+      0.01643410575140747,
+      0.029657594042977742
+    ],
+    "memory_peak_points": 200,
+    "memory_end_points": 198,
+    "memory_peak_segments": 7,
+    "normal_spread_max_m": 0.0,
+    "unknown_points": 0,
+    "localization_max_error": [
+      0.0,
+      0.0001048713911220163
+    ],
+    "snapshot_max_error": [
+      0.0012000000000019218,
+      6.838809231455294e-06
+    ],
+    "displacement_m": 0.3888000000001585,
+    "observed_samples": 42,
+    "memory_samples": 42,
+    "path_samples": 42,
+    "memory_source_points": 897,
+    "spawn_world": [
+      0.9900000095367432,
+      1.049999976158142,
+      0.01,
+      1.5707963267948966
+    ],
+    "odom_to_world": [
+      0.9900000095367432,
+      1.049999976158361,
+      1.5707963267962932
+    ],
+    "corner_memory_error_m": 0.002343572444764893,
+    "corner_forward_m": 0.21119999999995054,
+    "outgoing_memory": true,
+    "corner_angle_deg": 86.6780551625863
+  },
+  {
+    "scenario": "rotate",
+    "imu_odom_yaw_max_difference": 0.008264654700245493,
+    "observed_error_m": [
+      0.003508633264124335,
+      0.01299164499785828,
+      0.0290882203645126
+    ],
+    "memory_error_m": [
+      0.005037026400321665,
+      0.012001688746628325,
+      0.02710874221937587
+    ],
+    "memory_peak_points": 327,
+    "memory_end_points": 327,
+    "memory_peak_segments": 32,
+    "normal_spread_max_m": 0.002166457391998426,
+    "unknown_points": 0,
+    "localization_max_error": [
+      0.0,
+      0.0002904542409596367
+    ],
+    "snapshot_max_error": [
+      4.145988428332696e-15,
+      0.001999385024694912
+    ],
+    "displacement_m": 3.3657926512081282e-12,
+    "observed_samples": 119,
+    "memory_samples": 118,
+    "path_samples": 105,
+    "memory_source_points": 6023,
+    "spawn_world": [
+      0.9900000095367432,
+      2.309999942779541,
+      0.01,
+      0.0
+    ],
+    "odom_to_world": [
+      0.9900000095370358,
+      2.309999942779541,
+      -1.5691269055113806e-13
+    ],
+    "rotation_peak_rad": 0.5011999999819472
+  }
+]

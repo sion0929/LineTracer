@@ -1,0 +1,13 @@
+# Development-only mission command (gcs_command -> mission_manager). Not used by the competition profile.
+uint8 START=0
+uint8 KILL=1   # software stop request only; NOT a physical E-STOP
+
+string request_id
+string run_id
+uint8 command
+builtin_interfaces/Time sent_stamp
+---
+bool accepted
+string reason
+uint8 state
+string run_id

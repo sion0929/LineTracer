@@ -1,0 +1,68 @@
+# competition profile parameters. Every number here is a PLACEHOLDER until measured (design §14.2-14.3).
+# startup_delay_sec is set by nodes.launch.py (default 20.0, R-04).
+
+mission_manager:
+  ros__parameters:
+    check_timeout_sec: 30.0
+    auto_start: true
+    gcs_snapshot_enabled: false
+    sensor_timeout_sec: 1.0
+    stop_speed_epsilon: 0.01
+    min_travel_before_finish: 1.0
+    publish_rate_hz: 10.0
+
+line_detector:
+  ros__parameters:
+    backend: opencv_baseline      # opencv_baseline | fast_scnn (falls back if unavailable)
+    fast_scnn_model_path: ""
+    base_frame: base_footprint
+    # Camera geometry from the official PDF p.4 (matches model.sdf). base_footprint = ground under the axle.
+    camera_x_offset: 0.076        # [m] ahead of the axle
+    camera_height: 0.103          # [m] above ground
+    camera_hfov_deg: 62.2
+    image_width: 640
+    image_height: 480
+    projection_range_max: 1.2     # forward x [m], measured D-05 flat-ground ROI
+    projection_grid_resolution: 0.004
+    projection_slope_limit_rad: 0.0349066  # 2 deg: flat settled pitch ~0.33 deg; hill entry ~2.7 deg
+
+path_planner:
+  ros__parameters:
+    base_frame: base_footprint
+    odom_frame: odom
+    lookahead: 0.12
+    max_speed: 0.1
+    min_observed_length: 0.1
+    path_validity_sec: 0.3
+    observation_timeout_sec: 0.5
+    odom_timeout_sec: 0.5
+    imu_yaw_enabled: true  # D-07: gyro increments improve measured heading/map spread; no EKF.
+    memory_retention_sec: 30.0  # slow blind-curve approach; .06 m uncertainty gate remains authoritative
+    memory_max_points: 1200
+    memory_max_segments: 32
+    memory_speed_limit: 0.06
+    use_mlp: false
+    mlp_model_path: ""
+
+motion_controller:
+  ros__parameters:
+    max_linear: 0.1
+    max_angular: 1.5
+    rotate_kp: 1.5
+    rotate_ki: 0.0
+    rotate_kd: 0.05
+    candidate_validity_sec: 0.2
+    path_timeout_sec: 0.5
+
+safety_guard:
+  ros__parameters:
+    control_rate_hz: 50.0
+    max_linear: 0.2
+    max_angular: 1.5
+    max_linear_accel: 0.5
+    max_angular_accel: 3.0
+    mission_timeout_sec: 0.5
+    candidate_timeout_sec: 0.2
+    path_status_timeout_sec: 0.5
+    perception_timeout_sec: 0.5
+    odom_timeout_sec: 0.5

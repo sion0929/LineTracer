@@ -1,0 +1,31 @@
+[
+  {
+    "run": "finish",
+    "pass": false,
+    "finished": false,
+    "progress_m": 15.665809287070315,
+    "progress_percent": 99.7911587640226,
+    "wall_sec": 67.39634433411993,
+    "stop_true_pose": [
+      0.36702063037037724,
+      2.974836116203782,
+      3.0621066463769715
+    ],
+    "bar_signed_distance_m": -0.03702061725735539,
+    "bar_lateral_m": 0.004836087593552474,
+    "false_finish": false,
+    "finished_holds": false,
+    "zero_command_and_stopped": false,
+    "reason": "stalled: bounded rotation recovery exhausted; no line reacquired (image line lost/ambiguous or image tracking budget exhausted)",
+    "bag": "/ws/bags/d10/finish-232783",
+    "events": [
+      {
+        "wall_sec": 0.08413283992558718,
+        "state": 3,
+        "reason": "start requested"
+      }
+    ],
+    "lateral_p95_m": 0.01214260639810698,
+    "lateral_max_m": 0.01721308359358309
+  }
+]

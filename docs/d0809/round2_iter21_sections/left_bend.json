@@ -1,0 +1,149 @@
+{
+  "run": "left_bend",
+  "pass": true,
+  "full": false,
+  "progress_m": 7.75392541384981,
+  "progress_percent": 49.39248192281424,
+  "goal_m": 7.75,
+  "track_length_m": 15.698594425700026,
+  "stop_true_pose": [
+    0.32958897771355833,
+    1.6128984123946306,
+    1.554834083110572
+  ],
+  "wall_sec": 25.233877260936424,
+  "lateral_p95_m": 0.01539759646439282,
+  "lateral_max_m": 0.01677490137667046,
+  "reason": "section traversed",
+  "events": [
+    {
+      "stamp": 0.308,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 2.516,
+      "mode": 5,
+      "reason": "local memory reset"
+    },
+    {
+      "stamp": 2.56,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 3.708,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 5.692,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 6.62,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 6.712,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 7.308,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained"
+    },
+    {
+      "stamp": 7.408,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 10.212,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 10.44,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 10.504,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 13.88,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 13.908,
+      "mode": 1,
+      "reason": "trusted memory; projection or near line lost"
+    },
+    {
+      "stamp": 14.104,
+      "mode": 3,
+      "reason": "trusted memory; projection or near line lost; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 16.808,
+      "mode": 2,
+      "reason": "re-observation mismatch; memory retained; verified distance/uncertainty requires slowdown"
+    },
+    {
+      "stamp": 17.268,
+      "mode": 5,
+      "reason": "image line lost/ambiguous or image tracking budget exhausted"
+    },
+    {
+      "stamp": 17.304,
+      "mode": 2,
+      "reason": "verified image steering while metric memory is re-evaluated: unresolved re-observation mismatch"
+    },
+    {
+      "stamp": 20.872,
+      "mode": 0,
+      "reason": "consistent re-observation verified"
+    },
+    {
+      "stamp": 21.2,
+      "mode": 3,
+      "reason": "trusted current observation; verified distance/uncertainty requires slowdown; retained selected connected route through graph fragmentation"
+    },
+    {
+      "stamp": 23.904,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 28.316,
+      "mode": 5,
+      "reason": "mission memory reset"
+    },
+    {
+      "stamp": 28.328,
+      "mode": 0,
+      "reason": "trusted current observation"
+    },
+    {
+      "stamp": 28.416,
+      "mode": 5,
+      "reason": "mission memory reset"
+    },
+    {
+      "stamp": 28.428,
+      "mode": 0,
+      "reason": "trusted current observation"
+    }
+  ],
+  "bag": "/ws/bags/drive/left_bend-208527",
+  "candidate_reasons": [
+    "confirmed forward polyline; observed branch rules evaluated"
+  ]
+}
