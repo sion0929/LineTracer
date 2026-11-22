@@ -41,6 +41,39 @@ jobs:
             src/line_follower_tests/test/test_static_policy.py \
             src/line_follower_tests/test/test_asset_integrity.py
 
+  deps:
+    name: dependency check (rosdep keys + package boundaries)
+    runs-on: ubuntu-24.04
+    container:
+      image: ros:jazzy
+    defaults:
+      run:
+        shell: bash
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Install git (required for checkout inside the container)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Package boundaries (competition set must not depend on dev-only packages)
+        run: python3 .github/scripts/check_deps.py
+      - name: Every rosdep key declared in package.xml resolves on ros:jazzy
+        run: |
+          if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then rosdep init; fi
+          rosdep update --rosdistro jazzy
+          missing=0
+          for key in $(rosdep keys --from-paths src tools/gcs --ignore-src); do
+            if rosdep resolve "$key" --rosdistro jazzy > /dev/null 2>&1; then
+              echo "ok      $key"
+            else
+              echo "MISSING $key"; missing=1
+            fi
+          done
+          exit $missing
+
   build-test:
     name: build-test (ros:jazzy)
     runs-on: ubuntu-24.04
@@ -97,19 +130,13 @@ jobs:
           if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then rosdep init; fi
           rosdep update
 
+      # Only rosdep-installed dependencies are present below (no manual apt fallback),
+      # so a missing <depend> in any package.xml makes the build fail here.
       - name: rosdep install (src + tools/gcs)
         run: |
           apt-get update
           rosdep install --from-paths src tools/gcs --ignore-src -y --rosdistro jazzy
 
-      - name: Install packages rosdep could not resolve on this base image
-        # ros-jazzy-ros-gz: ros_gz_sim / ros_gz_bridge / ros_gz_image are sometimes split
-        # out of the base rosdep keys on a minimal image; python3-pyqt5 and libopencv-dev
-        # are plain apt packages referenced directly as rosdep keys in package.xml. These
-        # installs are idempotent no-ops if rosdep already pulled them in above.
-        run: |
-          apt-get install -y --no-install-recommends \
-            ros-jazzy-ros-gz python3-pyqt5 libopencv-dev ros-jazzy-rosbag2-storage-mcap
 
       - name: colcon build (all packages, including tools/gcs)
         run: |
@@ -185,10 +212,6 @@ jobs:
           rosdep install --from-paths src --ignore-src -y --rosdistro jazzy \
             --skip-keys line_follower_gcs
 
-      - name: Install packages rosdep could not resolve on this base image
-        run: |
-          apt-get install -y --no-install-recommends \
-            ros-jazzy-ros-gz libopencv-dev
 
       - name: colcon build --packages-up-to line_follower_bringup (Release, BUILD_TESTING=OFF)
         run: |
