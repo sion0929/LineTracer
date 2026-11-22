@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -57,7 +57,7 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends git ca-certificates
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Package boundaries (competition set must not depend on dev-only packages)
         run: python3 .github/scripts/check_deps.py
       - name: Every rosdep key declared in package.xml resolves on ros:jazzy
@@ -99,7 +99,7 @@ jobs:
           apt-get install -y --no-install-recommends git ca-certificates
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Cache apt archives
         uses: actions/cache@v4
@@ -181,7 +181,7 @@ jobs:
           apt-get install -y --no-install-recommends git ca-certificates
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Cache apt archives
         uses: actions/cache@v4
