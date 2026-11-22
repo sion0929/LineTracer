@@ -102,7 +102,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache apt archives
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /var/cache/apt/archives
           key: apt-jazzy-${{ runner.os }}-${{ hashFiles('src/**/package.xml', 'tools/gcs/package.xml') }}
@@ -110,7 +110,7 @@ jobs:
             apt-jazzy-${{ runner.os }}-
 
       - name: Cache rosdep database
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.ros/rosdep
           key: rosdep-jazzy-${{ hashFiles('src/**/package.xml', 'tools/gcs/package.xml') }}
@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache apt archives
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /var/cache/apt/archives
           key: apt-jazzy-comp-${{ runner.os }}-${{ hashFiles('src/**/package.xml') }}
