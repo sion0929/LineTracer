@@ -28,12 +28,16 @@ HERE = Path(__file__).resolve().parent
 BRINGUP = HERE.parent / "src/line_follower_bringup"
 OFF_SECONDS = 0.6
 FINISH_TOLERANCE = 0.12
+# Waffle Pi wheels: centres at y=±0.1435 (separation 0.287), width 0.018; line half-width 0.010.
+WHEEL_OFFSET = 0.1435
+WHEEL_ON_LINE = 0.010 + 0.009
 MAX_JOBS = 16
 BENCH_DOMAINS = range(30, 102)
 COLUMNS = (
     "name", "map", "profile", "backend", "complete", "progress_m", "progress_pct", "lap_sec",
     "sim_sec", "wall_sec", "lat_p95", "lat_mean", "lat_max", "collision_count",
-    "avoidance_attempts", "avoided_count", "slip_count", "odom_windows", "reason",
+    "avoidance_attempts", "avoided_count", "slip_count", "odom_windows",
+    "wheel_line_events", "wheel_line_sec", "reason",
     "domain", "partition",
 )
 
@@ -168,6 +172,20 @@ class Score:
         self.avoidance = {}
         self.history = []
         self.complete = False
+        self.wheel_events, self.wheel_sec = 0, 0.0
+        self._wheel_on, self._wheel_t = False, None
+
+    def wheels(self, now, x, y, heading):
+        """Count a wheel touching the centreline (rising edges) and the time spent touching."""
+        normal = np.array([-np.sin(heading), np.cos(heading)])
+        centre = np.array([x, y])
+        on = any(self.track.project(centre + side * WHEEL_OFFSET * normal)[1] < WHEEL_ON_LINE
+                 for side in (1.0, -1.0))
+        if on and self._wheel_on and self._wheel_t is not None:
+            self.wheel_sec += now - self._wheel_t
+        if on and not self._wheel_on:
+            self.wheel_events += 1
+        self._wheel_on, self._wheel_t = on, now
 
     def observe(self, now, xy):
         candidate, error = self.track.project(xy, self.progress)
@@ -409,6 +427,7 @@ def evaluate(job_path):
                         wheel = min(tuple(odom), key=lambda sample: abs(sample[0] - cursor), default=None)
                         slip.observe(current, wheel)
                         reason = score.observe(cursor - origin, current[1:3])
+                        score.wheels(cursor - origin, current[1], current[2], current[4])
                         if reason:
                             break
                     # Keep the contact subscriber alive while Gazebo flushes notifications for the last tick.
@@ -429,6 +448,7 @@ def evaluate(job_path):
                         avoided_count=sum(passed and name not in contacts
                                           for name, passed in score.avoidance.items()),
                         slip_count=len(slip.events), slip_events=slip.events, odom_windows=slip.windows,
+                        wheel_line_events=score.wheel_events, wheel_line_sec=round(score.wheel_sec, 3),
                     )
         finally:
             rclpy.shutdown()
