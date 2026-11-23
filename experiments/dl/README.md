@@ -9,13 +9,12 @@ TurtleBot3 전방 카메라의 BGR 프레임에서 라인과 상자의 이진 �
 ```bash
 export LAB_NAME=lf_b ROS_DOMAIN_ID=12 GZ_PARTITION=lf_b
 sg docker -c 'tools/lab_env.sh build'
-bash experiments/dl/collect_dataset.sh \
-  /home/rvlab/orca/workspaces/26_robotprogramming_project/c-bench/experiments/worlds/gen_world.py
+bash experiments/dl/collect_dataset.sh
 ```
 
 데이터 경로는 `experiments/dl/runs/dataset-v1`이다. 맵마다 `image/`, `mask/` 아래에 640×480 PNG가 쌓인다. 마스크 값은 배경 0, 선 1, 장애물 2다. `frames.jsonl`에는 실제 카메라 프레임 시각과 Gazebo 자세, 표본의 횡편차·각도, 클래스별 픽셀 수가 담긴다. `summary.json`은 수집이 끝난 맵에만 작성된다. 재실행하면 완료한 맵을 건너뛴다.
 
-Codex-3의 버전 1 SDF/JSON/STL 묶음을 사용한다. 중심선을 따라 위치를 뽑고, 횡방향 ±0.1 m와 진행 방향 ±40° 범위에서 자세를 바꾼다. 상자 앞쪽도 추가로 샘플링한다. 라인 STL과 지면·상자 기하를 실제 로봇 자세로 투영하고 깊이 순서로 가림을 처리한다. 공식 트랙은 시험에만 포함한다.
+워크트리에 병합된 `experiments/worlds/gen_world.py`가 생성한 버전 1 SDF/JSON/STL 묶음을 사용한다. 중심선을 따라 위치를 뽑고, 횡방향 ±0.1 m와 진행 방향 ±40° 범위에서 자세를 바꾼다. 상자 앞쪽도 추가로 샘플링한다. 라인 STL과 지면·상자 기하를 실제 로봇 자세로 투영하고 깊이 순서로 가림을 처리한다. 공식 트랙은 시험에만 포함한다.
 
 | 용도 | 맵 시드 | 목표 프레임 |
 | --- | --- | ---: |

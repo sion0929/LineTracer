@@ -24,3 +24,8 @@
 - 공식 180장의 장애물 오검출이 15장 → 8장, 한 프레임의 최대 오검출이 28,465 → 9,601픽셀로 감소했다. 공식 라인 IoU는 0.8242 → 0.8356.
 - 랜덤 합계 라인 IoU는 0.8573 → 0.8671, 장애물 IoU는 0.9629 → 0.9550. Hard 303 장애물 IoU는 0.9375 → 0.9248. 후보 처리량은 CPU 187.3 FPS, GPU 238.7 FPS.
 - 어려운 맵의 장애물 IoU를 기준으로 기본 ONNX는 기존 모델을 유지했다. 개선 후보의 ONNX는 이 워크트리의 `experiments/dl/runs/shadow-study/shadow/line_seg.onnx`에 있다. 수치 원본과 같은 프레임 비교 이미지는 `experiments/dl/results/shadow-study/`에 기록했다. 시험 세트 재평가이므로 새 맵과 추종기에서의 검증은 남아 있다.
+
+## 2026-11-23 22:33 KST · 공용 생성기 병합
+
+- 리드가 검증한 생성기 병합 `90a4c59`를 포함하는 `dev/two-track`을 `track/b-dlseg`에 병합했다(`585203a`). 수집 스크립트와 안내가 현재 워크트리의 `experiments/worlds/gen_world.py`를 사용한다.
+- 수집 스크립트로 랜덤 맵 9개를 다시 생성했다. SDF·STL·JSON 27개 SHA256이 `experiments/dl/results/dataset.json`의 기록과 모두 일치했다. 기존 이미지·마스크는 수집 완료 기록을 사용했다. 막힌 점 없음.
