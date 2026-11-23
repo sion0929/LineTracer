@@ -1,0 +1,329 @@
+{
+  "frames": 2820,
+  "world_generator_commit": "532e0c8",
+  "resolution_wh": [
+    640,
+    480
+  ],
+  "maps": [
+    {
+      "split": "train",
+      "relative_directory": "train/easy_101",
+      "map": "easy_101",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/easy_101.sdf",
+      "capture_seed": 1101,
+      "map_seed": 101,
+      "difficulty": "easy",
+      "frames": 420,
+      "class_pixels": [
+        122664343,
+        1639170,
+        4720487
+      ],
+      "line_frames": 357,
+      "obstacle_frames": 176,
+      "sample_offset_range_m": [
+        -0.09944247287237105,
+        0.09980913812451417
+      ],
+      "sample_angle_range_deg": [
+        -39.853122255040354,
+        39.700671892843246
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008302630926349384,
+        0.04229737836563224
+      ]
+    },
+    {
+      "split": "train",
+      "relative_directory": "train/hard_103",
+      "map": "hard_103",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/hard_103.sdf",
+      "capture_seed": 1103,
+      "map_seed": 103,
+      "difficulty": "hard",
+      "frames": 420,
+      "class_pixels": [
+        122869960,
+        1964784,
+        4189256
+      ],
+      "line_frames": 358,
+      "obstacle_frames": 212,
+      "sample_offset_range_m": [
+        -0.0997354817711549,
+        0.09936685786475286
+      ],
+      "sample_angle_range_deg": [
+        -39.48757213179423,
+        39.802408654537345
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008370543207560468,
+        0.07926078128629503
+      ]
+    },
+    {
+      "split": "train",
+      "relative_directory": "train/hard_105",
+      "map": "hard_105",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/hard_105.sdf",
+      "capture_seed": 1105,
+      "map_seed": 105,
+      "difficulty": "hard",
+      "frames": 420,
+      "class_pixels": [
+        121526139,
+        1996436,
+        5501425
+      ],
+      "line_frames": 354,
+      "obstacle_frames": 225,
+      "sample_offset_range_m": [
+        -0.09891895293000974,
+        0.09974403260739909
+      ],
+      "sample_angle_range_deg": [
+        -39.90516944578259,
+        39.24775036407519
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008775541847313263,
+        0.08251769914000835
+      ]
+    },
+    {
+      "split": "train",
+      "relative_directory": "train/normal_102",
+      "map": "normal_102",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_102.sdf",
+      "capture_seed": 1102,
+      "map_seed": 102,
+      "difficulty": "normal",
+      "frames": 420,
+      "class_pixels": [
+        122302560,
+        1588368,
+        5133072
+      ],
+      "line_frames": 368,
+      "obstacle_frames": 274,
+      "sample_offset_range_m": [
+        -0.09982222010791358,
+        0.0987618818392017
+      ],
+      "sample_angle_range_deg": [
+        -39.943660361122674,
+        39.83670069095447
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008306446668861484,
+        0.05993921150553071
+      ]
+    },
+    {
+      "split": "train",
+      "relative_directory": "train/normal_104",
+      "map": "normal_104",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_104.sdf",
+      "capture_seed": 1104,
+      "map_seed": 104,
+      "difficulty": "normal",
+      "frames": 420,
+      "class_pixels": [
+        122355451,
+        1569616,
+        5098933
+      ],
+      "line_frames": 359,
+      "obstacle_frames": 160,
+      "sample_offset_range_m": [
+        -0.09986050293851585,
+        0.09928587510921144
+      ],
+      "sample_angle_range_deg": [
+        -39.56329570552275,
+        39.69169630008692
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008958066914426185,
+        0.06824201330710035
+      ]
+    },
+    {
+      "split": "val",
+      "relative_directory": "val/normal_201",
+      "map": "normal_201",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_201.sdf",
+      "capture_seed": 1201,
+      "map_seed": 201,
+      "difficulty": "normal",
+      "frames": 180,
+      "class_pixels": [
+        52656763,
+        657803,
+        1981434
+      ],
+      "line_frames": 148,
+      "obstacle_frames": 67,
+      "sample_offset_range_m": [
+        -0.09904816169705302,
+        0.09920252103454444
+      ],
+      "sample_angle_range_deg": [
+        -39.69960230397839,
+        38.992990878845916
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008712303791256995,
+        0.06333343026809435
+      ]
+    },
+    {
+      "split": "test",
+      "relative_directory": "test/easy_301",
+      "map": "easy_301",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/easy_301.sdf",
+      "capture_seed": 1301,
+      "map_seed": 301,
+      "difficulty": "easy",
+      "frames": 120,
+      "class_pixels": [
+        35447221,
+        454354,
+        962425
+      ],
+      "line_frames": 100,
+      "obstacle_frames": 43,
+      "sample_offset_range_m": [
+        -0.09942776801881847,
+        0.09938626291658145
+      ],
+      "sample_angle_range_deg": [
+        -39.41459442181834,
+        39.94409301370281
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008708076276569323,
+        0.04399894275082948
+      ]
+    },
+    {
+      "split": "test",
+      "relative_directory": "test/hard_303",
+      "map": "hard_303",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/hard_303.sdf",
+      "capture_seed": 1303,
+      "map_seed": 303,
+      "difficulty": "hard",
+      "frames": 120,
+      "class_pixels": [
+        34687554,
+        607009,
+        1569437
+      ],
+      "line_frames": 104,
+      "obstacle_frames": 72,
+      "sample_offset_range_m": [
+        -0.09816565977983294,
+        0.09979607140080055
+      ],
+      "sample_angle_range_deg": [
+        -39.99198663182636,
+        39.234775599752595
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.00895896918317889,
+        0.00903998533228064
+      ]
+    },
+    {
+      "split": "test",
+      "relative_directory": "test/normal_302",
+      "map": "normal_302",
+      "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_302.sdf",
+      "capture_seed": 1302,
+      "map_seed": 302,
+      "difficulty": "normal",
+      "frames": 120,
+      "class_pixels": [
+        34966837,
+        529891,
+        1367272
+      ],
+      "line_frames": 108,
+      "obstacle_frames": 43,
+      "sample_offset_range_m": [
+        -0.09850458794636029,
+        0.09599697989097336
+      ],
+      "sample_angle_range_deg": [
+        -36.20060075177421,
+        39.38427196111515
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.008979037322324824,
+        0.019894009386626325
+      ]
+    },
+    {
+      "split": "test",
+      "relative_directory": "test/official",
+      "map": "line_track",
+      "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+      "capture_seed": 1200,
+      "map_seed": null,
+      "difficulty": null,
+      "frames": 180,
+      "class_pixels": [
+        54537262,
+        758738,
+        0
+      ],
+      "line_frames": 152,
+      "obstacle_frames": 0,
+      "sample_offset_range_m": [
+        -0.09920975480410135,
+        0.09913697189895743
+      ],
+      "sample_angle_range_deg": [
+        -39.673937409278906,
+        38.89863813062159
+      ],
+      "gazebo_robot_origin_z_range_m": [
+        0.00881999871078423,
+        0.0692077303067764
+      ]
+    }
+  ],
+  "generated_world_files_sha256": {
+    "easy_101.json": "f5a3a1712e744a28c6cd7d8bf76552fa8a502f81d04217b4f7bd7604f124c774",
+    "easy_101.sdf": "911ea958ec843190fabb49688b6f6bdd7429900b3eaf43cf5b8583caf0b2f8e4",
+    "easy_101.stl": "f045b5b4efbf44f8c96a66136dfe9d0ec73fbbf928d57934baec996c4ac66904",
+    "easy_301.json": "1d3ea19003600cc627d5a036650fdd1c98f0b0d2bbb3e8927c9697955eda1c1e",
+    "easy_301.sdf": "936f6347e20c14d54753a71f8e924dc6ef9f3eb853cb9866209d65fc1b3a5ae1",
+    "easy_301.stl": "07b0c2284b290ae8f6bfd9e375d30a34989ecc3fd556c7a8b9d01c48d945af45",
+    "hard_103.json": "12c124f42894d3eb2ef7083a63a4614359e08f04750c74853c54121fbf7bff79",
+    "hard_103.sdf": "0db32b3e7da280b12e66418979f18450838d845e19d118f0d409a5c1fb8c4d72",
+    "hard_103.stl": "6688d260fccbc35b8aa6b69dbe33c9cfeecc52690060251b5e13ecf37719f230",
+    "hard_105.json": "b1df0888722a6d9bb8a3fb179dfcf0b42746710b1eb98cdce50bd41486442376",
+    "hard_105.sdf": "e1edb7f8a7a7305472cc55b2fe49a1729134c0a30fa75ea807d90e65997e1587",
+    "hard_105.stl": "e8a0a3aa281aac6404462e858ef6ec29467c73e8ae88d505645cda51ba79b4cb",
+    "hard_303.json": "d6ff440b4b83f514c1c39f3c7afd675dde3a8a2f3fcc9b549e7e8e9a005f82cf",
+    "hard_303.sdf": "639ac2c55a3e5629f96de2f1ff196d11998f74411b0b65fa6a6094cb09fa4268",
+    "hard_303.stl": "fc23b1852053fa465f203a580d6bf68bd01e2e12789485c7cd46b9cad0b59fe7",
+    "normal_102.json": "22428f0e25ab3784e6462f32cedc290687be920986d1a48c9e51e80aa6739bb7",
+    "normal_102.sdf": "bb1c1d50dd2c01c66638ef0b20af3a9b3532a9f9155e23590ef365d6b3e7b99d",
+    "normal_102.stl": "cf7302bb9b6dc89063a59ebd9c31803f1c3231763a813993974bf154a58486c0",
+    "normal_104.json": "5e98d7909068dc1640013dfd232040a579624cec762ac7e057183f7e01c0baf9",
+    "normal_104.sdf": "f4bb13937ce028b34b1a35479fb7844b435fbf6e6307f8e9b0e7e8d594c0e2a9",
+    "normal_104.stl": "3da1930a4c0fd4925423de987a4ca4708479b4568a8a5a20e1bbca7f52f817ea",
+    "normal_201.json": "65835e90bdf2b44ecafa0946dbf83943a067cd261126118ffb61ee829422d522",
+    "normal_201.sdf": "abc86be14162e1be0a901300327a7f0ad2705b2010762f6480da9ffd1b40c35a",
+    "normal_201.stl": "7f23adf8faaa2c50dbd40ca0b2216f0f0540dceee06ac8b8a1a87bcb6ee9cf13",
+    "normal_302.json": "c40b9ec4f557318073b94cf931ffa3998c7313f5d361467bc4ceb955b7736b68",
+    "normal_302.sdf": "591abd27ed39b2053674ac596713de2ddca8c8f63d65d731a4527c0a9b042185",
+    "normal_302.stl": "3338282c92f023a8351490eb8913d925149522165688739e1131e0ce157ad0e6"
+  }
+}
