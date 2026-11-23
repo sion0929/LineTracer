@@ -1,0 +1,32 @@
+{
+  "name": "01_01",
+  "map": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "profile": "reactive",
+  "args": [
+    "--reactive-recovery",
+    "--ld-min",
+    "0.05",
+    "--ld-gain",
+    "0.2",
+    "--alat",
+    "0.10",
+    "--vmax",
+    "0.10",
+    "--wmax",
+    "0.8",
+    "--waccel",
+    "1.6",
+    "--accel",
+    "0.30",
+    "--decel-cmd",
+    "0.40"
+  ],
+  "limit": 320.0,
+  "stall": 20,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/tmp_lead/follower_364e419.py",
+  "backend": "run_eval",
+  "domain": 30,
+  "partition": "lf_lead_t_b0c330d21908_001"
+}
