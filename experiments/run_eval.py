@@ -21,13 +21,14 @@ def main():
     p.add_argument('--limit', type=float, default=300)
     p.add_argument('--stall', type=float, default=20)
     p.add_argument('--off', type=float, default=0.08)
-    p.add_argument('--domain', type=int, default=61)
+    p.add_argument('--domain', type=int, default=os.environ.get('ROS_DOMAIN_ID', '61'))
     p.add_argument('--plot', action='store_true')
     a, follower_args = p.parse_known_args()
     if follower_args and follower_args[0] == '--':
         follower_args = follower_args[1:]
     out = HERE / 'results'; out.mkdir(exist_ok=True)
-    env = dict(os.environ, ROS_DOMAIN_ID=str(a.domain), GZ_PARTITION=f'eval_{os.getpid()}')
+    env = dict(os.environ, ROS_DOMAIN_ID=str(a.domain),
+               GZ_PARTITION=os.environ.get('GZ_PARTITION') or f'eval_{os.getpid()}')
     os.environ.update(env)
     log = open(out / f'{a.name}.log', 'w')
     sim = subprocess.Popen(['ros2', 'launch', 'line_follower_bringup', 'sim.launch.py', 'headless:=true'],
