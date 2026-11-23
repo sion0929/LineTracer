@@ -1,0 +1,23 @@
+# G2 holdout. Paths are relative to the repository root.
+# The basename is <difficulty>_<seed>_obs<count>.sdf.
+# World generator revision: 532e0c8
+experiments/worlds/generated/g2/easy_20_obs1.sdf
+experiments/worlds/generated/g2/easy_21_obs2.sdf
+experiments/worlds/generated/g2/easy_22_obs3.sdf
+experiments/worlds/generated/g2/easy_23_obs1.sdf
+experiments/worlds/generated/g2/easy_24_obs2.sdf
+experiments/worlds/generated/g2/easy_25_obs3.sdf
+experiments/worlds/generated/g2/normal_26_obs1.sdf
+experiments/worlds/generated/g2/normal_27_obs2.sdf
+experiments/worlds/generated/g2/normal_28_obs3.sdf
+experiments/worlds/generated/g2/normal_29_obs1.sdf
+experiments/worlds/generated/g2/normal_30_obs2.sdf
+experiments/worlds/generated/g2/normal_31_obs3.sdf
+experiments/worlds/generated/g2/normal_32_obs1.sdf
+experiments/worlds/generated/g2/hard_33_obs2.sdf
+experiments/worlds/generated/g2/hard_34_obs3.sdf
+experiments/worlds/generated/g2/hard_35_obs1.sdf
+experiments/worlds/generated/g2/hard_36_obs2.sdf
+experiments/worlds/generated/g2/hard_37_obs3.sdf
+experiments/worlds/generated/g2/hard_38_obs1.sdf
+experiments/worlds/generated/g2/hard_39_obs2.sdf

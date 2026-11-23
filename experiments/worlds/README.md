@@ -40,3 +40,28 @@ TurtleBot3는 월드에 포함된다. Gazebo 월드 이름은 기존 캡처 도�
 - `markings`는 출발·도착 T자 가로선과 보조 루프를 나타내는 폴리라인이다. 카메라의 라인 마스크를 생성할 때는 이 배열과 `centerline`을 함께 투영한다.
 - `start_pose` 및 각 상자의 `pose`는 `[x, y, z, roll, pitch, yaw]` 순서다. 단위는 m와 rad다. 상자 좌표는 중심점이며 `size`는 상자 자체 좌표계에서의 XYZ 크기다. `on_line`은 상자 중심의 중심선 배치 여부다.
 - `ramp.x`는 오르막 시작, 평탄부 시작·끝, 내리막 끝의 X 좌표다. `ramp.y`는 경사 표면의 Y 범위, `ramp.height_m`은 최대 높이다.
+
+## G2 상자 장애물 평가 세트
+
+[eval_set_G2.txt](eval_set_G2.txt)는 시드 20–39의 고정 평가 맵 20개를 실행 순서대로 담는다. 파일명에 난이도, 시드, 상자 수가 들어 있다. 생성기 버전은 `532e0c8`이며 난이도는 easy 6개, normal 7개, hard 7개다. 각 맵에 상자 1–3개가 있으며 최소 한 상자가 중심선 위에 있다. G2 점수의 재현을 위해 평가 세트는 파라미터 탐색용 맵과 분리한다.
+
+저장소 루트에서 목록에 지정된 파일을 생성한다. 각 SDF 옆에 같은 이름의 STL과 JSON이 함께 저장된다.
+
+```bash
+while IFS= read -r map; do
+  case "$map" in ''|\#*) continue ;; esac
+  file=${map##*/}
+  IFS=_ read -r difficulty seed obstacles <<< "${file%.sdf}"
+  python3 experiments/worlds/gen_world.py --seed "$seed" --difficulty "$difficulty" \
+    --obstacles "${obstacles#obs}" --output "$map" || break
+done < experiments/worlds/eval_set_G2.txt
+```
+
+생성한 맵을 랩 컨테이너의 `/ws`에서 평가할 때는 아래처럼 목록 순서대로 전달한다. 장애물 인근의 우회와 복귀를 평가하는 백엔드는 `obstacle`이다.
+
+```bash
+mapfile -t g2_maps < <(sed '/^#/d; /^$/d' experiments/worlds/eval_set_G2.txt)
+LAB_NAME=lf_c ROS_DOMAIN_ID=13 GZ_PARTITION=lf_c \
+  python3 experiments/bench.py "${g2_maps[@]}" --backend obstacle --jobs 3 \
+    --output experiments/worlds/generated/g2_bench
+```
