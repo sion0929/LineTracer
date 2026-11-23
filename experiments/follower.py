@@ -79,11 +79,13 @@ class Follower(Node):
         self.gap_origin = None
         self.camera_line = None
         self.camera_tangent = None
+        self.camera_near_support = False
         self.fresh_cells = None
         self.recovery_turn = None
         self.recovery_yaw = None
         self.recovery_path = None
         self.recovery_axis = None
+        self.camera_advance = None
         self.motion_anchor = None
         self.reanchors = 0
         self.cmd = Twist()
@@ -199,7 +201,10 @@ class Follower(Node):
         li, lj = iy[ok & dark], ix[ok & dark]
         if self.a.reactive_recovery:
             self.fresh_cells = (gi, gj, li, lj)
-            self.camera_line, self.camera_tangent = self.visible_line(lx[dark], ly[dark])
+            line_x, line_y = lx[dark], ly[dark]
+            self.camera_line, self.camera_tangent = self.visible_line(line_x, line_y)
+            near_line = (line_x > 0.29) & (line_x < 0.35) & (np.abs(line_y) < 0.075)
+            self.camera_near_support = np.count_nonzero(near_line) >= 16
         sc = self.score
         sc[gi, gj] = np.maximum(sc[gi, gj] - self.a.miss, -self.a.clamp)
         sc[li, lj] = np.minimum(sc[li, lj] + self.a.hit, self.a.clamp)
@@ -265,6 +270,7 @@ class Follower(Node):
         if self.recovery_turn is None:
             self.recovery_turn = math.copysign(1.0, turn_hint or self.w_prev or 1.0)
             self.recovery_yaw = self.pose[2]
+            self.camera_advance = None
             if path is not None and math.dist(self.pose[:2], path[-1]) < 0.10:
                 heading = self.pose[2] + turn_hint
                 if len(path) >= 3:
@@ -275,10 +281,18 @@ class Follower(Node):
             self.reanchor_local_map()
         limit = min(self.a.wmax, 0.5)
         if self.recovery_path is not None and self.follow_recovery_path(limit):
+            self.camera_advance = None
             return
-        yaw_from_start = math.remainder(self.pose[2] - self.recovery_yaw, 2 * math.pi)
+        x, y, yaw = self.pose
+        yaw_from_start = math.remainder(yaw - self.recovery_yaw, 2 * math.pi)
         camera_angle = math.atan2(self.camera_line[1], self.camera_line[0]) if self.camera_line is not None else None
-        if camera_angle is None or abs(yaw_from_start + camera_angle) > 1.35:
+        exhausted = self.camera_advance is not None and math.dist((x, y), self.camera_advance[:2]) >= 0.075
+        # A distant line can still look centered after the local line turns out of view.
+        same_direction = exhausted and camera_angle is not None and abs(
+            math.remainder(yaw + camera_angle - self.camera_advance[2], 2 * math.pi)
+        ) < 0.42
+        sector = 1.60 if exhausted else 1.35
+        if camera_angle is None or same_direction or abs(yaw_from_start + camera_angle) > sector:
             if yaw_from_start * self.recovery_turn >= 1.10:
                 self.recovery_turn = -self.recovery_turn
             self.set_motion(0.0, self.recovery_turn * min(limit, 0.34))
@@ -289,7 +303,10 @@ class Follower(Node):
                 self.recovery_axis = None
                 self.recovery_path = approach
                 if self.follow_recovery_path(limit):
+                    self.camera_advance = None
                     return
+        if abs(camera_angle) < 0.25 and (self.camera_advance is None or exhausted or self.camera_near_support):
+            self.camera_advance = (x, y, yaw + camera_angle)
         self.steer_recovery(camera_angle, limit, 0.045, 0.25)
 
     def corner_approach(self):
@@ -311,6 +328,12 @@ class Follower(Node):
         start = origin + current * incoming
         return np.linspace(start, start + (distance - 0.025) * incoming,
                            math.ceil(distance / self.a.step))
+
+    def camera_continues(self):
+        """Check for a longitudinal line beyond a mapped terminal bar."""
+        return (self.camera_near_support and self.camera_line is not None
+                and abs(self.camera_line[1]) < 0.06 and self.camera_tangent is not None
+                and abs(self.camera_tangent[0]) > 0.85)
 
     def follow_recovery_path(self, limit):
         x, y, yaw = self.pose
@@ -531,6 +554,13 @@ class Follower(Node):
                     if len(retry) > min_steps:
                         pts, reason = retry, retry_reason
                         break
+        if (reason == 'tee' and self.a.reactive_recovery
+                and (len(pts) - 1) * self.a.step <= self.a.stop_dist
+                and math.dist((x, y), pts[-1]) < self.a.stop_dist
+                and self.camera_continues()):
+            self.recovery_path = None
+            self.react_to_camera()
+            return
         if len(pts) < 2:
             if reason == 'tee' and math.hypot(sp[0] - x, sp[1] - y) < self.a.stop_dist:
                 self.finished = True
