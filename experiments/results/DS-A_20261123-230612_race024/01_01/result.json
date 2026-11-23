@@ -1,0 +1,73 @@
+{
+  "name": "01_01",
+  "map": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "profile": "racing1",
+  "args": [
+    "--reactive-recovery",
+    "--racing-line",
+    "--racing-corridor",
+    "0.10",
+    "--ld-min",
+    "0.05",
+    "--ld-gain",
+    "0.2",
+    "--alat",
+    "0.18",
+    "--vmax",
+    "0.24",
+    "--wmax",
+    "0.8",
+    "--waccel",
+    "1.6",
+    "--accel",
+    "0.40",
+    "--decel-cmd",
+    "0.55",
+    "--dump",
+    "/ws/experiments/results/DS-A_20261123-230612_race024/drive1.npz"
+  ],
+  "complete": false,
+  "domain": 11,
+  "partition": "lf_a",
+  "backend": "obstacle",
+  "reason": "off line at 3.34 m",
+  "progress_m": 3.329,
+  "progress_pct": 21.21,
+  "lap_sec": null,
+  "sim_sec": 38.576,
+  "wall_sec": 38.579,
+  "lat_p95": 0.0882,
+  "lat_mean": 0.0399,
+  "lat_max": 0.1477,
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 3,
+  "slip_events": [
+    {
+      "start_sim_sec": 3.376,
+      "windows": 1,
+      "peak_linear_mps": 0.148,
+      "peak_angular_radps": 0.004,
+      "end_sim_sec": 3.676
+    },
+    {
+      "start_sim_sec": 4.876,
+      "windows": 1,
+      "peak_linear_mps": 0.102,
+      "peak_angular_radps": 0.015,
+      "end_sim_sec": 5.176
+    },
+    {
+      "start_sim_sec": 7.576,
+      "windows": 2,
+      "peak_linear_mps": 0.124,
+      "peak_angular_radps": 0.026,
+      "end_sim_sec": 8.176
+    }
+  ],
+  "odom_windows": 128,
+  "wheel_line_events": 3,
+  "wheel_line_sec": 2.82
+}
