@@ -84,6 +84,8 @@ class Follower(Node):
         self.fresh_cells = None
         self.recovery_turn = None
         self.recovery_yaw = None
+        self.recovery_progress = None
+        self.recovery_scan_turn = None
         self.recovery_path = None
         self.recovery_axis = None
         self.camera_advance = None
@@ -270,9 +272,13 @@ class Follower(Node):
         return False
 
     def react_to_camera(self, turn_hint=0.0, path=None):
+        x, y, yaw = self.pose
+        now = time.monotonic()
         if self.recovery_turn is None:
             self.recovery_turn = math.copysign(1.0, turn_hint or self.w_prev or 1.0)
-            self.recovery_yaw = self.pose[2]
+            self.recovery_yaw = yaw
+            self.recovery_progress = (x, y, now)
+            self.recovery_scan_turn = self.recovery_turn
             self.camera_advance = None
             if path is not None and math.dist(self.pose[:2], path[-1]) < 0.10:
                 heading = self.pose[2] + turn_hint
@@ -287,10 +293,13 @@ class Follower(Node):
                     self.trusted_path = None
             self.reanchor_local_map()
         limit = min(self.a.wmax, 0.5)
-        if self.recovery_path is not None and self.follow_recovery_path(limit):
+        if math.dist((x, y), self.recovery_progress[:2]) >= 0.035:
+            self.recovery_progress = (x, y, now)
+            self.recovery_scan_turn = self.recovery_turn
+        wide_scan = now - self.recovery_progress[2] >= 4.5
+        if not wide_scan and self.recovery_path is not None and self.follow_recovery_path(limit):
             self.camera_advance = None
             return
-        x, y, yaw = self.pose
         yaw_from_start = math.remainder(yaw - self.recovery_yaw, 2 * math.pi)
         camera_angle = math.atan2(self.camera_line[1], self.camera_line[0]) if self.camera_line is not None else None
         exhausted = self.camera_advance is not None and math.dist((x, y), self.camera_advance[:2]) >= 0.075
@@ -298,8 +307,26 @@ class Follower(Node):
         same_direction = exhausted and camera_angle is not None and abs(
             math.remainder(yaw + camera_angle - self.camera_advance[2], 2 * math.pi)
         ) < 0.42
-        sector = 1.60 if exhausted else 1.35
-        if camera_angle is None or same_direction or abs(yaw_from_start + camera_angle) > sector:
+        wide_sector = 2.10
+        sector = wide_sector if wide_scan else (1.60 if exhausted else 1.35)
+        bearing = None if camera_angle is None else yaw_from_start + camera_angle
+        search = bearing is None or same_direction or abs(bearing) > sector
+        if (not wide_scan and bearing is not None and not same_direction and sector < abs(bearing) < wide_sector
+                and self.camera_tangent is not None and abs(self.camera_tangent[0]) > 0.80):
+            self.recovery_scan_turn = math.copysign(1.0, bearing)
+        if wide_scan:
+            # Intermittent side views can reverse the ordinary sweep before it
+            # reaches a corner exit. Commit to one direction until the limit.
+            aligned = (camera_angle is not None and abs(camera_angle) < 0.15
+                       and self.camera_near_support and self.camera_tangent is not None
+                       and abs(self.camera_tangent[0]) > 0.80)
+            if search or not aligned:
+                if yaw_from_start * self.recovery_scan_turn >= 1.95:
+                    self.recovery_scan_turn = -self.recovery_scan_turn
+                self.set_motion(0.0, self.recovery_scan_turn * min(limit, 0.46))
+                return
+            self.recovery_path = None
+        elif search:
             if yaw_from_start * self.recovery_turn >= 1.10:
                 self.recovery_turn = -self.recovery_turn
             self.set_motion(0.0, self.recovery_turn * min(limit, 0.34))
