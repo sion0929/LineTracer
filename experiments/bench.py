@@ -24,6 +24,8 @@ import xml.etree.ElementTree as ET
 
 import numpy as np
 
+from telemetry import Telemetry
+
 HERE = Path(__file__).resolve().parent
 BRINGUP = HERE.parent / "src/line_follower_bringup"
 OFF_SECONDS = 0.6
@@ -37,7 +39,7 @@ COLUMNS = (
     "name", "map", "profile", "backend", "complete", "progress_m", "progress_pct", "lap_sec",
     "sim_sec", "wall_sec", "lat_p95", "lat_mean", "lat_max", "collision_count",
     "avoidance_attempts", "avoided_count", "slip_count", "odom_windows",
-    "wheel_line_events", "wheel_line_sec", "reason",
+    "wheel_line_events", "wheel_line_sec", "max_progress_m", "reason",
     "domain", "partition",
 )
 
@@ -248,7 +250,7 @@ def atomic_json(path, value):
     temp.replace(path)
 
 
-def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy):
+def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy, cmd=(None,)):
     """Run the original scorer with this worker's world and output directory."""
     import run_eval
 
@@ -256,6 +258,7 @@ def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy):
     name = "legacy"
     out = folder / "results"
     score, slip = Score(track, job), SlipMonitor()
+    tele = Telemetry(track, WHEEL_OFFSET, WHEEL_ON_LINE)
     stopping = threading.Event()
     faults = []
     follower = None
@@ -274,6 +277,8 @@ def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy):
                 slip.observe(current, wheel)
                 # Monitor detours observed during the run; run_eval owns termination.
                 score.observe(cursor - origin, current[1:3])
+                score.wheels(cursor - origin, current[1], current[2], current[4])
+                tele.add(cursor - origin, current[1], current[2], current[4], cmd[0])
         except Exception as error:
             faults.append(error)
 
@@ -324,7 +329,11 @@ def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy):
         avoided_count=sum(passed and key not in contacts for key, passed in score.avoidance.items()),
         slip_count=len(slip.events), slip_events=slip.events, odom_windows=slip.windows,
         sim_sec=round(score.history[-1][0], 3) if score.history else None,
+        wheel_line_events=score.wheel_events, wheel_line_sec=round(score.wheel_sec, 3),
     )
+    summary = tele.save(folder, dict(result, profile=job["profile"], map=job["map"]))
+    if summary:
+        result["max_progress_m"] = summary["max_progress_m"]
     return result
 
 
@@ -332,6 +341,7 @@ def evaluate(job_path):
     import rclpy
     from rclpy.qos import qos_profile_sensor_data
     from nav_msgs.msg import Odometry
+    from geometry_msgs.msg import Twist
     from gz.transport13 import Node
     from gz.msgs10.contacts_pb2 import Contacts
     from gz.msgs10.pose_v_pb2 import Pose_V
@@ -348,6 +358,10 @@ def evaluate(job_path):
     os.environ["ROS_LOG_DIR"] = str(folder / "ros")
     truth, odom = deque(maxlen=150), deque(maxlen=150)
     collisions = set()
+    cmd = [None]
+
+    def receive_cmd(message):
+        cmd[0] = (message.linear.x, message.angular.z)
 
     def receive(message):
         for pose in message.pose:
@@ -386,6 +400,7 @@ def evaluate(job_path):
         try:
             probe = rclpy.create_node("bench_probe")
             probe.create_subscription(Odometry, "/odom", receive_odom, qos_profile_sensor_data)
+            probe.create_subscription(Twist, "/cmd_vel", receive_cmd, 10)
             with (folder / "run.log").open("w") as log, ExitStack() as stack:
                 sim = stack.enter_context(process(["gz", "sim", "-s", "-r", "--headless-rendering",
                                                    str(world)], log))
@@ -406,9 +421,10 @@ def evaluate(job_path):
                         raise RuntimeError(f"startup failed: pose={bool(truth)}, odom={bool(odom)}, "
                                            f"camera={camera_ready}, missing contact topics={sorted(missing)}")
                 if result["backend"] == "run_eval":
-                    result.update(run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy))
+                    result.update(run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy, cmd))
                 else:
                     score, slip = Score(track, job), SlipMonitor()
+                    tele = Telemetry(track, WHEEL_OFFSET, WHEEL_ON_LINE)
                     origin = cursor = truth[-1][0]
                     start = last_update = time.monotonic()
                     follower = stack.enter_context(process([sys.executable, job["follower"], *job["args"]], log))
@@ -428,6 +444,7 @@ def evaluate(job_path):
                         slip.observe(current, wheel)
                         reason = score.observe(cursor - origin, current[1:3])
                         score.wheels(cursor - origin, current[1], current[2], current[4])
+                        tele.add(cursor - origin, current[1], current[2], current[4], cmd[0])
                         if reason:
                             break
                     # Keep the contact subscriber alive while Gazebo flushes notifications for the last tick.
@@ -450,6 +467,9 @@ def evaluate(job_path):
                         slip_count=len(slip.events), slip_events=slip.events, odom_windows=slip.windows,
                         wheel_line_events=score.wheel_events, wheel_line_sec=round(score.wheel_sec, 3),
                     )
+                    summary = tele.save(folder, dict(result, profile=job["profile"], map=job["map"]))
+                    if summary:
+                        result["max_progress_m"] = summary["max_progress_m"]
         finally:
             rclpy.shutdown()
     except (Exception, KeyboardInterrupt) as error:
