@@ -20,7 +20,7 @@
 set -euo pipefail
 
 WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-NAME=line_follower_lab
+NAME=${LAB_NAME:-line_follower_lab}
 IMAGE=${LAB_IMAGE:-rp/ros2:jazzy-lab}
 SETUP='source /opt/ros/jazzy/setup.bash; [ -f /ws/install_lab/setup.bash ] && source /ws/install_lab/setup.bash'
 
