@@ -41,4 +41,5 @@ libraries=${DL_CUDA_LIBS:-}
 printf -v pythonpath '%q' "$runtime:/ws"
 printf -v ld_library_path '%q' "$libraries"
 sg docker -c "docker exec -e LAB_NAME -e ROS_DOMAIN_ID -e GZ_PARTITION \
+  -e ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST -e ROS_STATIC_PEERS= \
   -e PYTHONPATH=$pythonpath -e LD_LIBRARY_PATH=$ld_library_path lf_b bash -c $command"
