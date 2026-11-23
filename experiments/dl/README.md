@@ -119,3 +119,17 @@ bash experiments/dl/bench_follower.sh g1-dl-corridor \
 ```
 
 실행 폴더에 `telemetry.json`, `telemetry.png`와 거리별 시계열이 생성된다. 겹쳐 그리는 방법은 [주행 텔레메트리](../README_telemetry.md)를 참고한다.
+
+### 고정 G2 전체 평가
+
+`--tee-vision`은 DL 지도에서 짧은 양쪽 가로팔과 전방 선의 연속성을 확인해 도착 T자를 구분한다. 고정 맵 목록을 그대로 벤치마크에 넘긴다.
+
+```bash
+mapfile -t G2_SEEDS < <(sed -nE 's@.*/[a-z]+_([0-9]+)_obs[0-9]+\.sdf$@\1@p' \
+  experiments/worlds/eval_set_G2.txt)
+DL_OFFICIAL_RUNS=0 DL_G2_SEEDS="${G2_SEEDS[*]}" \
+DL_RUNTIME_DIR=/ws/experiments/dl/runs/lab-runtime-cuda \
+DL_CUDA_LIBS=/ws/experiments/dl/runs/lab-cuda-libs \
+bash experiments/dl/bench_follower.sh g2-dl-tee-all \
+  --device cuda --ort-threads 1 --tee-vision
+```

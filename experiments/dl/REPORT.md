@@ -169,3 +169,43 @@ GPU 고정 시드 20·26·33의 진행률은 29.72 / 29.92 / 29.83%였다. 세 �
 | g1-dl-corridor / 03_01 | 완주 | 15.582 m | 203.532 s | 0.1006 m/s | 0.0558 m/s² | 0.7398 rad/s | 3.20 cm | 0.00 s | 6회 / 2.46 s | [JSON](runs/follower-bench/g1-dl-corridor/03_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/03_01/telemetry.png) |
 | g1-dl-corridor / 04_01 | stalled at 11.16 m | 11.165 m | — | 0.1006 m/s | 0.0575 m/s² | 0.7238 rad/s | 3.42 cm | 0.00 s | 2회 / 1.02 s | [JSON](runs/follower-bench/g1-dl-corridor/04_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/04_01/telemetry.png) |
 | g1-dl-corridor / 05_01 | stalled at 13.11 m | 13.113 m | — | 0.1005 m/s | 0.0603 m/s² | 0.7309 rad/s | 3.36 cm | 0.00 s | 5회 / 2.00 s | [JSON](runs/follower-bench/g1-dl-corridor/05_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/05_01/telemetry.png) |
+
+## 고정 G2 장애물 세트 · 20맵
+
+`e98ec64`의 RTX 3090 후보로 `eval_set_G2.txt` 20맵을 각각 한 번 평가했다. 파일럿 4맵과 나머지 16맵은 같은 `--tee-vision`, `--backend obstacle --off 0.12` 설정을 사용했다. T자 종료에는 짧은 가로팔 양쪽의 지지 증거가 필요하며, 전방에 선이 이어질 경우 그 선을 따라간다. 공식 코너 제어 옵션은 이 G2 후보에서 끈 상태로 평가했다.
+
+| 난이도 | 완주 | 평균 최대 진행률 | 완주 랩타임 | 충돌 | 회피 성공/시도 | 바퀴 접촉 횟수 / 시간 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Easy | 1/6 | 61.86% | 195.744s | 1 | 2/3 | 29회 / 23.844s |
+| Normal | 1/7 | 41.16% | 199.652s | 0 | 3/3 | 25회 / 19.852s |
+| Hard | 0/7 | 47.72% | — | 2 | 2/4 | 11회 / 9.908s |
+| 전체 | **2/20** | **49.66%** | 평균 197.698s | **3** | **7/10** | 65회 / 53.604s |
+
+조기 T자 종료 로그는 0/20이었다. 기존에 4.5–4.8m에서 T자로 멈춘 시드 20·26·33은 각각 7.310m, 5.854m, 4.947m까지 갔고 이후 이탈했다. 새 후보의 콜백 p95는 19.88–31.21ms, 영상 처리율은 28.04–30.23Hz였다.
+
+접촉을 검출한 세 주행은 회피 성공에서 제외했다. 시드 25에서 박스와 차체의 기하 여유가 가장 작았던 시각은 복귀 회전 구간이었다. 시드 35에서는 상자 앞에서 옆으로 비키는 중 여유가 가장 작았다. 추종기 자체가 복귀를 기록하더라도 벤치 접촉이 우선한다. [시드 24 완주와 시드 25 접촉의 텔레메트리 비교](results/g2/avoidance-comparison.png) · [20맵 요약 JSON](results/g2/fixed-set.json).
+
+아래 표의 최대 진행, 횡오차 및 바퀴 접촉은 주행별 `telemetry.json`을 사용한다. 난이도별 바퀴 합계는 벤치 결과 `wheel_line_events`와 `wheel_line_sec`를 합산했다.
+
+| 맵 | 최대 s | 완주 / 랩 | 충돌 | 회피 성공/시도 | 횡오차 p95 / 최대 | 바퀴 접촉 | 종료 | 텔레메트리 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| easy_20_obs1 | 7.310m | — | 0 | 0/0 | 5.9/14.5cm | 5회/4.07s | off line at 7.31 m | [JSON](runs/follower-bench/g2-dl-tee-pilot/01_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-pilot/01_01/telemetry.png) |
+| easy_21_obs2 | 12.998m | — | 0 | 1/1 | 20.7/24.9cm | 7회/5.71s | off line at 13.00 m | [JSON](runs/follower-bench/g2-dl-tee-pilot/02_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-pilot/02_01/telemetry.png) |
+| easy_22_obs3 | 3.406m | — | 0 | 0/0 | 0.7/0.9cm | 6회/4.96s | stalled at 3.40 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/01_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/01_01/telemetry.png) |
+| easy_23_obs1 | 9.411m | — | 0 | 0/0 | 1.6/4.1cm | 3회/3.65s | stalled at 9.41 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/02_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/02_01/telemetry.png) |
+| easy_24_obs2 | 15.704m | 195.744s | 0 | 1/1 | 20.6/26.1cm | 3회/2.04s | finished | [JSON](runs/follower-bench/g2-dl-tee-remaining/03_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/03_01/telemetry.png) |
+| easy_25_obs3 | 8.125m | — | 1 | 0/1 | 26.7/28.5cm | 5회/5.16s | off line at 8.13 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/04_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/04_01/telemetry.png) |
+| normal_26_obs1 | 5.854m | — | 0 | 0/0 | 3.2/14.2cm | 1회/1.38s | off line at 5.85 m | [JSON](runs/follower-bench/g2-dl-tee-pilot/03_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-pilot/03_01/telemetry.png) |
+| normal_27_obs2 | 9.197m | — | 0 | 1/1 | 24.5/25.1cm | 3회/2.34s | off line at 9.20 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/05_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/05_01/telemetry.png) |
+| normal_28_obs3 | 2.882m | — | 0 | 0/0 | 5.1/5.1cm | 4회/3.30s | stalled at 2.88 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/06_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/06_01/telemetry.png) |
+| normal_29_obs1 | 2.984m | — | 0 | 0/0 | 8.9/9.0cm | 4회/3.66s | stalled at 2.98 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/07_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/07_01/telemetry.png) |
+| normal_30_obs2 | 3.581m | — | 0 | 0/0 | 1.6/2.6cm | 8회/6.66s | stalled at 3.58 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/08_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/08_01/telemetry.png) |
+| normal_31_obs3 | 5.188m | — | 0 | 1/1 | 26.5/27.6cm | 3회/2.52s | off line at 5.19 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/09_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/09_01/telemetry.png) |
+| normal_32_obs1 | 15.875m | 199.652s | 0 | 1/1 | 19.1/25.1cm | 2회/1.50s | finished | [JSON](runs/follower-bench/g2-dl-tee-remaining/10_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/10_01/telemetry.png) |
+| hard_33_obs2 | 4.947m | — | 0 | 0/0 | 4.5/15.7cm | 1회/0.30s | off line at 4.95 m | [JSON](runs/follower-bench/g2-dl-tee-pilot/04_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-pilot/04_01/telemetry.png) |
+| hard_34_obs3 | 9.050m | — | 0 | 0/0 | 2.7/12.2cm | 1회/1.74s | off line at 9.05 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/11_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/11_01/telemetry.png) |
+| hard_35_obs1 | 3.706m | — | 1 | 0/1 | 21.7/22.4cm | 1회/1.86s | stalled at 3.70 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/12_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/12_01/telemetry.png) |
+| hard_36_obs2 | 3.842m | — | 1 | 0/1 | 19.4/20.1cm | 1회/0.78s | stalled at 3.84 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/13_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/13_01/telemetry.png) |
+| hard_37_obs3 | 14.896m | — | 0 | 2/2 | 26.8/28.0cm | 5회/3.91s | off line at 14.90 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/14_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/14_01/telemetry.png) |
+| hard_38_obs1 | 7.410m | — | 0 | 0/0 | 2.5/13.4cm | 1회/1.02s | off line at 7.41 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/15_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/15_01/telemetry.png) |
+| hard_39_obs2 | 9.469m | — | 0 | 0/0 | 3.4/14.4cm | 1회/0.96s | off line at 9.47 m | [JSON](runs/follower-bench/g2-dl-tee-remaining/16_01/telemetry.json) · [PNG](runs/follower-bench/g2-dl-tee-remaining/16_01/telemetry.png) |

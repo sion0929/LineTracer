@@ -76,3 +76,10 @@
 - 기본 세 맵의 기존 T자 정체 거리 → 수정 최대 도달 거리는 20번 4.502→7.310m, 26번 4.801→5.854m, 33번 4.790→4.947m였다. 기존 시드 21의 10.598m T자 정체 지점도 지나 12.998m에 도달했다. 수정 후보 4회는 모두 이후 이탈(0/4 완주), T자 조기 종료 0회였다.
 - 시드 21 회피 1/1, 파일럿 충돌 0건. 시드 21 텔레메트리는 속도 p95 0.1009m/s, |가속도| p95 0.0736m/s², |각속도| p95 0.6010rad/s, 최대 횡오차 24.91cm, 바퀴 접촉 7회·5.71초다. `experiments/dl/runs/follower-bench/g2-dl-tee-pilot/02_01/{telemetry.json,telemetry.png}`.
 - DeepSeek가 같은 후보로 나머지 고정 16맵을 실행 중이다. 완료 시 파일럿 4맵과 합쳐 20맵을 검증한다.
+
+## 2026-11-24 01:39 KST · 고정 G2 20맵 전체 실측
+
+- DeepSeek가 `lf_b`에서 T자 후보 `e98ec64`로 고정 시드 20–39를 각각 1회 실행했다. 서로 다른 20개 결과와 20개의 `telemetry.{json,png,csv,npz}`를 검증했다. 원본은 `experiments/dl/runs/follower-bench/{g2-dl-tee-pilot,g2-dl-tee-remaining}/`, 집계는 `experiments/dl/results/g2/fixed-set.json`.
+- 완주 2/20(10%), 최대 진행률 평균 49.66%. 완주는 Easy 24의 195.744초와 Normal 32의 199.652초다. 충돌 3건, 회피 성공 7/10(70%). 바퀴 선 접촉 합계 65회·53.604초(벤치). 조기 T자 종료 로그 0/20. CUDA 콜백 p95 19.88–31.21ms, 시뮬 영상 처리율 28.04–30.23Hz.
+- Easy 24는 회피 1/1·충돌 0으로 완주했다. 텔레메트리 요약은 `experiments/dl/runs/follower-bench/g2-dl-tee-remaining/03_01/telemetry.json`, 그림은 같은 폴더의 `telemetry.png`. 시드 25 접촉과 비교한 그림은 `experiments/dl/results/g2/avoidance-comparison.png`. 각 맵의 텔레메트리 수치와 PNG 경로는 `experiments/dl/REPORT.md`.
+- 남은 문제는 교차부 이후 경로 이탈·정체와 우회 진입·복귀 때 차체의 상자 여유다. T자 종료 개선으로 기존 세 정체 지점을 통과했지만 전체 완주율은 10%였다. 코너 공동 수정은 리드 지시대로 Codex-1 병합 전까지 진행하지 않았다.
