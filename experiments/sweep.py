@@ -131,7 +131,8 @@ def run(args, optuna):
                 follower_args.extend((f"--{name}", str(trial.suggest_float(name, low, high))))
             path = args.output / f"trial_{trial.number:04d}"
             results = run_matrix(args.maps, {"optuna": follower_args}, path, jobs=args.jobs,
-                                 limit=args.limit, stall=args.stall, follower=args.follower)
+                                 limit=args.limit, stall=args.stall, follower=args.follower,
+                                 backend="obstacle")
             failed = [r["reason"] for r in results if r["reason"].startswith("error:")]
             if failed:
                 trial.set_user_attr("errors", failed)
