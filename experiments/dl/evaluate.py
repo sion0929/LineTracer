@@ -56,6 +56,9 @@ def evaluate(segment, maps, output):
     for directory, summary, records in maps:
         counts = np.zeros((2, 3, 3), dtype=np.int64)
         failures = {}
+        clean_frames = 0
+        false_obstacle_frames = 0
+        max_false_obstacle_pixels = 0
         for index, row in enumerate(records):
             filename = row["file"]
             image, target = read_pair(directory, filename)
@@ -66,6 +69,11 @@ def evaluate(segment, maps, output):
             raw = confusion(target, prediction)
             counts[0] += raw
             counts[1] += confusion(target, baseline)
+            if raw[2].sum() == 0:
+                clean_frames += 1
+                false_pixels = int(raw[:, 2].sum())
+                false_obstacle_frames += false_pixels > 0
+                max_false_obstacle_pixels = max(max_false_obstacle_pixels, false_pixels)
             scores = class_iou(raw)
             for category, number, minimum in (("line", 1, 300), ("obstacle", 2, 600)):
                 if raw[number].sum() < minimum:
@@ -74,7 +82,12 @@ def evaluate(segment, maps, output):
                 if category not in failures or score < failures[category][0]:
                     name = f"{summary['map']} / {filename} / {category} IoU {score:.3f}"
                     failures[category] = (score, name, image, target, prediction, baseline)
-        results[summary["map"]] = (len(records), counts)
+        obstacle_audit = {
+            "obstacle_free_frames": clean_frames,
+            "false_obstacle_frames": false_obstacle_frames,
+            "max_false_obstacle_pixels": max_false_obstacle_pixels,
+        }
+        results[summary["map"]] = (len(records), counts, obstacle_audit)
         for category, case in failures.items():
             failure_example(output, f"{summary['map']}-{category}", case)
     return results, frames_for_benchmark
@@ -142,8 +155,11 @@ def main():
         raise ValueError("Test split must contain an official map and a held-out random map")
     segment = Segmenter(args.onnx, threads=args.threads)
     results, frames = evaluate(segment, test_maps, args.out)
-    random = [(n, counts) for name, (n, counts) in results.items() if name not in official]
-    rows = {name: result(n, counts) for name, (n, counts) in results.items()}
+    random = [(n, counts) for name, (n, counts, _) in results.items() if name not in official]
+    rows = {
+        name: {**result(n, counts), "obstacle_audit": audit}
+        for name, (n, counts, audit) in results.items()
+    }
     rows["heldout_random_pooled"] = result(sum(n for n, _ in random), sum(c for _, c in random))
     speed = {"onnx_cpu": {"threads": args.threads, **benchmark(segment, frames, args.benchmark_frames)}}
     if args.checkpoint:

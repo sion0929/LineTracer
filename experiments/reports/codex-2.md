@@ -17,3 +17,10 @@
 - 홀드아웃 랜덤 360장에서 U-Net 라인 0.8573, 장애물 0.9629. OpenCV gray<80은 각각 0.3313, 0.0000. 공식 180장의 라인 IoU는 U-Net 0.8242, OpenCV 0.8745. 공식 트랙 15장에 장애물 오검출이 있었다. `experiments/dl/results/evaluation.json`.
 - 전처리·마스크 생성 포함 CPU 257.3 FPS(p95 4.92 ms), RTX 3090 359.1 FPS(p95 3.58 ms). ONNX와 PyTorch 출력을 8장으로 대조했고 랩에서 기본 `segment()` 호출을 검증했다.
 - 모델 `experiments/dl/line_seg.onnx`, 상세 표와 실패 사례 `experiments/dl/REPORT.md`, Codex-1 연동 예제 `experiments/dl/README.md`. 잔여 문제는 공식 트랙의 그림자 오검출과 먼 라인·프레임 가장자리 상자 누락이다. 완주율과 회피 성능은 추종기 연동 후 확인한다.
+
+## 2026-11-23 22:32 KST · 그림자 증강 후속 비교
+
+- DeepSeek 워커를 `LAB_NAME=lf_b ROS_DOMAIN_ID=12 GZ_PARTITION=lf_b`로 백그라운드 실행했다. 24 epoch 후보 학습 1회와 기준·후보 평가 각 1회를 마쳤다. 결과 수치는 각 실행의 JSON에서 확인했다.
+- 공식 180장의 장애물 오검출이 15장 → 8장, 한 프레임의 최대 오검출이 28,465 → 9,601픽셀로 감소했다. 공식 라인 IoU는 0.8242 → 0.8356.
+- 랜덤 합계 라인 IoU는 0.8573 → 0.8671, 장애물 IoU는 0.9629 → 0.9550. Hard 303 장애물 IoU는 0.9375 → 0.9248. 후보 처리량은 CPU 187.3 FPS, GPU 238.7 FPS.
+- 어려운 맵의 장애물 IoU를 기준으로 기본 ONNX는 기존 모델을 유지했다. 개선 후보의 ONNX는 이 워크트리의 `experiments/dl/runs/shadow-study/shadow/line_seg.onnx`에 있다. 수치 원본과 같은 프레임 비교 이미지는 `experiments/dl/results/shadow-study/`에 기록했다. 시험 세트 재평가이므로 새 맵과 추종기에서의 검증은 남아 있다.

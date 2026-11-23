@@ -1,0 +1,20 @@
+{
+  "train_frames": 2100,
+  "validation_frames": 180,
+  "train_maps": [
+    101,
+    103,
+    105,
+    102,
+    104
+  ],
+  "validation_maps": [
+    201
+  ],
+  "parameters": 106323,
+  "best_epoch": 24,
+  "val_foreground_mean_iou": 0.9357733785805062,
+  "elapsed_s": 55.32267317300284,
+  "seed": 12,
+  "shadow_probability": 0.5
+}

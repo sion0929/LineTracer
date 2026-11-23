@@ -49,3 +49,18 @@ Codex-3 생성기 `532e0c8`의 중심선을 따라 위치를 샘플링했다. �
 - [공식 000177](results/failure-line_track-obstacle-fp.jpg)에서 언덕 주변 그림자 28,465픽셀이 장애물로 분류됐다.
 - [Hard 303 000089](results/failure-hard_303-line.jpg)에서 멀리 있는 보조선 일부를 놓쳤다. 이 프레임의 U-Net 라인 IoU는 0.359였다.
 - [Hard 303 000082](results/failure-hard_303-obstacle.jpg)에서 왼쪽 화면 경계에 걸친 상자 일부를 놓쳤다. 이 프레임의 U-Net 장애물 IoU는 0.510이었다.
+
+## 후속 실험 · 국소 그림자 증강
+
+같은 학습·검증 분할에서 `--shadow-prob 0.5`로 24 epoch를 학습하고 기존 시험 540장을 다시 평가했다. 선택 기준은 검증 맵의 전경 평균 IoU였다. 증강 모델의 검증 전경 평균 IoU는 0.9358이었다.
+
+| 지표 | 기준 U-Net | 그림자 증강 U-Net |
+| --- | ---: | ---: |
+| 공식 라인 IoU | 0.8242 | 0.8356 |
+| 공식 장애물 오검출 프레임 | 15/180 | 8/180 |
+| 공식 프레임당 최대 장애물 오검출 | 28,465픽셀 | 9,601픽셀 |
+| 랜덤 합계 라인 IoU | 0.8573 | 0.8671 |
+| 랜덤 합계 장애물 IoU | 0.9629 | 0.9550 |
+| Hard 303 장애물 IoU | 0.9375 | 0.9248 |
+
+그림자 증강으로 공식 오검출 프레임이 7장 줄었다. 기본 ONNX는 Hard 303 장애물 IoU가 더 높은 기준 모델로 유지했다. 이 비교는 동일 시험 세트의 재평가다. [공식 000177 비교 이미지](results/shadow-study/official-000177.jpg) · [기준 평가](results/shadow-study/baseline.json) · [후보 평가](results/shadow-study/shadow.json) · [후보 학습](results/shadow-study/training.json)

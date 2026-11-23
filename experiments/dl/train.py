@@ -34,7 +34,18 @@ class FrameDataset(Dataset):
         return self.images[index], self.labels[index]
 
 
-def augment_batch(images, labels):
+def apply_shadow(images, center, slope, softness, strength):
+    """Attenuate RGB on one side of a softly edged screen-space line."""
+    height, width = images.shape[-2:]
+    x = torch.linspace(-1, 1, width, device=images.device)[None, None, :]
+    y = torch.linspace(-1, 1, height, device=images.device)[None, :, None]
+    distance = y - center[:, None, None] - slope[:, None, None] * x
+    alpha = (distance / softness[:, None, None] + 0.5).clamp(0, 1)
+    scale = 1 - (1 - strength[:, None, None]) * alpha
+    return images * scale[:, None]
+
+
+def augment_batch(images, labels, shadow_prob=0.0):
     batch = len(images)
     device = images.device
     shape = (batch, 1, 1, 1)
@@ -50,6 +61,13 @@ def augment_batch(images, labels):
     gamma = 0.75 + 0.50 * rand(shape)
     bias = 0.16 * rand(shape) - 0.08
     images = (images.pow(gamma) * brightness * balance + bias).clamp_(0, 1)
+    if shadow_prob:
+        selected = rand(batch) < shadow_prob
+        strength = torch.where(selected, 0.30 + 0.45 * rand(batch), 1.0)
+        images = apply_shadow(
+            images, -0.1 + 0.9 * rand(batch), 0.9 * (rand(batch) - 0.5),
+            0.015 + 0.12 * rand(batch), strength,
+        )
     return images, labels
 
 
@@ -102,9 +120,12 @@ def main():
     parser.add_argument("--batch-size", type=int, default=24)
     parser.add_argument("--seed", type=int, default=12)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cuda")
+    parser.add_argument("--shadow-prob", type=float, default=0.0)
     args = parser.parse_args()
     if min(args.epochs, args.batch_size) < 1:
         parser.error("epochs and batch size must be positive")
+    if not 0 <= args.shadow_prob <= 1:
+        parser.error("shadow probability must be between 0 and 1")
     args.out.mkdir(parents=True, exist_ok=False)
     cv2.setNumThreads(1)
     torch.set_num_threads(4)
@@ -138,7 +159,7 @@ def main():
             for rgb, target in train_batches:
                 inputs = rgb.to(device, non_blocking=True).permute(0, 3, 1, 2).float().div_(255)
                 target = target.to(device, non_blocking=True).long()
-                inputs, target = augment_batch(inputs, target)
+                inputs, target = augment_batch(inputs, target, args.shadow_prob)
                 optimizer.zero_grad(set_to_none=True)
                 with torch.autocast(device.type, enabled=use_cuda):
                     logits = F.interpolate(model(inputs), target.shape[-2:], mode="bilinear", align_corners=False)
@@ -169,6 +190,7 @@ def main():
         "parameters": sum(t.numel() for t in model.parameters()),
         "best_epoch": best_epoch, "val_foreground_mean_iou": best,
         "elapsed_s": time.monotonic() - start, "seed": args.seed,
+        "shadow_probability": args.shadow_prob,
     }
     (args.out / "training.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary), flush=True)

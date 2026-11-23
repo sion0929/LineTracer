@@ -47,6 +47,8 @@ DL_RUN=experiments/dl/runs/small-unet-v1
 
 학습은 320×240 RGB 입력에 밝기, 대비, 감마, 채널별 색상 이득, 좌우반전 증강을 적용한다. 검증 맵의 라인·장애물 평균 IoU가 가장 높은 체크포인트를 ONNX로 내보낸다. 평가 IoU는 원본 640×480의 기하 라벨을 기준으로 계산한다. OpenCV 비교는 BGR을 회색조로 바꾼 후 밝기 80 미만을 라인으로 분류한다. CPU에서 ONNX Runtime으로, GPU에서 같은 체크포인트를 PyTorch로 실행하며 두 측정 모두 영상 전처리와 최종 마스크를 포함한다.
 
+`train`의 `--shadow-prob 0.5` 옵션은 학습 프레임에 부드러운 경계의 국소 그림자를 추가한다. `evaluate`는 맵별로 정답 장애물이 없는 프레임 수, 그중 장애물 픽셀을 하나 이상 예측한 프레임 수와 프레임당 최대 오검출 픽셀 수를 `obstacle_audit`에 기록한다.
+
 ## Codex-1 연동
 
 저장소 루트를 Python 모듈 검색 경로에 추가한다. ROS 이미지의 `encoding`을 확인해 RGB 영상은 BGR로 변환하고, `step`에 패딩이 있으면 제거한다. 기본 모델은 `experiments/dl/line_seg.onnx`이며 `LINE_SEG_ONNX`로 경로를 바꿀 수 있다. 랩에서 실행할 때는 랩 Python이 `onnxruntime`을 찾을 수 있어야 한다.
