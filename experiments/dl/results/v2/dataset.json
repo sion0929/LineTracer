@@ -1,0 +1,199 @@
+{
+  "train": {
+    "frames": 2820,
+    "maps": [
+      {
+        "map": "easy_101",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/easy_101.sdf",
+        "capture_seed": 1101,
+        "map_seed": 101,
+        "difficulty": "easy",
+        "frames": 420,
+        "class_pixels": [
+          122664343,
+          1639170,
+          4720487
+        ]
+      },
+      {
+        "map": "easy_401",
+        "world": "/ws/experiments/dl/runs/dataset-v2/worlds/easy_401.sdf",
+        "capture_seed": 1401,
+        "map_seed": 401,
+        "difficulty": "easy",
+        "frames": 240,
+        "class_pixels": [
+          72788487,
+          939513,
+          0
+        ]
+      },
+      {
+        "map": "hard_103",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/hard_103.sdf",
+        "capture_seed": 1103,
+        "map_seed": 103,
+        "difficulty": "hard",
+        "frames": 420,
+        "class_pixels": [
+          122869960,
+          1964784,
+          4189256
+        ]
+      },
+      {
+        "map": "hard_105",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/hard_105.sdf",
+        "capture_seed": 1105,
+        "map_seed": 105,
+        "difficulty": "hard",
+        "frames": 420,
+        "class_pixels": [
+          121526139,
+          1996436,
+          5501425
+        ]
+      },
+      {
+        "map": "hard_403",
+        "world": "/ws/experiments/dl/runs/dataset-v2/worlds/hard_403.sdf",
+        "capture_seed": 1403,
+        "map_seed": 403,
+        "difficulty": "hard",
+        "frames": 240,
+        "class_pixels": [
+          72506906,
+          1221094,
+          0
+        ]
+      },
+      {
+        "map": "normal_102",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_102.sdf",
+        "capture_seed": 1102,
+        "map_seed": 102,
+        "difficulty": "normal",
+        "frames": 420,
+        "class_pixels": [
+          122302560,
+          1588368,
+          5133072
+        ]
+      },
+      {
+        "map": "normal_104",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_104.sdf",
+        "capture_seed": 1104,
+        "map_seed": 104,
+        "difficulty": "normal",
+        "frames": 420,
+        "class_pixels": [
+          122355451,
+          1569616,
+          5098933
+        ]
+      },
+      {
+        "map": "normal_402",
+        "world": "/ws/experiments/dl/runs/dataset-v2/worlds/normal_402.sdf",
+        "capture_seed": 1402,
+        "map_seed": 402,
+        "difficulty": "normal",
+        "frames": 240,
+        "class_pixels": [
+          72657496,
+          1070504,
+          0
+        ]
+      }
+    ]
+  },
+  "val": {
+    "frames": 300,
+    "maps": [
+      {
+        "map": "normal_201",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_201.sdf",
+        "capture_seed": 1201,
+        "map_seed": 201,
+        "difficulty": "normal",
+        "frames": 180,
+        "class_pixels": [
+          52656763,
+          657803,
+          1981434
+        ]
+      },
+      {
+        "map": "normal_451",
+        "world": "/ws/experiments/dl/runs/dataset-v2/worlds/normal_451.sdf",
+        "capture_seed": 1451,
+        "map_seed": 451,
+        "difficulty": "normal",
+        "frames": 120,
+        "class_pixels": [
+          36360020,
+          503980,
+          0
+        ]
+      }
+    ]
+  },
+  "test": {
+    "frames": 540,
+    "maps": [
+      {
+        "map": "easy_301",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/easy_301.sdf",
+        "capture_seed": 1301,
+        "map_seed": 301,
+        "difficulty": "easy",
+        "frames": 120,
+        "class_pixels": [
+          35447221,
+          454354,
+          962425
+        ]
+      },
+      {
+        "map": "hard_303",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/hard_303.sdf",
+        "capture_seed": 1303,
+        "map_seed": 303,
+        "difficulty": "hard",
+        "frames": 120,
+        "class_pixels": [
+          34687554,
+          607009,
+          1569437
+        ]
+      },
+      {
+        "map": "normal_302",
+        "world": "/ws/experiments/dl/runs/dataset-v1/worlds/normal_302.sdf",
+        "capture_seed": 1302,
+        "map_seed": 302,
+        "difficulty": "normal",
+        "frames": 120,
+        "class_pixels": [
+          34966837,
+          529891,
+          1367272
+        ]
+      },
+      {
+        "map": "line_track",
+        "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+        "capture_seed": 1200,
+        "map_seed": null,
+        "difficulty": null,
+        "frames": 180,
+        "class_pixels": [
+          54537262,
+          758738,
+          0
+        ]
+      }
+    ]
+  }
+}

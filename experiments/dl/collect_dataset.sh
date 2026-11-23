@@ -2,7 +2,7 @@
 # Run from the b-dlseg root after building the lf_b container.
 set -euo pipefail
 export LAB_NAME=lf_b ROS_DOMAIN_ID=12 GZ_PARTITION=lf_b
-generator=${1:?Pass the path to Codex-3 gen_world.py}
+generator=experiments/worlds/gen_world.py
 root=experiments/dl/runs/dataset-v1
 mkdir -p "$root/worlds"
 

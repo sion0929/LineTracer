@@ -13,10 +13,10 @@ INPUT_SIZE = (320, 240)
 DEFAULT_MODEL = Path(__file__).with_name("line_seg.onnx")
 
 
-def prepare(bgr_img):
+def prepare(bgr_img, size=INPUT_SIZE):
     if bgr_img.shape != (HEIGHT, WIDTH, 3) or bgr_img.dtype != np.uint8:
         raise ValueError(f"Expected uint8 BGR image of shape ({HEIGHT}, {WIDTH}, 3)")
-    small = cv2.resize(bgr_img, INPUT_SIZE, interpolation=cv2.INTER_AREA)
+    small = cv2.resize(bgr_img, size, interpolation=cv2.INTER_AREA)
     return np.ascontiguousarray(small[:, :, ::-1].transpose(2, 0, 1)[None], dtype=np.float32) / 255
 
 
@@ -51,10 +51,12 @@ class Segmenter:
         self.session = ort.InferenceSession(str(model_path), options, providers=providers)
         if self.session.get_providers()[0] != providers[0]:
             raise RuntimeError(f"ONNX Runtime failed to activate {providers[0]}")
-        self.input_name = self.session.get_inputs()[0].name
+        model_input = self.session.get_inputs()[0]
+        self.input_name = model_input.name
+        self.input_size = tuple(model_input.shape[-2:][::-1])
 
     def __call__(self, bgr_img):
-        scores, = self.session.run(None, {self.input_name: prepare(bgr_img)})
+        scores, = self.session.run(None, {self.input_name: prepare(bgr_img, self.input_size)})
         return decode(scores)
 
 
@@ -67,3 +69,13 @@ def _default_segmenter():
 def segment(bgr_img):
     """Return (line_mask, obstacle_mask), each a (480, 640) boolean array."""
     return _default_segmenter()(bgr_img)
+
+
+def dark_line_mask(bgr_img):
+    return cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY) < 80
+
+
+def segment_hybrid(bgr_img):
+    """Use thresholded line pixels and let the network remove obstacle pixels."""
+    _, obstacle_mask = segment(bgr_img)
+    return dark_line_mask(bgr_img) & ~obstacle_mask, obstacle_mask

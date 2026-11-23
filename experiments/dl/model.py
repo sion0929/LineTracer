@@ -18,7 +18,7 @@ def upsample(feature, skip):
 
 
 class SmallUNet(nn.Module):
-    def __init__(self):
+    def __init__(self, refine=False):
         super().__init__()
         self.half_res = nn.Sequential(block(3, 12, 2), block(12, 12))
         self.quarter = nn.Sequential(block(12, 20, 2), block(20, 20))
@@ -28,6 +28,10 @@ class SmallUNet(nn.Module):
         self.up_quarter = nn.Sequential(block(24 + 20, 24), block(24, 16))
         self.up_half = nn.Sequential(block(16 + 12, 16), block(16, 12))
         self.classes = nn.Conv2d(12, 3, 1)
+        self.refine = nn.Conv2d(6, 3, 3, padding=1) if refine else None
+        if self.refine is not None:
+            nn.init.zeros_(self.refine.weight)
+            nn.init.zeros_(self.refine.bias)
 
     def forward(self, image):
         half = self.half_res(image)
@@ -37,4 +41,8 @@ class SmallUNet(nn.Module):
         decoded = self.up_eighth(upsample(deep, eighth))
         decoded = self.up_quarter(upsample(decoded, quarter))
         decoded = self.up_half(upsample(decoded, half))
-        return self.classes(decoded)
+        logits = self.classes(decoded)
+        if self.refine is not None:
+            logits = F.interpolate(logits, size=image.shape[-2:], mode="bilinear", align_corners=False)
+            logits = logits + self.refine(torch.cat((image, logits), dim=1))
+        return logits

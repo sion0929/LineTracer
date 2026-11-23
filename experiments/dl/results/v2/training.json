@@ -1,0 +1,31 @@
+{
+  "train_frames": 2820,
+  "validation_frames": 300,
+  "train_maps": [
+    101,
+    401,
+    103,
+    105,
+    403,
+    102,
+    104,
+    402
+  ],
+  "validation_maps": [
+    201,
+    451
+  ],
+  "parameters": 106488,
+  "best_epoch": 20,
+  "val_foreground_mean_iou": 0.8873086378776404,
+  "elapsed_s": 198.37499297299655,
+  "seed": 12,
+  "shadow_probability": 0.4,
+  "official_style": true,
+  "input_size_wh": [
+    640,
+    480
+  ],
+  "initial_checkpoint": "experiments/dl/runs/small-unet-v1/best.pt",
+  "learning_rate": 0.0007
+}
