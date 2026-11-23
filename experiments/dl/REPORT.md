@@ -152,3 +152,20 @@ GPU 고정 시드 20·26·33의 진행률은 29.72 / 29.92 / 29.83%였다. 세 �
 | RTX 3090 | easy_21_obs2 | 70.53% | 6 | 5.520 |
 
 반지름 10cm 코너에서는 차체가 선 중심을 따라가도 안쪽 바퀴가 선을 밟을 수 있다. 통로 최적 경로의 목표에 선 중심 기준 ±0.10m 안에서 좌우 바퀴 궤적의 접촉 횟수와 시간을 함께 줄이는 것을 포함한다. 같은 맵에서 완주 여부와 진행 거리, 랩타임, 충돌·회피 지표와 함께 비교한다.
+
+## G1 코너 재현 및 종료된 검증
+
+규칙 기준판 `364e419`를 공식 3회 재현했다. 리드의 실패 최대 도달은 3.338m였고, 재현의 같은 두 번째 코너 실패는 3.294m였다. 두 주행 모두 코너에서 약 0.045m/s 직진 명령이 이어지는 동안 횡오차가 커졌다. [리드 실패와 재현 비교 PNG](results/g1/lead-vs-repro.png) · [리드 텔레메트리](../results/lead/g1_364e419_fail/telemetry.json).
+
+`df30dec`의 딥러닝 급커브·통로 후보는 2/5 완주했고 총 4회가 3.34m를 통과했다. 한 회는 0.473m에서 이탈했고 영상 처리율이 46.10Hz로 기록돼 원인을 확정하지 못했다. 나머지 두 실패는 11.165m와 13.113m 정체였다. 리드 지시에 따라 대기 중이던 추가 코너 배치는 취소했다. 공통 코너 수정은 Codex-1이 맡는다.
+
+| 배치 / 실행 | 완주 | 최대 s | 랩타임 | v p95 | 절대 a p95 | 절대 w p95 | 최대 횡오차 | ±10cm 밖 | 바퀴 접촉 횟수 / 시간 | 텔레메트리 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| g1-rule-repro / 01_01 | off line at 2.46 m | 2.458 m | — | 0.1000 m/s | 0.0418 m/s² | 0.3617 rad/s | 14.44 cm | 2.22 s | 2회 / 6.24 s | [JSON](runs/follower-bench/g1-rule-repro/01_01/telemetry.json) · [PNG](runs/follower-bench/g1-rule-repro/01_01/telemetry.png) |
+| g1-rule-repro / 02_01 | 완주 | 15.584 m | 180.020 s | 0.1009 m/s | 0.0633 m/s² | 0.7969 rad/s | 3.35 cm | 0.00 s | 6회 / 1.86 s | [JSON](runs/follower-bench/g1-rule-repro/02_01/telemetry.json) · [PNG](runs/follower-bench/g1-rule-repro/02_01/telemetry.png) |
+| g1-rule-repro / 03_01 | off line at 3.26 m | 3.294 m | — | 0.1003 m/s | 0.0554 m/s² | 0.5522 rad/s | 12.69 cm | 1.20 s | 1회 / 0.84 s | [JSON](runs/follower-bench/g1-rule-repro/03_01/telemetry.json) · [PNG](runs/follower-bench/g1-rule-repro/03_01/telemetry.png) |
+| g1-dl-corridor / 01_01 | off line at 0.47 m | 0.473 m | — | 0.0340 m/s | 0.0379 m/s² | 0.3509 rad/s | 12.26 cm | 19.11 s | 4회 / 6.83 s | [JSON](runs/follower-bench/g1-dl-corridor/01_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/01_01/telemetry.png) |
+| g1-dl-corridor / 02_01 | 완주 | 15.585 m | 205.448 s | 0.1005 m/s | 0.0583 m/s² | 0.7273 rad/s | 3.57 cm | 0.00 s | 6회 / 2.88 s | [JSON](runs/follower-bench/g1-dl-corridor/02_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/02_01/telemetry.png) |
+| g1-dl-corridor / 03_01 | 완주 | 15.582 m | 203.532 s | 0.1006 m/s | 0.0558 m/s² | 0.7398 rad/s | 3.20 cm | 0.00 s | 6회 / 2.46 s | [JSON](runs/follower-bench/g1-dl-corridor/03_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/03_01/telemetry.png) |
+| g1-dl-corridor / 04_01 | stalled at 11.16 m | 11.165 m | — | 0.1006 m/s | 0.0575 m/s² | 0.7238 rad/s | 3.42 cm | 0.00 s | 2회 / 1.02 s | [JSON](runs/follower-bench/g1-dl-corridor/04_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/04_01/telemetry.png) |
+| g1-dl-corridor / 05_01 | stalled at 13.11 m | 13.113 m | — | 0.1005 m/s | 0.0603 m/s² | 0.7309 rad/s | 3.36 cm | 0.00 s | 5회 / 2.00 s | [JSON](runs/follower-bench/g1-dl-corridor/05_01/telemetry.json) · [PNG](runs/follower-bench/g1-dl-corridor/05_01/telemetry.png) |
