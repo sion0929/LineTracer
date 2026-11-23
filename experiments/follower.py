@@ -79,6 +79,7 @@ class Follower(Node):
         self.gap_origin = None
         self.camera_line = None
         self.camera_tangent = None
+        self.camera_points = None
         self.camera_near_support = False
         self.fresh_cells = None
         self.recovery_turn = None
@@ -203,6 +204,7 @@ class Follower(Node):
         if self.a.reactive_recovery:
             self.fresh_cells = (gi, gj, li, lj)
             line_x, line_y = lx[dark], ly[dark]
+            self.camera_points = (line_x, line_y)
             self.camera_line, self.camera_tangent = self.visible_line(line_x, line_y)
             near_line = (line_x > 0.29) & (line_x < 0.35) & (np.abs(line_y) < 0.075)
             self.camera_near_support = np.count_nonzero(near_line) >= 16
@@ -336,9 +338,25 @@ class Follower(Node):
 
     def camera_continues(self):
         """Check for a longitudinal line beyond a mapped terminal bar."""
-        return (self.camera_near_support and self.camera_line is not None
-                and abs(self.camera_line[1]) < 0.06 and self.camera_tangent is not None
-                and abs(self.camera_tangent[0]) > 0.85)
+        if not self.camera_near_support or self.camera_line is None:
+            return False
+        target_x, target_y = self.camera_line
+        if abs(math.atan2(target_y, target_x)) >= 0.25:
+            return False
+        if self.camera_tangent is not None and abs(self.camera_tangent[0]) > 0.85:
+            return True
+        # A crossing can obscure the local tangent. Require the same forward
+        # stripe to appear in three separated camera distance bands.
+        if self.camera_points is None:
+            return False
+        x, y = self.camera_points
+        slopes = np.linspace(-0.45, 0.45, 19)
+        supported = np.ones(len(slopes), dtype=bool)
+        for low, high in ((0.29, 0.35), (0.37, 0.43), (0.47, 0.53)):
+            band = (x > low) & (x < high)
+            expected = target_y + slopes[:, None] * (x[band] - target_x)
+            supported &= np.count_nonzero(np.abs(y[band] - expected) < 0.027, axis=1) >= 16
+        return bool(supported.any())
 
     def cached_recovery_path(self):
         """Keep a short, ordered piece of the last local path through a blind turn."""
