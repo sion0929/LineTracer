@@ -1,0 +1,21 @@
+seed,category,reason,max_s_m,max_progress_pct,failure_s_m,centerline_turn_deg,heading_error_deg,cmd_v,cmd_w,stopped_s,lat_p95_cm,lat_max_cm,wheel_line_events,wheel_line_sec
+seed00,false_terminal,stalled at 11.64m,11.644,75.08,11.634,0.0,10.2,0.0,0.0,31.26,1.37,2.72,2,1.56
+seed01,false_terminal,stalled at 11.62m,11.619,72.99,11.608,0.0,-5.3,0.0,0.0,20.68,1.29,3.3,0,0.0
+seed02,false_terminal,stalled at 11.04m,11.039,71.61,11.029,0.0,-7.9,0.0,0.0,30.82,4.72,5.14,2,1.62
+seed03,corner_stall,stalled at 3.57m,3.569,21.93,3.557,75.0,-4.9,0.0,0.34,40.08,1.11,1.23,11,8.34
+seed04,corner_stall,stalled at 3.57m,3.572,24.24,3.56,43.3,-0.7,0.0,-0.34,25.32,2.01,3.27,3,2.58
+seed05,false_terminal,stalled at 5.46m,5.458,34.63,5.447,0.0,9.9,0.0,0.0,21.01,1.86,2.57,0,0.0
+seed06,false_terminal,stalled at 7.93m,7.928,51.75,7.921,0.0,4.7,0.0,0.0,29.81,7.37,7.75,2,1.26
+seed07,corner_stall,stalled at 2.89m,2.89,18.87,2.878,40.7,37.0,0.0,0.02,39.93,7.31,7.34,4,4.62
+seed08,false_terminal,stalled at 7.61m,7.607,49.93,7.596,0.0,10.4,0.0,0.0,21.78,2.67,4.08,0,0.0
+seed09,false_terminal,stalled at 4.22m,4.218,27.32,4.208,0.0,-5.9,0.0,0.0,38.03,10.28,10.33,5,3.78
+seed10,false_terminal,stalled at 4.20m,4.201,26.25,4.191,0.0,-8.2,0.0,0.0,37.86,6.49,6.54,4,3.42
+seed11,false_terminal,stalled at 7.06m,7.057,46.29,7.046,0.0,-8.9,0.0,0.0,21.34,1.44,4.86,0,0.0
+seed12,false_terminal,stalled at 11.54m,11.544,75.43,11.536,0.0,11.8,0.0,0.0,20.57,1.57,3.24,0,0.0
+seed13,corner_departure,off line >0.12m at 9.32m,9.314,58.97,9.187,56.2,33.2,0.045,0.123,0.66,2.57,12.83,1,0.66
+seed14,false_terminal,stalled at 4.65m,4.648,29.32,4.639,0.0,-5.7,0.0,0.0,20.64,1.12,3.49,0,0.0
+seed15,false_terminal,stalled at 10.92m,10.917,69.52,10.908,0.0,-5.9,0.0,0.0,21.18,1.84,3.84,0,0.0
+seed16,false_terminal,stalled at 8.60m,8.603,52.94,8.595,0.0,-9.4,0.0,0.0,21.48,1.77,4.86,0,0.0
+seed17,false_terminal,stalled at 7.48m,7.48,45.56,7.469,0.0,-10.1,0.0,0.0,20.82,1.45,3.74,0,0.0
+seed18,false_terminal,stalled at 8.98m,8.986,54.81,8.978,0.0,-9.1,0.0,0.0,20.76,1.32,3.43,0,0.0
+seed19,false_terminal,stalled at 8.75m,8.748,56.11,8.742,0.0,-9.4,0.0,0.0,21.48,1.6,4.67,0,0.0

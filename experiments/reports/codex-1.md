@@ -241,3 +241,83 @@
 | 10 | 15.584 | 182.220 | 2.05 / 5.35 | 0.1006 | 6 / 1.62 | [telemetry.png](../results/DS-A_20261124-011714_qualify10/run10_1/01_01/telemetry.png) |
 
 - 독립 10회는 기본 속도 설정으로 실행했다. 레이싱 라인 고속 설정의 기존 비교 결과에는 이번 수정의 재시험 수치가 포함되지 않는다.
+
+## 2026-11-24 — G1 기준선과 레이싱 루프 복구
+
+- 리드가 178.2초와 172.8초로 재현한 `c6f9100`의 제어값을 `3eed70a`에서 무옵션 기본값으로 고정했다. 레이싱은 `--racing-line`으로만 활성화된다. 코드 `29ba6d8`을 고정한 레이싱 배치와 현재 코드에 동일한 레이싱 옵션을 전달했을 때 파싱된 인자가 모두 일치했다.
+- 리드의 3.338 m 코너 실패는 횡오차 최대 14.73 cm, 정지 2.40초, 바퀴 접촉 1회·0.88초였다. 저장된 궤적과 각속도 명령에서 역산한 카메라 방향으로 재생했을 때, G1 전진 제한은 3.323 m에서 정지 명령을 냈다. [리드 실패 텔레메트리](../results/lead/g1_364e419_fail/telemetry.png) · [G1 수정 전후 비교](../results/DS-A_20261124-020221_racing-loop10/compare-g1-corner.png)
+- 리드의 레이싱 루프 실패는 11.520 m에서 정지 47.09초, 횡오차 p95 7.74 cm, 최대 8.54 cm, 설계 통로 이탈 0초, 바퀴 접촉 1회·0.18초였다. 레이싱 목표의 방향을 따라갈 수 없을 때 지역 지도를 지우는 대신 G1 중심선 추종으로 복귀하도록 수정했다. 인접한 복귀 레인으로 목표가 건너뛰지 않도록 첫 0.10 m 구간에서 추종 시작점을 찾고, 일반 복구에서도 선을 못 찾을 때 최근 중심선을 최대 0.22 m만 사용한다. 이 경로에는 0.09 m 횡거리 및 1.25 rad 진행 방향 제한이 적용된다. [리드 루프 실패 텔레메트리](../results/lead/race_13f4a0d_run1/telemetry.png) · [레이싱 루프 비교](../results/DS-A_20261124-020221_racing-loop10/compare-racing-loop.png)
+- 리드의 정체 자세와 공식 경로를 사용한 오프라인 재생은 11.505 m에서 11.720 m까지 진행했고 횡오차 p95는 5.06 cm였다. 이 재생의 카메라 관측은 기하 모델로 생성했다. [재생 수치](../results/DS-A_20261124_racing-loop-offline.jsonl)
+
+### 공식 레이싱 10회 최종 결과
+
+- DeepSeek 워커가 고정 후보 `29ba6d8`을 공식 트랙에서 10회 실행했다. `bench.py --backend run_eval --off 0.12 --limit 320`과 `LAB_NAME=lf_a ROS_DOMAIN_ID=11 GZ_PARTITION=lf_a`를 사용했다. 레이싱 통로 반폭은 0.05 m, 최고 속도는 0.18 m/s, 횡가속도 제한은 0.18 m/s²였다.
+- 6/10 완주로 9/10 기준에 미달했다. 완주 평균 169.54초로 177초보다 7.46초 짧았고, 150초 목표에는 도달하지 못했다. 루프에 도달한 6회는 전부 통과했다. 실패 4회는 2.718, 3.485, 5.541, 6.731 m 정체였다. 리드 지시에 따라 레이싱은 보류했다.
+
+| 회차 | 결과 | 최대 도달(m) | 랩타임(초) | 횡오차 p95 / 최대(cm) | 속도 p95(m/s) | 정지(초) | 바퀴 접촉 횟수 / 시간(초) | 텔레메트리 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| run1_1 | stalled at 3.48m | 3.485 | — | 9.60 / 9.85 | 0.1800 | 33.92 | 8 / 10.96 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run1_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run1_1/01_01/telemetry.png) |
+| run2_1 | 완주 | 15.582 | 150.77 | 2.47 / 7.03 | 0.1801 | 4.50 | 6 / 1.26 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run2_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run2_1/01_01/telemetry.png) |
+| run3_1 | stalled at 2.72m | 2.718 | — | 3.83 / 4.48 | 0.1800 | 64.18 | 0 / 0.00 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run3_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run3_1/01_01/telemetry.png) |
+| run4_1 | stalled at 6.73m | 6.731 | — | 8.41 / 8.69 | 0.1799 | 45.73 | 10 / 13.45 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run4_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run4_1/01_01/telemetry.png) |
+| run5_1 | 완주 | 15.579 | 176.18 | 8.59 / 9.52 | 0.1800 | 27.05 | 11 / 7.92 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run5_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run5_1/01_01/telemetry.png) |
+| run6_1 | 완주 | 15.579 | 181.45 | 7.77 / 9.26 | 0.1800 | 25.30 | 10 / 6.48 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run6_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run6_1/01_01/telemetry.png) |
+| run7_1 | stalled at 5.54m | 5.541 | — | 9.17 / 9.46 | 0.1800 | 45.84 | 4 / 5.24 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run7_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run7_1/01_01/telemetry.png) |
+| run8_1 | 완주 | 15.580 | 178.39 | 7.60 / 9.14 | 0.1800 | 25.08 | 10 / 5.94 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run8_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run8_1/01_01/telemetry.png) |
+| run9_1 | 완주 | 15.577 | 175.34 | 5.23 / 8.20 | 0.1801 | 22.30 | 10 / 5.10 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run9_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run9_1/01_01/telemetry.png) |
+| run10_1 | 완주 | 15.582 | 155.10 | 2.04 / 3.90 | 0.1801 | 2.70 | 6 / 1.74 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run10_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run10_1/01_01/telemetry.png) |
+
+## 2026-11-24 02:43 KST — 장애물 없는 랜덤 맵 일반화
+
+- 레이싱 평가 종료 후 일반화 측정으로 전환했다. `gen_world.py`로 C_bench20의 시드·난이도 조합(easy 0–6, normal 7–13, hard 14–19)을 동일하게 만들고 장애물 수를 모두 0으로 지정했다. 시드당 한 번씩 `bench.py --backend run_eval --off 0.12 --limit 320`으로 채점한다. 기준선은 `620cf65`의 OpenCV follower 무옵션 실행이다. 시드 0 채점 후 작업 컨테이너에서 `jq`가 없어 집계가 멈췄고, Python으로 집계를 바꿔 기존 시드 0 결과부터 이어갔다.
+- 시드 0–2는 71.61–75.08%에서 종점 T자 오인으로 멈췄다. 주행 로그에 종점 판정이 남았다. 해당 세 자세의 카메라 기하 재생에서는 전방 선이 보였으며, 각 맵 실제 종점 자세를 3가지 방향으로 재생한 9건에서는 전방 선 근거가 없었다. `7cc4510`은 횡거리 고정 임계값을 카메라 편각으로 바꾸고, 교차부에서 근거리 접선이 모호하면 3개 거리 구간에 연속된 전방 선이 있는지 확인한다. [시드 0 텔레메트리](../results/DS-A_20261124-022833_random20-baseline/seed00/01_01/telemetry.png) · [시드 1](../results/DS-A_20261124-022833_random20-baseline/seed01/01_01/telemetry.png) · [시드 2](../results/DS-A_20261124-022833_random20-baseline/seed02/01_01/telemetry.png)
+- 시드 3·4는 각각 3.569 m(21.93%)와 3.572 m(24.24%)에서 전진 0과 회전 ±0.34 rad/s 명령이 이어졌다. 주행 탐색 상한은 약 2.49와 2.29 rad였으며 이후 중심선 진행 방향은 π rad였다. `e9ac065`는 4.5초 동안 3.5 cm 이동하지 못할 때에만 탐색 범위를 1.95 rad로 넓히고, 카메라에서 가까운 종방향 출구가 확인되면 전진한다. 측정 위치와 지도의 선을 사용한 평면 카메라·이상적 회전 재생에서 후보는 각각 약 9.1초와 8.9초에 출구 방향으로 전진 명령을 냈다. [시드 3 텔레메트리](../results/DS-A_20261124-022833_random20-baseline/seed03/01_01/telemetry.png) · [시드 4](../results/DS-A_20261124-022833_random20-baseline/seed04/01_01/telemetry.png)
+- DeepSeek 워커는 `LAB_NAME=lf_a ROS_DOMAIN_ID=11 GZ_PARTITION=lf_a`에서 순서대로 [기준선 20맵](../results/DS-A_20261124-022833_random20-baseline/), [후보 20맵](../results/DS-A_20261124-024302_random20-candidate/), [무옵션 공식 회귀 5회](../results/DS-A_20261124-024302_generalization-official5/)를 채점한다. 각 폴더에 `progress.jsonl`, `summary.json`과 주행별 텔레메트리가 저장된다. G1의 기존 9/10은 기준선 측정값이며, 이번 후보의 공식 성적은 회귀에서 확인한다.
+
+### 랜덤 기준선 20맵 완료 · 03:12 KST
+
+- **0/20 완주**, 평균 최대 진행률 **48.18%**, 인프라 오류 0건. 실패 중 16건은 완주 전에 follower가 종료 T자임을 기록했고, 3건은 코너에서 정체했으며, 1건은 코너에서 통로를 이탈했다. 분류에는 실패 시작 위치 전후 0.25 m/0.18 m의 기준선 방향을 사용했다. 코너 판정 임계는 방향 변화 35°다. [벤치 요약](../results/DS-A_20261124-022833_random20-baseline/summary.json) · [시드별 분류 CSV](../results/DS-A_20261124-022833_random20-baseline/failures.csv)
+- 이탈한 시드 13은 최대 9.314 m(58.97%), 횡오차 p95 2.57 cm·최대 12.83 cm였다. 이탈 시작점 주변 기준선 방향 변화는 56.2°였고, 시계열에서 전진 명령 중앙값 0.045 m/s와 회전 명령 중앙값 0.123 rad/s를 확인했다. [텔레메트리 JSON](../results/DS-A_20261124-022833_random20-baseline/seed13/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-022833_random20-baseline/seed13/01_01/telemetry.png)
+
+### 동일 랜덤 20맵 후보 검증 완료 · 04:16 KST
+
+- 후보 `e9ac065`는 **8/20 완주**, 평균 최대 진행률 **67.12%**로 기준선보다 **18.94%p** 더 진행했다. 완주 평균 223.06초, 인프라 오류 0건이다. 완주 시드는 03, 05, 08, 09, 11, 12, 16, 17이다. [벤치 요약](../results/DS-A_20261124-024302_random20-candidate/summary.json) · [시드별 실패 분류와 텔레메트리 수치](../results/DS-A_20261124-024302_random20-candidate/failures.csv)
+- 기준선 종점 오인 16건 중 10건, 코너 정체 3건 중 2건에서 이전 최대 진행을 0.25 m 이상 넘었다. 후보 실패는 종점 오인 6건, 이탈 5건(코너 3건), 320초 제한 1건이었다.
+- 시드 3은 기준선 3.569 m에서 후보 16.159 m 완주로 개선됐고, 랩타임 316.12초, 정지 110.69초, 횡오차 p95 2.08 cm, 바퀴 접촉 13회·12.72초였다. 시드 0은 11.644 m에서 7.006 m로 감소했고 후보 최대 횡오차는 13.83 cm였다. [시드 3 비교 PNG](../results/DS-A_20261124-024302_random20-candidate/compare-seed03.png) · [시드 0 비교 PNG](../results/DS-A_20261124-024302_random20-candidate/compare-seed00.png)
+
+| 시드 | 기준선 진행 / 분류 | 후보 진행 / 분류 | 진행 차이(%p) | 기준선 / 후보 JSON |
+| --- | --- | --- | ---: | --- |
+| seed00 | 75.08% / `false_terminal` | 45.18% / `departure` | -29.90 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed00/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed00/01_01/telemetry.json) |
+| seed01 | 72.99% / `false_terminal` | 89.79% / `false_terminal` | +16.80 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed01/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed01/01_01/telemetry.json) |
+| seed02 | 71.61% / `false_terminal` | 21.54% / `corner_departure` | -50.07 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed02/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed02/01_01/telemetry.json) |
+| seed03 | 21.93% / `corner_stall` | 99.29% / `complete` | +77.36 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed03/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed03/01_01/telemetry.json) |
+| seed04 | 24.24% / `corner_stall` | 45.46% / `other` | +21.22 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed04/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed04/01_01/telemetry.json) |
+| seed05 | 34.63% / `false_terminal` | 99.23% / `complete` | +64.60 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed05/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed05/01_01/telemetry.json) |
+| seed06 | 51.75% / `false_terminal` | 21.78% / `false_terminal` | -29.97 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed06/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed06/01_01/telemetry.json) |
+| seed07 | 18.87% / `corner_stall` | 19.89% / `corner_departure` | +1.02 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed07/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed07/01_01/telemetry.json) |
+| seed08 | 49.93% / `false_terminal` | 99.24% / `complete` | +49.31 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed08/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed08/01_01/telemetry.json) |
+| seed09 | 27.32% / `false_terminal` | 99.23% / `complete` | +71.91 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed09/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed09/01_01/telemetry.json) |
+| seed10 | 26.25% / `false_terminal` | 19.49% / `corner_departure` | -6.76 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed10/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed10/01_01/telemetry.json) |
+| seed11 | 46.29% / `false_terminal` | 99.22% / `complete` | +52.93 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed11/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed11/01_01/telemetry.json) |
+| seed12 | 75.43% / `false_terminal` | 99.25% / `complete` | +23.82 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed12/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed12/01_01/telemetry.json) |
+| seed13 | 58.97% / `corner_departure` | 55.84% / `false_terminal` | -3.13 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed13/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed13/01_01/telemetry.json) |
+| seed14 | 29.32% / `false_terminal` | 31.89% / `false_terminal` | +2.57 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed14/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed14/01_01/telemetry.json) |
+| seed15 | 69.52% / `false_terminal` | 53.37% / `false_terminal` | -16.15 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed15/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed15/01_01/telemetry.json) |
+| seed16 | 52.94% / `false_terminal` | 99.27% / `complete` | +46.33 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed16/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed16/01_01/telemetry.json) |
+| seed17 | 45.56% / `false_terminal` | 99.28% / `complete` | +53.72 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed17/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed17/01_01/telemetry.json) |
+| seed18 | 54.81% / `false_terminal` | 88.09% / `departure` | +33.28 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed18/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed18/01_01/telemetry.json) |
+| seed19 | 56.11% / `false_terminal` | 56.11% / `false_terminal` | +0.00 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed19/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed19/01_01/telemetry.json) |
+
+### 공식 트랙 회귀 5회 완료 · 04:33 KST
+
+- `e9ac065` 무옵션 OpenCV follower로 공식 **5/5 완주**했다. 평균 178.15초(175.82–180.94초), 횡오차 p95 최대 1.80 cm, 각 회차 바퀴 접촉 6회·1.74–2.00초였다. 인프라 오류는 0건이다. 이번 후보의 공식 회귀 표본은 5회이며, 기존 G1 9/10은 기준선 기록이다. [벤치 요약](../results/DS-A_20261124-024302_generalization-official5/summary.json) · [공식 회귀 비교 PNG](../results/DS-A_20261124-024302_generalization-official5/compare-official5.png)
+
+| 회차 | 최대 진행(m) | 랩타임(초) | 횡오차 p95 / 최대(cm) | 속도 p95(m/s) | 정지(초) | 바퀴 접촉 횟수 / 시간(초) | 텔레메트리 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| official01 | 15.579 | 178.09 | 1.70 / 3.45 | 0.1008 | 0.66 | 6 / 1.88 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official01/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official01/01_01/telemetry.png) |
+| official02 | 15.575 | 175.82 | 1.75 / 3.15 | 0.1008 | 0.66 | 6 / 1.80 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official02/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official02/01_01/telemetry.png) |
+| official03 | 15.582 | 180.94 | 1.80 / 3.18 | 0.1007 | 0.66 | 6 / 1.98 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official03/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official03/01_01/telemetry.png) |
+| official04 | 15.582 | 177.57 | 1.58 / 3.23 | 0.1008 | 0.66 | 6 / 1.74 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official04/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official04/01_01/telemetry.png) |
+| official05 | 15.581 | 178.33 | 1.71 / 3.30 | 0.1008 | 0.66 | 6 / 2.00 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official05/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official05/01_01/telemetry.png) |
+
+- 랜덤 진행률이 향상됐고 공식 회귀 5회를 모두 통과해 일반화 수정을 이 브랜치의 무옵션 기본 동작으로 유지했다. 레이싱은 보류 상태다.
