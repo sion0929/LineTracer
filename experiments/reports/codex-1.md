@@ -241,3 +241,28 @@
 | 10 | 15.584 | 182.220 | 2.05 / 5.35 | 0.1006 | 6 / 1.62 | [telemetry.png](../results/DS-A_20261124-011714_qualify10/run10_1/01_01/telemetry.png) |
 
 - 독립 10회는 기본 속도 설정으로 실행했다. 레이싱 라인 고속 설정의 기존 비교 결과에는 이번 수정의 재시험 수치가 포함되지 않는다.
+
+## 2026-11-24 — G1 기준선과 레이싱 루프 복구
+
+- 리드가 178.2초와 172.8초로 재현한 `c6f9100`의 제어값을 `3eed70a`에서 무옵션 기본값으로 고정했다. 레이싱은 `--racing-line`으로만 활성화된다. 코드 `29ba6d8`을 고정한 레이싱 배치와 현재 코드에 동일한 레이싱 옵션을 전달했을 때 파싱된 인자가 모두 일치했다.
+- 리드의 3.338 m 코너 실패는 횡오차 최대 14.73 cm, 정지 2.40초, 바퀴 접촉 1회·0.88초였다. 저장된 궤적과 각속도 명령에서 역산한 카메라 방향으로 재생했을 때, G1 전진 제한은 3.323 m에서 정지 명령을 냈다. [리드 실패 텔레메트리](../results/lead/g1_364e419_fail/telemetry.png) · [G1 수정 전후 비교](../results/DS-A_20261124-020221_racing-loop10/compare-g1-corner.png)
+- 리드의 레이싱 루프 실패는 11.520 m에서 정지 47.09초, 횡오차 p95 7.74 cm, 최대 8.54 cm, 설계 통로 이탈 0초, 바퀴 접촉 1회·0.18초였다. 레이싱 목표의 방향을 따라갈 수 없을 때 지역 지도를 지우는 대신 G1 중심선 추종으로 복귀하도록 수정했다. 인접한 복귀 레인으로 목표가 건너뛰지 않도록 첫 0.10 m 구간에서 추종 시작점을 찾고, 일반 복구에서도 선을 못 찾을 때 최근 중심선을 최대 0.22 m만 사용한다. 이 경로에는 0.09 m 횡거리 및 1.25 rad 진행 방향 제한이 적용된다. [리드 루프 실패 텔레메트리](../results/lead/race_13f4a0d_run1/telemetry.png) · [레이싱 루프 비교](../results/DS-A_20261124-020221_racing-loop10/compare-racing-loop.png)
+- 리드의 정체 자세와 공식 경로를 사용한 오프라인 재생은 11.505 m에서 11.720 m까지 진행했고 횡오차 p95는 5.06 cm였다. 이 재생의 카메라 관측은 기하 모델로 생성했다. [재생 수치](../results/DS-A_20261124_racing-loop-offline.jsonl)
+
+### 공식 레이싱 10회 최종 결과
+
+- DeepSeek 워커가 고정 후보 `29ba6d8`을 공식 트랙에서 10회 실행했다. `bench.py --backend run_eval --off 0.12 --limit 320`과 `LAB_NAME=lf_a ROS_DOMAIN_ID=11 GZ_PARTITION=lf_a`를 사용했다. 레이싱 통로 반폭은 0.05 m, 최고 속도는 0.18 m/s, 횡가속도 제한은 0.18 m/s²였다.
+- 6/10 완주로 9/10 기준에 미달했다. 완주 평균 169.54초로 177초보다 7.46초 짧았고, 150초 목표에는 도달하지 못했다. 루프에 도달한 6회는 전부 통과했다. 실패 4회는 2.718, 3.485, 5.541, 6.731 m 정체였다. 리드 지시에 따라 레이싱은 보류했다.
+
+| 회차 | 결과 | 최대 도달(m) | 랩타임(초) | 횡오차 p95 / 최대(cm) | 속도 p95(m/s) | 정지(초) | 바퀴 접촉 횟수 / 시간(초) | 텔레메트리 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| run1_1 | stalled at 3.48m | 3.485 | — | 9.60 / 9.85 | 0.1800 | 33.92 | 8 / 10.96 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run1_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run1_1/01_01/telemetry.png) |
+| run2_1 | 완주 | 15.582 | 150.77 | 2.47 / 7.03 | 0.1801 | 4.50 | 6 / 1.26 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run2_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run2_1/01_01/telemetry.png) |
+| run3_1 | stalled at 2.72m | 2.718 | — | 3.83 / 4.48 | 0.1800 | 64.18 | 0 / 0.00 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run3_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run3_1/01_01/telemetry.png) |
+| run4_1 | stalled at 6.73m | 6.731 | — | 8.41 / 8.69 | 0.1799 | 45.73 | 10 / 13.45 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run4_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run4_1/01_01/telemetry.png) |
+| run5_1 | 완주 | 15.579 | 176.18 | 8.59 / 9.52 | 0.1800 | 27.05 | 11 / 7.92 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run5_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run5_1/01_01/telemetry.png) |
+| run6_1 | 완주 | 15.579 | 181.45 | 7.77 / 9.26 | 0.1800 | 25.30 | 10 / 6.48 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run6_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run6_1/01_01/telemetry.png) |
+| run7_1 | stalled at 5.54m | 5.541 | — | 9.17 / 9.46 | 0.1800 | 45.84 | 4 / 5.24 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run7_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run7_1/01_01/telemetry.png) |
+| run8_1 | 완주 | 15.580 | 178.39 | 7.60 / 9.14 | 0.1800 | 25.08 | 10 / 5.94 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run8_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run8_1/01_01/telemetry.png) |
+| run9_1 | 완주 | 15.577 | 175.34 | 5.23 / 8.20 | 0.1801 | 22.30 | 10 / 5.10 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run9_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run9_1/01_01/telemetry.png) |
+| run10_1 | 완주 | 15.582 | 155.10 | 2.04 / 3.90 | 0.1801 | 2.70 | 6 / 1.74 | [JSON](../results/DS-A_20261124-020221_racing-loop10/run10_1/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-020221_racing-loop10/run10_1/01_01/telemetry.png) |
