@@ -37,3 +37,49 @@
 - 랜덤 라인 IoU는 v1 DL 0.8573, v1 하이브리드 0.8987, v2 DL 0.9604, v2 하이브리드 0.7529. 랜덤 장애물 IoU는 v1 0.9629, v2 0.8810.
 - 1–2m 공식 라인 픽셀 재현율은 59.5% → 89.9%. 0.5m 미만 랜덤 화면 가장자리 상자는 92.6% → 67.4%로 하락했다. 표는 `experiments/dl/REPORT.md`, 거리 구간별 분모와 분자는 `experiments/dl/results/v2/{v1,v2}.json`.
 - CPU 46.8 FPS(p95 25.77ms), RTX 3090 149.8 FPS(p95 9.44ms). `experiments/dl/line_seg_v2.onnx`로 랩에서 `segment`와 `segment_hybrid` API 검증. 공식 그림자 오검출과 가까운 가장자리 상자 누락, 추종기 주행 결과가 잔여 확인 항목이다.
+
+## 2026-11-23 22:58 KST · G3 CPU 후보
+
+- `dev/two-track`의 `07f842f`를 받아 Codex-1 `364e419`와 원본 `experiments/follower.py`가 일치함을 확인했다. 복사본 `experiments/dl/follower_dl.py`에 v2 라인, v1 장애물, 좌우 여유와 지도 복귀를 추가했다(`9bddf25`).
+- DeepSeek가 `lf_b`에서 `bench.py --backend obstacle --off 0.12`로 평가했다. CPU 후보는 공식 0/3, 고정 G2 시드 20·26·33에서 0/3. 충돌 0건, 회피 성공 0건. 공식 진행률 21.24% / 11.24% / 16.02%, G2 진행률 7.66% / 8.33% / 6.70%.
+- 6회 모두 콜백 p95 63.16–100.99ms, 시뮬 영상 처리 13.55–22.31Hz로 30Hz 목표 미달. `experiments/dl/runs/follower-bench/dual-a/*/{result.json,run.log}`에서 확인했다. 랩의 CUDAExecutionProvider에서 두 ONNX를 읽고 추론을 확인한 뒤 같은 계획을 GPU 후보로 다시 위임했다.
+
+## 2026-11-23 23:09 KST · G3 CUDA 후보 비교 수치
+
+- 같은 주행 설정과 v2 라인·v1 장애물 ONNX를 RTX 3090에서 실행했다. DeepSeek의 6회 결과와 보충 1회 결과를 `result.json`과 `run.log`에서 직접 확인했다. 채점은 고정 G2와 `--backend obstacle --off 0.12`를 사용했다.
+- 공식 3/3 완주, 랩타임 179.652 / 186.708 / 176.116초(중앙값 179.652초), 최대 횡오차 3.49 / 8.94 / 3.39cm, 충돌 0건. 바퀴 접촉 판정은 각 6회였다.
+- G2 기본 시드 20·26·33은 4.502 / 4.801 / 4.790m에서 T자 종료 오인 후 정체했다. 보충 시드 21은 3.83m의 상자를 오른쪽 24cm로 우회하고 선 지도로 복귀했다. bench 회피 성공 1/1, 충돌 0건. 이후 T자 종료 오인으로 10.598m(70.53%)에서 정체했다. GPU G2 전체 0/4 완주, 충돌 0건, 회피 성공 1/1.
+- CUDA 7회 모두 콜백 p95 18.61–28.09ms로 33.3ms 이내였다. 시뮬 영상 처리율은 29.16–30.25Hz였고 공식 두 회에서 30Hz에 조금 못 미쳤다. T자 종료 오인과 바퀴 접촉이 잔여 문제다.
+- 비교표 `experiments/dl/REPORT.md`, 실행별 수치 `experiments/dl/results/g3/`, 원본 실행 `experiments/dl/runs/follower-bench/{dual-a,dual-cuda-b,dual-cuda-b-early}/`. 기준 추종기와 공용 채점기 소스는 병합본 `07f842f`를 사용했다.
+
+## 2026-11-23 23:10 KST · 바퀴 접촉 지표 반영
+
+- `git merge dev/two-track` 결과 이미 최신이었다. 바퀴 지표 `1f00892`와 고정 G2 세트 `076fe40`가 모두 현재 브랜치에 있다.
+- 기존 13회 벤치의 두 접촉 열을 원본 `result.json`과 대조해 `experiments/dl/REPORT.md`에 추가했다. GPU 공식 3회는 각각 6회, 접촉 시간 1.856 / 1.320 / 1.560초다. G2 회피 성공 시드 21은 6회, 5.520초다.
+- 반지름 10cm 코너의 안쪽 바퀴 접촉을 고려해 ±0.10m 통로 안의 경로 최적화 목표에 접촉 횟수와 시간을 포함했다. 기존 실측을 기준으로 사용한다.
+
+## 2026-11-24 01:09 KST · 텔레메트리 병합 및 코너 재현
+
+- `dev/two-track`의 `793c256`과 비교 그림 후속 `17c12d3`을 병합했다(`65a047f`). `experiments/README_telemetry.md`의 주행별 출력 형식을 확인했다.
+- DeepSeek가 원본 `364e419`와 `--off 0.12`로 공식 3회를 재현했다. 1/3 완주, 랩 180.020초. 실패의 최대 도달 거리는 2.458m와 3.294m였다. 03회차는 리드가 보고한 두 번째 코너에서 진행거리 3.263m 부근에 머문 채 0.045m/s 직진 명령이 이어져 최대 횡오차 12.69cm, ±0.12m 밖 0.72초를 기록했다.
+- 03회차의 `telemetry.json` 기준 실속도 p95 0.1003m/s, 절대 가속도 p95 0.0554m/s², 절대 각속도 p95 0.5522rad/s, 횡오차 p95 6.67cm, 바퀴 접촉 1회·0.84초. 원본 요약 및 그림은 `experiments/dl/runs/follower-bench/g1-rule-repro/03_01/{telemetry.json,telemetry.png}`.
+- 수정 후보 `df30dec`는 DL 복사본에서 급회전 감속, 복구 직진 전 근거리 지도 확인, 바퀴 접촉을 고려한 최대 4cm 경로 후보를 적용했다. 재현이 종료된 뒤 CUDA 공식 5회 검증을 같은 워커 방식으로 시작했다.
+
+## 2026-11-24 01:16 KST · 코너 배치 종료, G2 전환
+
+- 실행 중이던 `df30dec` 공식 5회만 종료까지 진행했다. 2/5 완주(205.448 / 203.532초), 3.34m 통과 4/5. 실패 최대 진행은 0.473 / 11.165 / 13.113m다. 01회차 영상 처리율은 46.10Hz로 기록됐고 원인은 미확정이다. 완주 두 회의 전체 텔레메트리 수치와 5회 PNG 경로는 `experiments/dl/REPORT.md`와 `experiments/dl/results/g1/official-telemetry.json`에 있다. 리드 실패 비교 `experiments/dl/results/g1/lead-vs-repro.png`.
+- 대기 중이던 추가 공식 5회는 시작 전에 취소했다. 코너 제어 변경은 종료하고 Codex-1의 공통 수정 병합을 기다린다. G2의 조기 T자 종료를 DL 지도 형태로 구분하는 후보를 고정 시드 20·21·26·33으로 위임했다.
+
+## 2026-11-24 01:22 KST · G2 T자 판정 파일럿
+
+- DL 지도에서 양팔 길이가 짧고 전방 선이 이어지지 않는 경우에만 T자 종료를 인정한다. 전방에 일정 길이의 선이 다시 보이면 갭을 연결한다. `e98ec64`, 단위 검사 19개 통과. G2는 `--tee-vision`을 켜고 공통 코너 제어 옵션은 사용하지 않았다.
+- 기본 세 맵의 기존 T자 정체 거리 → 수정 최대 도달 거리는 20번 4.502→7.310m, 26번 4.801→5.854m, 33번 4.790→4.947m였다. 기존 시드 21의 10.598m T자 정체 지점도 지나 12.998m에 도달했다. 수정 후보 4회는 모두 이후 이탈(0/4 완주), T자 조기 종료 0회였다.
+- 시드 21 회피 1/1, 파일럿 충돌 0건. 시드 21 텔레메트리는 속도 p95 0.1009m/s, |가속도| p95 0.0736m/s², |각속도| p95 0.6010rad/s, 최대 횡오차 24.91cm, 바퀴 접촉 7회·5.71초다. `experiments/dl/runs/follower-bench/g2-dl-tee-pilot/02_01/{telemetry.json,telemetry.png}`.
+- DeepSeek가 같은 후보로 나머지 고정 16맵을 실행 중이다. 완료 시 파일럿 4맵과 합쳐 20맵을 검증한다.
+
+## 2026-11-24 01:39 KST · 고정 G2 20맵 전체 실측
+
+- DeepSeek가 `lf_b`에서 T자 후보 `e98ec64`로 고정 시드 20–39를 각각 1회 실행했다. 서로 다른 20개 결과와 20개의 `telemetry.{json,png,csv,npz}`를 검증했다. 원본은 `experiments/dl/runs/follower-bench/{g2-dl-tee-pilot,g2-dl-tee-remaining}/`, 집계는 `experiments/dl/results/g2/fixed-set.json`.
+- 완주 2/20(10%), 최대 진행률 평균 49.66%. 완주는 Easy 24의 195.744초와 Normal 32의 199.652초다. 충돌 3건, 회피 성공 7/10(70%). 바퀴 선 접촉 합계 65회·53.604초(벤치). 조기 T자 종료 로그 0/20. CUDA 콜백 p95 19.88–31.21ms, 시뮬 영상 처리율 28.04–30.23Hz.
+- Easy 24는 회피 1/1·충돌 0으로 완주했다. 텔레메트리 요약은 `experiments/dl/runs/follower-bench/g2-dl-tee-remaining/03_01/telemetry.json`, 그림은 같은 폴더의 `telemetry.png`. 시드 25 접촉과 비교한 그림은 `experiments/dl/results/g2/avoidance-comparison.png`. 각 맵의 텔레메트리 수치와 PNG 경로는 `experiments/dl/REPORT.md`.
+- 남은 문제는 교차부 이후 경로 이탈·정체와 우회 진입·복귀 때 차체의 상자 여유다. T자 종료 개선으로 기존 세 정체 지점을 통과했지만 전체 완주율은 10%였다. 코너 공동 수정은 리드 지시대로 Codex-1 병합 전까지 진행하지 않았다.

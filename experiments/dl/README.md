@@ -90,3 +90,46 @@ dark = line_mask[RAY_V, RAY_U].ravel()[ok0]
 ```
 
 두 마스크는 모두 `(480, 640)`의 `numpy.bool_` 배열이다. 첫 호출에 ONNX 세션을 로드하므로 주행 전에 한 번 호출해 준비할 수 있다. 장애물 마스크는 장애물 회피 로직 입력으로 사용한다.
+
+## G3 비교용 추종기
+
+`follower_dl.py`는 Codex-1의 `364e419`를 복사해 카메라 인식과 장애물 우회를 붙인 별도 실행 파일이다. 라인은 v2, 장애물은 v1을 기본 모델로 쓴다. 장애물로 가려진 픽셀은 라인 지도의 음성 증거에서 빼고, 일반 추종은 지도의 선 중심을 목표로 한다.
+
+일반 추종의 설계 통로는 선 중심 기준 ±0.10m다. 좁은 통로를 막은 상자는 카메라 마스크에서 직립 영역의 하단을 투영해 위치를 추정한다. 좌우 여유를 로봇 폭과 비교한 뒤, 가능한 쪽으로 비켜 지나가고 기존 라인 지도에 복귀한다. 원래 통로 밖 이동은 우회 구간에서 허용한다. `bench.py --backend obstacle --off 0.12`가 일반 이탈, 상자 접촉과 복귀, 바퀴 접촉을 채점한다.
+
+```bash
+bash experiments/dl/prepare_lab_cuda.sh
+DL_RUNTIME_DIR=/ws/experiments/dl/runs/lab-runtime-cuda \
+DL_CUDA_LIBS=/ws/experiments/dl/runs/lab-cuda-libs \
+bash experiments/dl/bench_follower.sh dual-cuda-b --device cuda --ort-threads 1
+```
+
+CUDA 실행에는 RTX 3090에 접근 가능한 `lf_b` 랩 빌드와 CUDA 13·cuDNN 9 라이브러리가 필요하다. 준비 스크립트는 기존 호스트 라이브러리를 워크트리의 실행 폴더에 연결한다. 이름마다 별도 디렉터리에 공식 3회와 고정 G2의 20·26·33번 각 1회가 저장된다. `DL_BENCH_JOBS=1`로 동시 주행 수를 줄일 수 있다. 실행별 `result.json`과 `run.log`에 채점 및 추론·콜백 타이밍이 기록된다.
+
+### 공식 코너 및 통로 검증
+
+`--corner-guard`는 지도에서 급회전이 보이면 0.055m/s로 감속하고, 목표 각도가 0.72rad를 넘으면 먼저 회전한다. 복구에 들어갈 때 재앵커링 직전의 근거리 선 셀을 보관하고, 그 근거를 벗어나는 카메라 직진 명령을 정지·회전으로 바꾼다. `--corridor-path`는 이때 좌우 바퀴와 선의 예상 접촉을 비교해 최대 4cm의 경로 오프셋을 고려한다. 일반 통로는 ±0.10m다.
+
+```bash
+DL_OFFICIAL_RUNS=5 DL_G2_SEEDS='' \
+DL_RUNTIME_DIR=/ws/experiments/dl/runs/lab-runtime-cuda \
+DL_CUDA_LIBS=/ws/experiments/dl/runs/lab-cuda-libs \
+bash experiments/dl/bench_follower.sh g1-dl-corridor \
+  --device cuda --ort-threads 1 --corner-guard --corridor-path
+```
+
+실행 폴더에 `telemetry.json`, `telemetry.png`와 거리별 시계열이 생성된다. 겹쳐 그리는 방법은 [주행 텔레메트리](../README_telemetry.md)를 참고한다.
+
+### 고정 G2 전체 평가
+
+`--tee-vision`은 DL 지도에서 짧은 양쪽 가로팔과 전방 선의 연속성을 확인해 도착 T자를 구분한다. 고정 맵 목록을 그대로 벤치마크에 넘긴다.
+
+```bash
+mapfile -t G2_SEEDS < <(sed -nE 's@.*/[a-z]+_([0-9]+)_obs[0-9]+\.sdf$@\1@p' \
+  experiments/worlds/eval_set_G2.txt)
+DL_OFFICIAL_RUNS=0 DL_G2_SEEDS="${G2_SEEDS[*]}" \
+DL_RUNTIME_DIR=/ws/experiments/dl/runs/lab-runtime-cuda \
+DL_CUDA_LIBS=/ws/experiments/dl/runs/lab-cuda-libs \
+bash experiments/dl/bench_follower.sh g2-dl-tee-all \
+  --device cuda --ort-threads 1 --tee-vision
+```
