@@ -34,6 +34,7 @@ if __package__ in (None, ''):
 from experiments.dl.corridor import guarded_speed, near_bend, recovery_motion_supported, wheel_aware_path
 from experiments.dl.detour import camera_boxes, choose_detour, transform_boxes
 from experiments.dl.infer import Segmenter
+from experiments.dl.junction import terminal_shape
 
 MODELS = Path(__file__).resolve().parent
 
@@ -97,6 +98,8 @@ class Follower(Node):
         self.guarded_frames = 0
         self.offset_frames = 0
         self.recovery_brake_frames = 0
+        self.junction_reconnects = 0
+        self.junction_reconnect_time = -math.inf
         self.recovery_line = np.empty((0, 2))
         self.processing_times = deque(maxlen=3000)
         self.inference_times = deque(maxlen=3000)
@@ -485,8 +488,31 @@ class Follower(Node):
                 continuation = self.forward_continuation(px, py, incoming, angles)
                 if continuation is None:
                     if self.transverse_bar(px, py, incoming, angles):
-                        end_reason = 'tee'
-                        break
+                        if not self.a.tee_vision:
+                            end_reason = 'tee'
+                            break
+                        compact, forward = self.junction_shape(px, py, incoming)
+                        if compact:
+                            end_reason = 'tee'
+                            break
+                        if forward is not None:
+                            c, s = math.cos(incoming), math.sin(incoming)
+                            dx = c * forward[0] - s * forward[1]
+                            dy = s * forward[0] + c * forward[1]
+                            length = math.hypot(dx, dy)
+                            remaining = self.a.horizon - total
+                            ratio = min(1.0, remaining / length)
+                            n = max(1, round(length * ratio / step))
+                            pts.extend((px + dx * t, py + dy * t)
+                                       for t in np.linspace(0, ratio, n + 1)[1:])
+                            px, py = pts[-1]
+                            total += length * ratio
+                            h = math.atan2(dy, dx)
+                            now = time.monotonic()
+                            if now - self.junction_reconnect_time > 1.0:
+                                self.junction_reconnect_time = now
+                                self.junction_reconnects += 1
+                            continue
                 else:
                     best = math.remainder(incoming + continuation - h, 2 * math.pi)
             h = h + best
@@ -526,6 +552,18 @@ class Follower(Node):
         return all(any(self.line_at(px + reach * math.cos(heading + sign * offset),
                                     py + reach * math.sin(heading + sign * offset)) == 1
                        for offset in side) for sign in (-1, 1))
+
+    def junction_shape(self, px, py, heading):
+        """Use DL-positive floor cells around the putative junction."""
+        ix, iy = int((px - ORIGIN) / RES), int((py - ORIGIN) / RES)
+        radius = math.ceil(0.31 / RES)
+        x0, x1 = max(0, ix - radius), min(GRID, ix + radius + 1)
+        y0, y1 = max(0, iy - radius), min(GRID, iy + radius + 1)
+        rows, cols = np.nonzero(self.grid[y0:y1, x0:x1] == 1)
+        dx = ORIGIN + (cols + x0 + 0.5) * RES - px
+        dy = ORIGIN + (rows + y0 + 0.5) * RES - py
+        c, s = math.cos(heading), math.sin(heading)
+        return terminal_shape(np.column_stack((c * dx + s * dy, -s * dx + c * dy)))
 
     def gap_path(self, endpoint, heading):
         """Find a nearby fragment with enough mapped line to continue tracing."""
@@ -785,6 +823,7 @@ def main():
     p.add_argument('--avoid-speed', type=float, default=0.10)
     p.add_argument('--avoid-trigger', type=float, default=0.56)
     p.add_argument('--avoid-padding', type=float, default=0.025)
+    p.add_argument('--tee-vision', action='store_true')
     p.add_argument('--corner-guard', action='store_true')
     p.add_argument('--corridor-path', action='store_true')
     p.add_argument('--vmax', type=float, default=0.22)
@@ -832,6 +871,8 @@ def main():
                                 detours_started=n.detours_started, detours_finished=n.detours_finished)
         print(f"DL corridor: brake_frames={n.guarded_frames} offset_frames={n.offset_frames} "
               f"recovery_brake_frames={n.recovery_brake_frames}", flush=True)
+        if a.tee_vision:
+            print(f"DL junction: reconnects={n.junction_reconnects}", flush=True)
         if n.processing_times:
             seconds = np.asarray(n.processing_times)
             infer = np.asarray(n.inference_times)
