@@ -98,7 +98,10 @@ dark = line_mask[RAY_V, RAY_U].ravel()[ok0]
 일반 추종의 설계 통로는 선 중심 기준 ±0.10m다. 좁은 통로를 막은 상자는 카메라 마스크에서 직립 영역의 하단을 투영해 위치를 추정한다. 좌우 여유를 로봇 폭과 비교한 뒤, 가능한 쪽으로 비켜 지나가고 기존 라인 지도에 복귀한다. 원래 통로 밖 이동은 우회 구간에서 허용한다. `bench.py --backend obstacle --off 0.12`가 일반 이탈, 상자 접촉과 복귀, 바퀴 접촉을 채점한다.
 
 ```bash
-bash experiments/dl/bench_follower.sh dual-a --ort-threads 3
+bash experiments/dl/prepare_lab_cuda.sh
+DL_RUNTIME_DIR=/ws/experiments/dl/runs/lab-runtime-cuda \
+DL_CUDA_LIBS=/ws/experiments/dl/runs/lab-cuda-libs \
+bash experiments/dl/bench_follower.sh dual-cuda-b --device cuda --ort-threads 1
 ```
 
-실행에는 위의 랩 ONNX Runtime 경로와 `lf_b` 랩 빌드가 필요하다. 이름마다 별도 디렉터리에 공식 3회와 고정 G2의 20·26·33번 각 1회가 저장된다. `DL_BENCH_JOBS=1`로 동시 주행 수를 줄일 수 있다. 실행별 `result.json`과 `run.log`에 채점 및 추론·콜백 타이밍이 기록된다.
+CUDA 실행에는 RTX 3090에 접근 가능한 `lf_b` 랩 빌드와 CUDA 13·cuDNN 9 라이브러리가 필요하다. 준비 스크립트는 기존 호스트 라이브러리를 워크트리의 실행 폴더에 연결한다. 이름마다 별도 디렉터리에 공식 3회와 고정 G2의 20·26·33번 각 1회가 저장된다. `DL_BENCH_JOBS=1`로 동시 주행 수를 줄일 수 있다. 실행별 `result.json`과 `run.log`에 채점 및 추론·콜백 타이밍이 기록된다.

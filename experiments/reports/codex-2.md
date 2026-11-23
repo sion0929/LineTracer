@@ -37,3 +37,9 @@
 - 랜덤 라인 IoU는 v1 DL 0.8573, v1 하이브리드 0.8987, v2 DL 0.9604, v2 하이브리드 0.7529. 랜덤 장애물 IoU는 v1 0.9629, v2 0.8810.
 - 1–2m 공식 라인 픽셀 재현율은 59.5% → 89.9%. 0.5m 미만 랜덤 화면 가장자리 상자는 92.6% → 67.4%로 하락했다. 표는 `experiments/dl/REPORT.md`, 거리 구간별 분모와 분자는 `experiments/dl/results/v2/{v1,v2}.json`.
 - CPU 46.8 FPS(p95 25.77ms), RTX 3090 149.8 FPS(p95 9.44ms). `experiments/dl/line_seg_v2.onnx`로 랩에서 `segment`와 `segment_hybrid` API 검증. 공식 그림자 오검출과 가까운 가장자리 상자 누락, 추종기 주행 결과가 잔여 확인 항목이다.
+
+## 2026-11-23 22:58 KST · G3 CPU 후보
+
+- `dev/two-track`의 `07f842f`를 받아 Codex-1 `364e419`와 원본 `experiments/follower.py`가 일치함을 확인했다. 복사본 `experiments/dl/follower_dl.py`에 v2 라인, v1 장애물, 좌우 여유와 지도 복귀를 추가했다(`9bddf25`).
+- DeepSeek가 `lf_b`에서 `bench.py --backend obstacle --off 0.12`로 평가했다. CPU 후보는 공식 0/3, 고정 G2 시드 20·26·33에서 0/3. 충돌 0건, 회피 성공 0건. 공식 진행률 21.24% / 11.24% / 16.02%, G2 진행률 7.66% / 8.33% / 6.70%.
+- 6회 모두 콜백 p95 63.16–100.99ms, 시뮬 영상 처리 13.55–22.31Hz로 30Hz 목표 미달. `experiments/dl/runs/follower-bench/dual-a/*/{result.json,run.log}`에서 확인했다. 랩의 CUDAExecutionProvider에서 두 ONNX를 읽고 추론을 확인한 뒤 같은 계획을 GPU 후보로 다시 위임했다.

@@ -21,6 +21,7 @@ import time
 import cv2
 import numpy as np
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
@@ -78,10 +79,10 @@ class Follower(Node):
         super().__init__('experimental_dl_follower')
         self.a = a
         cv2.setNumThreads(1)
-        self.line_model = Segmenter(a.line_model, threads=a.ort_threads)
+        self.line_model = Segmenter(a.line_model, threads=a.ort_threads, device=a.device)
         self.obstacle_model = (
             self.line_model if Path(a.line_model).resolve() == Path(a.obstacle_model).resolve()
-            else Segmenter(a.obstacle_model, threads=a.ort_threads)
+            else Segmenter(a.obstacle_model, threads=a.ort_threads, device=a.device)
         )
         warm = np.zeros((H, W, 3), np.uint8)
         self.line_model(warm)
@@ -744,6 +745,7 @@ def main():
     p.add_argument('--line-model', type=Path, default=MODELS / 'line_seg_v2.onnx')
     p.add_argument('--obstacle-model', type=Path, default=MODELS / 'line_seg.onnx')
     p.add_argument('--ort-threads', type=int, default=4)
+    p.add_argument('--device', choices=('cpu', 'cuda'), default='cpu')
     p.add_argument('--avoid', action=argparse.BooleanOptionalAction, default=True)
     p.add_argument('--avoid-speed', type=float, default=0.10)
     p.add_argument('--avoid-trigger', type=float, default=0.56)
@@ -782,7 +784,7 @@ def main():
     n = Follower(a)
     try:
         rclpy.spin(n)
-    except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
+    except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
         if a.dump:

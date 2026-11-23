@@ -10,8 +10,14 @@ if [[ ! "$candidate" =~ ^[a-zA-Z0-9_-]+$ ]]; then
 fi
 output="experiments/dl/runs/follower-bench/$candidate"
 official=src/line_follower_bringup/worlds/line_track.sdf
-maps=("$official" "$official" "$official")
-seeds=(20 26 33)
+official_runs=${DL_OFFICIAL_RUNS:-3}
+if [[ ! "$official_runs" =~ ^[0-3]$ ]]; then
+  echo 'DL_OFFICIAL_RUNS must be between 0 and 3' >&2
+  exit 2
+fi
+maps=()
+for (( run=0; run<official_runs; run++ )); do maps+=("$official"); done
+read -r -a seeds <<< "${DL_G2_SEEDS:-20 26 33}"
 while IFS= read -r map; do
   case "$map" in ''|\#*) continue ;; esac
   file=${map##*/}
@@ -21,7 +27,7 @@ while IFS= read -r map; do
     --obstacles "${obstacles#obs}" --output "$map"
   maps+=("$map")
 done < experiments/worlds/eval_set_G2.txt
-[[ "${#maps[@]}" == 6 ]]
+[[ "${#maps[@]}" -eq $((official_runs + ${#seeds[@]})) ]]
 flags=(--reactive-recovery --ld-min 0.05 --ld-gain 0.2 --alat 0.10 --vmax 0.10
        --wmax 0.8 --waccel 1.6 --accel 0.30 --decel-cmd 0.40 "$@")
 # Values are passed unexpanded by the inner shell; the Python CLI parses the profile.
@@ -29,5 +35,9 @@ printf -v invocation '%q ' python3 experiments/bench.py "${maps[@]}" --backend o
   --follower experiments/dl/follower_dl.py --profile "$candidate=${flags[*]}" \
   --output "$output" --jobs "${DL_BENCH_JOBS:-2}" --limit 300 --stall 20
 printf -v command '%q' "source /opt/ros/jazzy/setup.bash && source /ws/install_lab/setup.bash && $invocation"
+runtime=${DL_RUNTIME_DIR:-/ws/experiments/dl/runs/lab-runtime}
+libraries=${DL_CUDA_LIBS:-}
+printf -v pythonpath '%q' "$runtime:/ws"
+printf -v ld_library_path '%q' "$libraries"
 sg docker -c "docker exec -e LAB_NAME -e ROS_DOMAIN_ID -e GZ_PARTITION \
-  -e PYTHONPATH=/ws/experiments/dl/runs/lab-runtime:/ws lf_b bash -c $command"
+  -e PYTHONPATH=$pythonpath -e LD_LIBRARY_PATH=$ld_library_path lf_b bash -c $command"
