@@ -1,0 +1,23 @@
+[1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="turtlebot3_waffle_pi"]/link[@name="camera_rgb_frame"]/sensor[@name="camera"]/gz_frame_id:/ws/src/line_follower_bringup/models/turtlebot3_waffle_pi/model.sdf:L352]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[INFO] [1795449988.087953178] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[INFO] [1795449988.089576319] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/imu (gz.msgs.IMU) -> /imu (sensor_msgs/msg/Imu)] (Lazy 0)
+[INFO] [1795449988.092758115] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/odom (gz.msgs.Odometry) -> /odom (nav_msgs/msg/Odometry)] (Lazy 0)
+[INFO] [1795449988.095485246] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/camera/camera_info (gz.msgs.CameraInfo) -> /camera/camera_info (sensor_msgs/msg/CameraInfo)] (Lazy 0)
+[INFO] [1795449988.096937113] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/cmd_vel (geometry_msgs/msg/Twist) -> /cmd_vel (gz.msgs.Twist)] (Lazy 0)
+Authorization required, but no authorization protocol specified
+
+libEGL warning: pci id for fd 70: 10de:2204, driver (null)
+
+pci id for fd 72: 10de:2204, driver (null)
+pci id for fd 73: 10de:2204, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+libEGL warning: pci id for fd 70: 10de:2204, driver (null)
+
+pci id for fd 72: 10de:2204, driver (null)
+pci id for fd 73: 10de:2204, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+libEGL warning: pci id for fd 70: 10de:2204, driver (null)
+
+[INFO] [1795449995.024854890] [ros_gz_bridge]: Passing message from ROS geometry_msgs/msg/Twist to Gazebo gz.msgs.Twist (showing msg only once per type)
+[INFO] [1795450147.265836295] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [1795450147.479606501] [rclcpp]: signal_handler(SIGINT/SIGTERM)
