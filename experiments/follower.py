@@ -24,6 +24,8 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Image, Imu
 
+from racing_line import nearest_station, plan_path
+
 # camera geometry (model.sdf): 0.076 m ahead of axle, 0.103 m above ground, hfov 1.085595, 640x480
 CAM_X, CAM_H, W, H = 0.076, 0.103, 640, 480
 F = (W / 2) / math.tan(1.085595 / 2)
@@ -559,7 +561,8 @@ class Follower(Node):
             return
         if self.a.reactive_recovery:
             stalled = self.stalled() if self.recovery_turn is None else False
-            supported = remaining >= 0.16 and np.hypot(rx[0], ry[0]) < 0.065
+            support_radius = self.a.racing_corridor + 0.02 if self.a.racing_line else 0.065
+            supported = remaining >= 0.16 and np.hypot(rx[0], ry[0]) < support_radius
             turn_too_far = abs(alpha) > self.a.rotate_angle
             lost = stalled or near_end or turn_too_far or (self.recovery_turn is not None and not supported)
             if reason != 'tee' and lost:
@@ -572,6 +575,9 @@ class Follower(Node):
                 self.recovery_path = None
                 self.recovery_axis = None
                 self.motion_anchor = None
+        if self.a.racing_line:
+            self.track_racing(pts, ld)
+            return
         if reason in ('end', 'unknown') and near_end:
             dx, dy = rx[-1] - rx[0], ry[-1] - ry[0]
             angle = math.atan2(dy, dx)
@@ -611,6 +617,35 @@ class Follower(Node):
                 v = min(v, self.a.wmax / max(abs(curv), 1e-3))
         self.set_motion(v, w)
 
+    def track_racing(self, centerline, lookahead):
+        plan = plan_path(
+            centerline, corridor=self.a.racing_corridor, vmax=self.a.vmax,
+            lateral_accel=self.a.alat, accel=self.a.accel, braking=self.a.decel_cmd,
+            wmax=self.a.wmax, initial_speed=self.v_prev, corner_vmax=0.10,
+            reaction_time=max(0.0, self.a.latency) + 1 / 30,
+        )
+        x, y, yaw = self.pose
+        station = nearest_station(plan, (x, y))
+        target_s = min(station + lookahead, plan.arc[-1])
+        tx = np.interp(target_s, plan.arc, plan.points[:, 0]) - x
+        ty = np.interp(target_s, plan.arc, plan.points[:, 1]) - y
+        forward = math.cos(yaw) * tx + math.sin(yaw) * ty
+        lateral = -math.sin(yaw) * tx + math.cos(yaw) * ty
+        angle = math.atan2(lateral, forward)
+        if abs(angle) > self.a.rotate_angle:
+            if self.a.reactive_recovery:
+                self.react_to_camera(angle)
+            else:
+                self.set_motion(0.0, math.copysign(min(self.a.wmax, self.a.k_rot * abs(angle)), angle))
+            return
+        curvature = 2 * lateral / max(tx * tx + ty * ty, 1e-4)
+        magnitude = max(abs(curvature), 1e-6)
+        v = min(float(np.interp(station, plan.arc, plan.speed)), self.a.wmax / magnitude,
+                math.sqrt(self.a.alat / magnitude))
+        if magnitude >= 3.0:
+            v = min(v, 0.10)
+        self.set_motion(v, v * curvature)
+
     def set_motion(self, v, w):
         # Rate limits apply to both tracking and recovery commands.
         dt = 1.0 / 30
@@ -647,6 +682,9 @@ def main():
                    help='try a bounded low-speed approach to a supported nearby line fragment')
     p.add_argument('--reactive-recovery', action='store_true',
                    help='refresh the local map and steer using the latest camera observation when tracking fails')
+    p.add_argument('--racing-line', action='store_true',
+                   help='plan a low-time trajectory inside the mapped line corridor')
+    p.add_argument('--racing-corridor', type=float, default=0.10)
     p.add_argument('--dump', default='')
     p.add_argument('--latency', type=float, default=0.04)
     p.add_argument('--imu-yaw', type=int, default=1)
@@ -658,6 +696,10 @@ def main():
     p.add_argument('--clamp', type=int, default=12)
     p.add_argument('--terrain-tau', type=float, default=1.0)
     a, _ = p.parse_known_args()
+    if not 0.0 < a.racing_corridor <= 0.10:
+        p.error('--racing-corridor must be in (0, 0.10] m')
+    if a.racing_line and min(a.vmax, a.alat, a.accel, a.decel_cmd, a.wmax) <= 0.0:
+        p.error('racing-line speed, acceleration, braking and angular limits must be positive')
     rclpy.init()
     n = Follower(a)
     try:
