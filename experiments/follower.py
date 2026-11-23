@@ -236,8 +236,9 @@ class Follower(Node):
                         return s[0], s[1], yaw
         return None
 
-    def trace(self, px, py, h):
-        step, r = self.a.step, self.a.probe
+    def trace(self, px, py, h, probe=None):
+        step = self.a.step
+        r = self.a.probe if probe is None else probe
         angles = np.radians(np.arange(-105, 106, 5))
         pts = [(px, py)]
         end_reason = 'length'
@@ -265,17 +266,26 @@ class Follower(Node):
                 break
             centers = [float(np.mean(cl)) for cl in clusters]
             best = min(centers, key=abs)
-            if abs(best) > math.radians(45):
-                left = [c for c in centers if c > math.radians(45)]
-                right = [c for c in centers if c < -math.radians(45)]
-                if left and right:          # T junction: line ends in a bar
-                    end_reason = 'tee'
-                    break
+            if abs(best) > math.radians(25) and self.tee_arms(px, py, h, clusters, centers):
+                end_reason = 'tee'
+                break
             h = h + best
             px, py = px + step * math.cos(h), py + step * math.sin(h)
             pts.append((px, py))
             total += step
         return np.array(pts), end_reason
+
+    def tee_arms(self, px, py, heading, clusters, centers):
+        """Check that both sides extend past short line artifacts at corners."""
+        support = set()
+        reach = 0.065
+        for cluster, center in zip(clusters, centers):
+            if abs(center) <= math.radians(25):
+                continue
+            if any(self.line_at(px + reach * math.cos(heading + angle),
+                                py + reach * math.sin(heading + angle)) == 1 for angle in cluster):
+                support.add(math.copysign(1, center))
+        return len(support) == 2
 
     # ---------------------------------------------------------------- control
     def control(self):
@@ -288,6 +298,24 @@ class Follower(Node):
             self.cmd = Twist()
             return
         pts, reason = self.trace(*sp)
+        min_steps = math.ceil(self.a.stop_dist / self.a.step)
+        if reason in ('end', 'unknown') and len(pts) <= min_steps:
+            heading_error = math.remainder(yaw - sp[2], 2 * math.pi)
+            if 1e-3 < abs(heading_error) < 0.35:
+                # A small heading change can shift arc samples across sparse cells.
+                retry, retry_reason = self.trace(sp[0], sp[1], yaw)
+                if len(retry) > min_steps:
+                    pts, reason = retry, retry_reason
+            if len(pts) <= min_steps and math.hypot(sp[0] - x, sp[1] - y) < 0.08:
+                # Nearby fragments can have a small gap after wheel slip.
+                # Use a wider probe only when the usual trace cannot reach the lookahead.
+                for probe in (0.045, 0.08):
+                    if probe <= self.a.probe:
+                        continue
+                    retry, retry_reason = self.trace(*sp, probe)
+                    if len(retry) > min_steps:
+                        pts, reason = retry, retry_reason
+                        break
         if len(pts) < 2:
             self.cmd = Twist()
             return
@@ -299,10 +327,21 @@ class Follower(Node):
         seg = np.hypot(np.diff(rx), np.diff(ry))
         arc = np.r_[0, np.cumsum(seg)]
         remaining = arc[-1]
-        if reason in ('end', 'tee') and remaining < self.a.stop_dist and np.hypot(rx[-1], ry[-1]) < self.a.stop_dist:
-            self.get_logger().info(f'path finished ({reason}); stopping')
-            self.finished = reason == 'tee'
+        near_end = remaining < self.a.stop_dist and np.hypot(rx[-1], ry[-1]) < self.a.stop_dist
+        if reason == 'tee' and near_end:
+            self.get_logger().info('terminal T reached; stopping')
+            self.finished = True
             self.cmd = Twist()
+            return
+        if reason in ('end', 'unknown') and near_end:
+            # A short mapped curve can terminate at the edge of the camera view.
+            # Turn toward its tangent so the continuation can enter the image.
+            dx, dy = rx[-1] - rx[0], ry[-1] - ry[0]
+            angle = math.atan2(dy, dx)
+            w = 0.0
+            if math.hypot(dx, dy) >= 0.02 and 0.15 <= abs(angle) <= 1.2:
+                w = max(-0.4, min(0.4, 1.5 * angle))
+            self.set_motion(0.0, w)
             return
         # curvature ahead from heading change over the next window
         hd = np.unwrap(np.arctan2(np.diff(ry), np.diff(rx)))
@@ -333,7 +372,10 @@ class Follower(Node):
             w = max(-self.a.wmax, min(self.a.wmax, v * curv + self.a.k_head * alpha * (v < 0.02)))
             if abs(w) >= self.a.wmax:
                 v = min(v, self.a.wmax / max(abs(curv), 1e-3))
-        # rate limits (sudden wheel-speed jumps make the simulated base skid)
+        self.set_motion(v, w)
+
+    def set_motion(self, v, w):
+        # Rate limits apply to both tracking and recovery commands.
         dt = 1.0 / 30
         v = min(v, self.v_prev + self.a.accel * dt); v = max(v, self.v_prev - self.a.decel_cmd * dt)
         w = min(w, self.w_prev + self.a.waccel * dt); w = max(w, self.w_prev - self.a.waccel * dt)
