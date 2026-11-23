@@ -29,3 +29,11 @@
 
 - 리드가 검증한 생성기 병합 `90a4c59`를 포함하는 `dev/two-track`을 `track/b-dlseg`에 병합했다(`585203a`). 수집 스크립트와 안내가 현재 워크트리의 `experiments/worlds/gen_world.py`를 사용한다.
 - 수집 스크립트로 랜덤 맵 9개를 다시 생성했다. SDF·STL·JSON 27개 SHA256이 `experiments/dl/results/dataset.json`의 기록과 모두 일치했다. 기존 이미지·마스크는 수집 완료 기록을 사용했다. 막힌 점 없음.
+
+## 2026-11-23 22:43 KST · v2·하이브리드·거리별 재현율
+
+- DeepSeek 워커에 `LAB_NAME=lf_b ROS_DOMAIN_ID=12 GZ_PARTITION=lf_b`를 지정해 무장애물 학습 720장, 검증 120장 수집과 v2 학습·평가를 맡겼다. 수집·평가 결과 JSON을 직접 확인했다. 총 학습 2,820장, 검증 300장, 기존 시험 540장. 공식 프레임은 시험에만 있다. `experiments/dl/results/v2/dataset.json`.
+- 조명 기울기와 쐐기형 그림자 증강, 640×480 RGB 경계 보정을 학습한 v2의 공식 라인 IoU는 **0.9423**으로 OpenCV 0.8745와 v1 0.8242보다 높았다. 공식 오검출은 15/180 → 14/180장, 최대 28,465 → 24,888픽셀.
+- 랜덤 라인 IoU는 v1 DL 0.8573, v1 하이브리드 0.8987, v2 DL 0.9604, v2 하이브리드 0.7529. 랜덤 장애물 IoU는 v1 0.9629, v2 0.8810.
+- 1–2m 공식 라인 픽셀 재현율은 59.5% → 89.9%. 0.5m 미만 랜덤 화면 가장자리 상자는 92.6% → 67.4%로 하락했다. 표는 `experiments/dl/REPORT.md`, 거리 구간별 분모와 분자는 `experiments/dl/results/v2/{v1,v2}.json`.
+- CPU 46.8 FPS(p95 25.77ms), RTX 3090 149.8 FPS(p95 9.44ms). `experiments/dl/line_seg_v2.onnx`로 랩에서 `segment`와 `segment_hybrid` API 검증. 공식 그림자 오검출과 가까운 가장자리 상자 누락, 추종기 주행 결과가 잔여 확인 항목이다.

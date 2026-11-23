@@ -48,17 +48,39 @@ DL_RUN=experiments/dl/runs/small-unet-v1
 
 `train`의 `--shadow-prob 0.5` 옵션은 학습 프레임에 부드러운 경계의 국소 그림자를 추가한다. `evaluate`는 맵별로 정답 장애물이 없는 프레임 수, 그중 장애물 픽셀을 하나 이상 예측한 프레임 수와 프레임당 최대 오검출 픽셀 수를 `obstacle_audit`에 기록한다.
 
+### v2 재현
+
+v1 데이터와 학습 체크포인트를 먼저 만든 뒤 무장애물 맵을 추가한다. 랜덤 학습 시드 401–403과 검증 시드 451을 수집하며 기존 시험 세트를 연결한다.
+
+```bash
+bash experiments/dl/collect_v2.sh
+DL_DATA=experiments/dl/runs/dataset-v2
+DL_V2=experiments/dl/runs/v2-study/v2
+"$DL_PY" -m experiments.dl.train --data "$DL_DATA" --out "$DL_V2" \
+  --epochs 24 --batch-size 12 --seed 12 --shadow-prob 0.40 \
+  --official-style --full-resolution --learning-rate 0.0007 \
+  --initialize-from experiments/dl/runs/small-unet-v1/best.pt
+"$DL_PY" -m experiments.dl.evaluate --data "$DL_DATA" \
+  --onnx "$DL_V2/line_seg.onnx" --checkpoint "$DL_V2/best.pt" \
+  --out experiments/dl/runs/v2-study/v2-eval --distance-recall --benchmark-frames 480
+```
+
+거리별 재현율은 정답 픽셀을 카메라 광축의 전방 거리로 나눈다. 라인은 전 화면, 가장자리 상자는 화면의 좌우 64픽셀과 상하 48픽셀 띠를 사용한다.
+
 ## Codex-1 연동
 
 저장소 루트를 Python 모듈 검색 경로에 추가한다. ROS 이미지의 `encoding`을 확인해 RGB 영상은 BGR로 변환하고, `step`에 패딩이 있으면 제거한다. 기본 모델은 `experiments/dl/line_seg.onnx`이며 `LINE_SEG_ONNX`로 경로를 바꿀 수 있다. 랩에서 실행할 때는 랩 Python이 `onnxruntime`을 찾을 수 있어야 한다.
 
 ```python
-from experiments.dl.infer import segment
+from experiments.dl.infer import segment, segment_hybrid
 
-# follower.py의 --perception dl 분기에서 호출한다.
-line_mask, obstacle_mask = segment(bgr_img)
+# follower.py의 --perception dl 및 --perception hybrid 분기에서 호출한다.
+perceive = segment_hybrid if args.perception == "hybrid" else segment
+line_mask, obstacle_mask = perceive(bgr_img)
 dark = line_mask[RAY_V, RAY_U].ravel()[ok0]
 ```
+
+하이브리드 라인은 회색조 밝기 80 미만인 픽셀에서 DL 장애물 마스크를 뺀 결과다. 장애물 마스크는 DL 출력이다.
 
 랩 이미지에 pip가 없는 경우, Python 3.12 호스트 환경에서 아래 명령을 한 번 실행한다. 랩에서 추종기를 실행할 때 `PYTHONPATH`에 `/ws/experiments/dl/runs/lab-runtime:/ws`를 추가한다.
 

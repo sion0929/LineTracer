@@ -30,7 +30,7 @@ class ObstacleAuditTest(unittest.TestCase):
             self.assertTrue(cv2.imwrite(str(root / "mask" / names[1]), labels))
             records = [{"file": name} for name in names]
             results, _ = evaluate(segment, [(root, {"map": "example"}, records)], root)
-            _, _, audit = results["example"]
+            _, _, audit, _ = results["example"]
             self.assertEqual(audit, {
                 "obstacle_free_frames": 1,
                 "false_obstacle_frames": 1,
