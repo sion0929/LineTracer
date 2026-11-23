@@ -18,3 +18,18 @@
 - easy 시드 0과 normal 시드 9로 유효 trial 10/10, 실제 주행 20회, 완주 0/20, 정체 17회와 이탈 3회였다. 최고 점수는 trial 8의 0.1470, 평균 진행률은 17.64%, 평균 횡오차 p95는 0.0212 m였다. 실행 제한 32초와 정체 제한 8초를 사용한 재개·기록 검증이므로 완주 성능과 실전 파라미터는 검증이 남았다.
 - SQLite와 개별 주행은 `experiments/sweeps/2026-11-23/`에 있다. 커밋에 포함한 요약은 `experiments/results/C_sweep_smoke_summary.md`, 맵별 로그는 `experiments/results/DS-C_20261123-2220_sweep.log`다. 재현 명령은 `experiments/sweeps/README.md`에 정리했다.
 - 랩 컨테이너 전체 테스트는 205개, 오류·실패·건너뜀 각 0개였다. 로그는 `experiments/worlds/generated/final_colcon_test.log`다.
+
+## 2026-11-23 · 추가 · 고정 20맵 기본 follower
+
+- DeepSeek 워커에 공식 트랙 1개와 생성 맵 20개를 맡겼다. follower는 `b16a161`의 기본 인자를 사용했다. 랩 `lf_c`에서 주 슬롯 13/`lf_c`와 병렬 슬롯 31/`lf_c_bench_31`, 32/`lf_c_bench_32`로 실행했고, 주행별 시뮬레이션 제한은 140초였다. CSV 21행과 개별 JSON을 대조해 인프라 오류 0건을 확인했다.
+
+| 맵 | 완주 | 평균 진행률 | 평균 횡오차 p95 | 정체 | 이탈 | 슬립 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 공식 | 0/1 | 16.90% | 7.29 cm | 0 | 1 | 1 |
+| easy | 0/7 | 18.19% | 3.11 cm | 7 | 0 | 1 |
+| normal | 0/7 | 16.98% | 3.60 cm | 6 | 1 | 6 |
+| hard | 0/6 | 16.74% | 5.83 cm | 3 | 3 | 17 |
+| 생성 맵 전체 | 0/20 | 17.33% | 4.10 cm | 16 | 4 | 24 |
+
+- 21개 주행의 최종 진행 위치가 모두 첫 코너 구간 또는 그 앞뒤 0.35 m에 있었다. 첫 코너 구간은 중심선 진행 방향이 출발 방향에서 10–80° 변하는 부분으로 계산했다. 생성 맵 로그의 정지 사유는 `end` 12개, `tee` 8개였다. 상자 구간에 도달한 사례가 없어 회피율 측정은 남았다.
+- 보관 CSV는 `experiments/results/C_bench20_defaults.csv`다. 개별 결과와 워커 로그, 코너 대조 결과는 `experiments/worlds/generated/bench20_20261123-2227/`에 있다. 맵 선택과 follower 고정 방법은 `experiments/sweeps/README.md`에 추가했다.

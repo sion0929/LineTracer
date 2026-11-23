@@ -69,3 +69,34 @@ LAB_NAME=lf_c ROS_DOMAIN_ID=13 GZ_PARTITION=lf_c python3 experiments/sweep.py "$
 ```
 
 스윕 검증용 32초 제한은 재개와 결과 저장을 확인하기 위한 설정이다. 전체 코스의 속도와 완주율에 맞춰 튜닝할 때는 충분한 `--limit`과 별도의 결과 폴더를 사용한다.
+
+## 고정 20맵 기본 follower 비교
+
+시드와 상자 수를 [20맵 미리보기](../worlds/preview_20.png)와 동일하게 둔다. 랩 컨테이너에서 ROS Jazzy 환경을 소싱한 다음 저장소 루트 `/ws`에서 실행한다.
+
+```bash
+maps=(src/line_follower_bringup/worlds/line_track.sdf)
+for seed in {0..19}; do
+  if (( seed < 7 )); then difficulty=easy
+  elif (( seed < 14 )); then difficulty=normal
+  else difficulty=hard
+  fi
+  map="experiments/worlds/generated/${difficulty}_${seed}.sdf"
+  python3 experiments/worlds/gen_world.py --seed "$seed" --difficulty "$difficulty" \
+    --obstacles "$((seed % 4))" --output "$map"
+  maps+=("$map")
+done
+
+LAB_NAME=lf_c ROS_DOMAIN_ID=13 GZ_PARTITION=lf_c \
+  python3 experiments/bench.py "${maps[@]}" --jobs 3 --limit 140 \
+  --output experiments/worlds/generated/bench20_repro
+```
+
+공식 트랙과 생성 맵을 비교할 때 follower의 커밋과 인자를 고정한다. 생성 맵 평균은 시드 0–19의 20개 주행을 집계한다. 결과 CSV의 `reason`이 `error:`로 시작하면 해당 실행은 인프라 오류로 분리한다.
+
+이 측정의 follower를 이후 브랜치에서 재현하려면 호스트 워크트리에서 다음과 같이 고정한다. 컨테이너의 벤치 명령에 `--follower experiments/worlds/generated/baseline_follower.py`를 추가한다.
+
+```bash
+mkdir -p experiments/worlds/generated
+git show b16a161:experiments/follower.py > experiments/worlds/generated/baseline_follower.py
+```
