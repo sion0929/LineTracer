@@ -220,7 +220,12 @@ def compare(out, paths):
     runs = find_runs(paths)
     if not runs:
         raise SystemExit("no telemetry.npz found")
-    fig, axes = plt.subplots(4, 1, figsize=(14, 12), sharex=True)
+    fig = plt.figure(figsize=(14, 12))
+    grid = fig.add_gridspec(4, 1, height_ratios=(1, 1, 1, 0.8))
+    axes = [fig.add_subplot(grid[0])]
+    axes += [fig.add_subplot(grid[i], sharex=axes[0]) for i in (1, 2)]
+    axes.append(fig.add_subplot(grid[3]))
+    length = 0.0
     best = []
     for run in runs:
         data, centerline = load(run)
@@ -230,6 +235,7 @@ def compare(out, paths):
         axes[1].plot(c["s"], c["v"], lw=0.8)
         axes[2].plot(c["s"], c["t"] - c["t"][0], lw=0.8)
         best.append((label, float(c["progress"].max()), float(centerline[-1, 2])))
+        length = max(length, float(centerline[-1, 2]))
     axes[0].axhspan(-CORRIDOR_DESIGN, CORRIDOR_DESIGN, color="tab:green", alpha=0.08)
     axes[0].set_ylabel("lateral [m]")
     axes[1].set_ylabel("speed [m/s]")
@@ -240,6 +246,8 @@ def compare(out, paths):
     axes[3].barh(range(len(best)), [100 * b[1] / b[2] for b in best])
     axes[3].set_yticks(range(len(best)), labels, fontsize=6)
     axes[3].set_xlabel("max progress [%]")
+    axes[3].set_xlim(0, 100)
+    axes[0].set_xlim(0, length)
     for ax in axes[:3]:
         ax.grid(alpha=0.3)
     fig.tight_layout()
