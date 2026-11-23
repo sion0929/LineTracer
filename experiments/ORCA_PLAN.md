@@ -27,7 +27,7 @@
 동시 실행 규칙: 내 고유 ROS_DOMAIN_ID와 GZ_PARTITION만 사용, `pkill gz` 같은 전역 종료 금지(자기 프로세스 그룹만 정리).
 카메라: 차축 앞 0.076 m, 높이 0.103 m, 피치 0, hfov 1.085595, 640x480 30 Hz. 선: 베이지 매트 위 검은 선 폭 약 2 cm. 로봇 앞 0.3 m는 카메라 사각지대.
 기존 실험 코드(experiments/): follower.py(지도 기반 추종기), run_eval.py(헤드리스 1회 주행 채점: 진행률·랩타임·횡오차, 0.08 m 0.6 s 이탈 시 실패), run.sh(실행 래퍼), calib.py(텔레포트·투영 검증), dbg.py(지도 디버그 그림), gt.npy/segments.npy(공식 트랙 중심선).
-git: 내 브랜치에만 커밋, main/dev/two-track 직접 수정 금지. 끝나면 변경 요약·측정 수치·남은 문제를 보고.
+git: 내 브랜치에만 커밋, main/dev/two-track 직접 수정 금지. push·PR 생성 절대 금지(로컬 커밋만, pre-push 훅이 막음, --no-verify 우회 금지). 원격 업로드는 사용자가 직접 지시할 때만 리드가 한다. 끝나면 변경 요약·측정 수치·남은 문제를 보고.
 [워커 위임 규칙] 시뮬레이션 반복 실행·스윕·장시간 대기는 직접 붙잡고 있지 말고 DeepSeek 워커에게 맡겨라: `opencode run -m opengateway/deepseek/deepseek-v4.1-flash-eco "<무엇을 실행·몇 번·결과를 어느 파일에 어떤 형식으로·코드 수정 금지·에러 3회면 중단하고 로그 요약>"`. 워커 결과는 반드시 결과 파일 수치로 직접 확인하고 보고해라.
 ```
 
