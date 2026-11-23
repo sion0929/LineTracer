@@ -6,6 +6,19 @@
 2. `tools/lab_env.sh`의 `NAME=line_follower_lab` → `NAME=${LAB_NAME:-line_follower_lab}` 로 바꿔 커밋 (워크트리마다 컨테이너 분리).
 3. 각 에이전트는 `dev/two-track`에서 자기 워크트리/브랜치를 만들어 작업.
 
+## 편성표 (Orca에 생성 완료)
+| 이름 | 에이전트 | Orca 워크트리 / 탭 | 브랜치 | LAB_NAME | ROS_DOMAIN_ID | GZ_PARTITION |
+|---|---|---|---|---|---|---|
+| LEAD | Claude Code (충북대 메일 구독 계정, Orca `[C] Claude Chat`) | `LEAD · 오케스트레이터` (메인 체크아웃) / 탭 `[C] Claude Chat` | `dev/two-track` | lf_lead | 10 | lf_lead |
+| Codex-1 | Codex gpt-6.2-sol medium, 터미널 탭 `Codex-1 · 추종기` | `A · 추종기 (Codex-1)` = `a-follower` | `track/a-follower` | lf_a | 11 | lf_a |
+| Codex-2 | Codex gpt-6.2-sol medium, 터미널 탭 `Codex-2 · 딥러닝` | `B · 딥러닝 인식 (Codex-2)` = `b-dlseg` | `track/b-dlseg` | lf_b | 12 | lf_b |
+| Codex-3 | Codex gpt-6.2-sol medium, 터미널 탭 `Codex-3 · 맵·채점` | `C · 맵·채점·스윕 (Codex-3)` = `c-bench` | `track/c-bench` | lf_c | 13 | lf_c |
+| DS-A / DS-B / DS-C | DeepSeek V4.1 Flash eco (`opencode run`) | 상주 탭 없음: 각 Codex가 자기 워크트리에서 일회성으로 호출 | 커밋 안 함 | 호출한 Codex 것 사용 | 호출한 Codex 것 | 호출한 Codex 것 |
+| DS-NIGHT | DeepSeek (프롬프트 D) | `c-bench`에 탭 `DS-NIGHT · 야간스윕` (sweep.py 완성 후 생성) | 커밋 안 함 | lf_sweep | 20 | lf_sweep |
+
+작업자 보고: 각 워크트리 `experiments/reports/codex-N.md`. 지시서: `experiments/briefs/codex-N.md`.
+워커 결과 파일 규칙: `experiments/results/<DS-이름>_<YYYYMMDD-HHMM>_<내용>.{json,log,md}`.
+
 ## 공통 컨텍스트 (모든 에이전트 프롬프트 맨 앞에 붙이기)
 ```
 [공통 컨텍스트] 한국어로 보고할 것.
@@ -15,19 +28,19 @@
 동시 실행 규칙: 내 고유 ROS_DOMAIN_ID와 GZ_PARTITION만 사용, `pkill gz` 같은 전역 종료 금지(자기 프로세스 그룹만 정리).
 카메라: 차축 앞 0.076 m, 높이 0.103 m, 피치 0, hfov 1.085595, 640x480 30 Hz. 선: 베이지 매트 위 검은 선 폭 약 2 cm. 로봇 앞 0.3 m는 카메라 사각지대.
 기존 실험 코드(experiments/): follower.py(지도 기반 추종기), run_eval.py(헤드리스 1회 주행 채점: 진행률·랩타임·횡오차, 0.08 m 0.6 s 이탈 시 실패), run.sh(실행 래퍼), calib.py(텔레포트·투영 검증), dbg.py(지도 디버그 그림), gt.npy/segments.npy(공식 트랙 중심선).
-git: 내 브랜치에만 커밋, main/dev/two-track 직접 수정 금지. 끝나면 변경 요약·측정 수치·남은 문제를 보고.
+git: 내 브랜치에만 커밋, main/dev/two-track 직접 수정 금지. push·PR 생성 절대 금지(로컬 커밋만, pre-push 훅이 막음, --no-verify 우회 금지). 원격 업로드는 사용자가 직접 지시할 때만 리드가 한다. 끝나면 변경 요약·측정 수치·남은 문제를 보고.
 [워커 위임 규칙] 시뮬레이션 반복 실행·스윕·장시간 대기는 직접 붙잡고 있지 말고 DeepSeek 워커에게 맡겨라: `opencode run -m opengateway/deepseek/deepseek-v4.1-flash-eco "<무엇을 실행·몇 번·결과를 어느 파일에 어떤 형식으로·코드 수정 금지·에러 3회면 중단하고 로그 요약>"`. 워커 결과는 반드시 결과 파일 수치로 직접 확인하고 보고해라.
 ```
 
-## 3단 구조: 오케스트레이터(Claude, 충북대) → 작업자(Codex) → 워커(DeepSeek)
+## 3단 구조: 오케스트레이터(Claude, 충북대 계정 로그인) → 작업자(Codex) → 워커(DeepSeek)
 | 층 | 누가 | 하는 일 | 하지 않는 일 |
 |---|---|---|---|
-| 오케스트레이터 | Claude Code (충북대 AI Gateway) | 계획·지시서 작성, Codex 작업 배정, 결과 수치 재현 확인, 병합·게이트 판정 | 직접 대량 코딩, 반복 실행 |
+| 오케스트레이터 | Claude Code (충북대 메일 계정 로그인) | 계획·지시서 작성, Codex 작업 배정, 결과 수치 재현 확인, 병합·게이트 판정 | 직접 대량 코딩, 반복 실행 |
 | 작업자 | Codex ×3 (Codex-1/2/3) | 설계·구현·디버깅, 워커에게 반복 실행 위임 | 남의 소유 파일 수정, 병합 |
 | 워커 | DeepSeek V4.1 Flash eco (OpenCode, Sionic 서빙) | 정해진 스크립트 반복 실행·재시작·로그 요약 | 코드(.py) 수정, 판단 |
 
-오케스트레이터 실행(Orca 터미널, 충북대 게이트웨이로 Claude Code 기동):
-`ANTHROPIC_BASE_URL=https://factchat-cloud.mindlogic.ai/v1/gateway/claude ANTHROPIC_API_KEY="$CBNU_API_KEY" claude`
+오케스트레이터 실행(Orca 터미널): 충북대 메일 계정으로 로그인한 Claude Code 그대로 `claude` 실행.
+계정 확인/전환은 Claude Code 안에서 `/status`(현재 계정 확인), 필요하면 `/login`으로 충북대 메일 계정 선택. ANTHROPIC_API_KEY·ANTHROPIC_BASE_URL 환경변수가 설정돼 있으면 로그인 대신 API로 붙으니 비워 둘 것.
 워커 호출(작업자 Codex가 자기 터미널에서 실행):
 `opencode run -m opengateway/deepseek/deepseek-v4.1-flash-eco "<지시>"`
 
@@ -86,7 +99,7 @@ experiments/follower.py(지도 기반 추종기)를 완성해. 구조: 어두운
 opencode run -m opengateway/deepseek/deepseek-v4.1-flash-eco "experiments/sweeps/README.md의 절차대로 experiments/sweep.py를 실행해. 프로세스가 죽거나 30분간 trial이 진행되지 않으면 같은 스토리지로 재시작해. 1시간마다 experiments/sweeps/<날짜>/summary.md에 상위 5개 파라미터와 점수를 표로 갱신해. 코드(.py)는 절대 수정하지 말고, 에러가 3번 반복되면 멈추고 에러 로그만 요약해."
 ```
 
-## 프롬프트 E — 오케스트레이터(Claude, 충북대 게이트웨이)
+## 프롬프트 E — 오케스트레이터(Claude, 충북대 계정 로그인)
 ```
 (공통 컨텍스트 붙이기) 너는 오케스트레이터다. 직접 대량 코딩이나 시뮬 반복 실행은 하지 말고, 작업은 Codex 작업자 3명에게, 반복 실행은 그들이 DeepSeek 워커에게 맡기게 해라. 계획서: experiments/ORCA_PLAN.md.
 1) 0단계(브랜치 dev/two-track 커밋, lab_env.sh LAB_NAME 지원)가 됐는지 확인하고 안 됐으면 수행.

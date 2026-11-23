@@ -1,0 +1,44 @@
+Optuna SQLite sweep · easy_0 + normal_9 · 32 s simulation limit · 8 s stall limit
+Invocation 1 target: 3 successful trials; invocation 2 target: 10, same SQLite study.
+Study: experiments/sweeps/2026-11-23/study.sqlite3
+Config: experiments/sweeps/2026-11-23/config.json
+
+Trial 00 COMPLETE score=0.13087500 parameters={"accel": 0.6, "alat": 0.25, "ld-gain": 0.4, "ld-min": 0.06, "vmax": 0.22, "waccel": 4.0}
+  easy_0: complete=False progress=18.72% lap=- p95=0.0127m collisions=0 slips=0 reason=stalled at 2.90 m
+  normal_9: complete=False progress=16.61% lap=- p95=0.0426m collisions=0 slips=1 reason=stalled at 2.56 m
+
+Trial 01 COMPLETE score=0.09925000 parameters={"accel": 0.4962834334866839, "alat": 0.25226663481987033, "ld-gain": 0.2462358479861395, "ld-min": 0.04166954820929942, "vmax": 0.18991418726134254, "waccel": 5.436549963794391}
+  easy_0: complete=False progress=18.84% lap=- p95=0.0136m collisions=0 slips=0 reason=stalled at 2.92 m
+  normal_9: complete=False progress=16.68% lap=- p95=0.067m collisions=0 slips=0 reason=off line at 2.60 m
+
+Trial 02 COMPLETE score=0.05287500 parameters={"accel": 0.5155865026848432, "alat": 0.12619902609246744, "ld-gain": 0.29420033450251426, "ld-min": 0.07223202408397589, "vmax": 0.3770589586530689, "waccel": 4.436953522472606}
+  easy_0: complete=False progress=18.59% lap=- p95=0.0496m collisions=0 slips=1 reason=stalled at 2.88 m
+  normal_9: complete=False progress=16.78% lap=- p95=0.0681m collisions=0 slips=1 reason=off line at 2.64 m
+
+Trial 03 COMPLETE score=0.14212500 parameters={"accel": 0.566681697583082, "alat": 0.23738618171118134, "ld-gain": 0.1809158264316691, "ld-min": 0.049072365097753146, "vmax": 0.417142993503656, "waccel": 3.8912318790219413}
+  easy_0: complete=False progress=18.62% lap=- p95=0.0163m collisions=0 slips=0 reason=stalled at 2.89 m
+  normal_9: complete=False progress=16.61% lap=- p95=0.03m collisions=0 slips=1 reason=stalled at 2.56 m
+
+Trial 04 COMPLETE score=0.03550000 parameters={"accel": 0.48784616137900794, "alat": 0.2587084265131825, "ld-gain": 0.45323034585992705, "ld-min": 0.04745215457578745, "vmax": 0.3637964112094952, "waccel": 5.748949429953591}
+  easy_0: complete=False progress=18.52% lap=- p95=0.0535m collisions=0 slips=0 reason=stalled at 2.87 m
+  normal_9: complete=False progress=16.61% lap=- p95=0.0781m collisions=0 slips=2 reason=stalled at 2.56 m
+
+Trial 05 COMPLETE score=0.10462500 parameters={"accel": 0.7245630829554486, "alat": 0.34362077360911414, "ld-gain": 0.29058712235708056, "ld-min": 0.07143673167505532, "vmax": 0.18950700269234888, "waccel": 5.198418406640215}
+  easy_0: complete=False progress=18.83% lap=- p95=0.0171m collisions=0 slips=0 reason=stalled at 2.92 m
+  normal_9: complete=False progress=16.79% lap=- p95=0.0592m collisions=0 slips=0 reason=stalled at 2.59 m
+
+Trial 06 COMPLETE score=0.12750000 parameters={"accel": 0.7752205563932577, "alat": 0.3228933167950646, "ld-gain": 0.26959055098358314, "ld-min": 0.04924305837369592, "vmax": 0.1645474704420997, "waccel": 3.2978823899129153}
+  easy_0: complete=False progress=18.79% lap=- p95=0.0123m collisions=0 slips=0 reason=stalled at 2.91 m
+  normal_9: complete=False progress=16.69% lap=- p95=0.0457m collisions=0 slips=0 reason=stalled at 2.58 m
+
+Trial 07 COMPLETE score=0.09512500 parameters={"accel": 0.7099660559849922, "alat": 0.1617654579904536, "ld-gain": 0.5066413753111056, "ld-min": 0.0813167567529588, "vmax": 0.2382507585225378, "waccel": 4.267538637998689}
+  easy_0: complete=False progress=18.89% lap=- p95=0.0188m collisions=0 slips=0 reason=stalled at 2.93 m
+  normal_9: complete=False progress=16.77% lap=- p95=0.0651m collisions=0 slips=1 reason=off line at 2.62 m
+
+Trial 08 COMPLETE score=0.14700000 parameters={"accel": 0.5263890586146744, "alat": 0.15702077611233406, "ld-gain": 0.30853196388911075, "ld-min": 0.04777369618786057, "vmax": 0.2885964278398856, "waccel": 5.986296920618598}
+  easy_0: complete=False progress=18.84% lap=- p95=0.0103m collisions=0 slips=0 reason=stalled at 2.92 m
+  normal_9: complete=False progress=16.44% lap=- p95=0.0321m collisions=0 slips=2 reason=stalled at 2.54 m
+
+Trial 09 COMPLETE score=0.13812500 parameters={"accel": 0.4705277992441737, "alat": 0.11117804555073652, "ld-gain": 0.40760789080793236, "ld-min": 0.052165183627129616, "vmax": 0.3356901680309236, "waccel": 5.7973512266000204}
+  easy_0: complete=False progress=18.91% lap=- p95=0.0102m collisions=0 slips=0 reason=stalled at 2.93 m
+  normal_9: complete=False progress=16.48% lap=- p95=0.0393m collisions=0 slips=1 reason=stalled at 2.55 m
