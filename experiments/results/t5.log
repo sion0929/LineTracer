@@ -1,0 +1,71 @@
+[INFO] [launch]: All log files can be found below /tmp/home/.ros/log/2026-11-23-12-17-07-836029-b45bf70ea007-1505
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [gazebo-1]: process started with pid [1514]
+[INFO] [parameter_bridge-2]: process started with pid [1515]
+[INFO] [image_bridge-3]: process started with pid [1517]
+[gazebo-1] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="turtlebot3_waffle_pi"]/link[@name="camera_rgb_frame"]/sensor[@name="camera"]/gz_frame_id:/ws/install_lab/line_follower_bringup/share/line_follower_bringup/models/turtlebot3_waffle_pi/model.sdf:L352]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[parameter_bridge-2] [INFO] [1795436229.131854634] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1795436229.132449726] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/imu (gz.msgs.IMU) -> /imu (sensor_msgs/msg/Imu)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1795436229.134530653] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/odom (gz.msgs.Odometry) -> /odom (nav_msgs/msg/Odometry)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1795436229.135915592] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/camera/camera_info (gz.msgs.CameraInfo) -> /camera/camera_info (sensor_msgs/msg/CameraInfo)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1795436229.136397775] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/cmd_vel (geometry_msgs/msg/Twist) -> /cmd_vel (gz.msgs.Twist)] (Lazy 0)
+[gazebo-1] Authorization required, but no authorization protocol specified
+[gazebo-1] 
+[gazebo-1] Authorization required, but no authorization protocol specified
+[gazebo-1] 
+[gazebo-1] libEGL warning: pci id for fd 55: 10de:2204, driver (null)
+[gazebo-1] 
+[gazebo-1] pci id for fd 57: 10de:2204, driver (null)
+[gazebo-1] pci id for fd 58: 10de:2204, driver (null)
+[gazebo-1] libEGL warning: egl: failed to create dri2 screen
+[gazebo-1] libEGL warning: pci id for fd 55: 10de:2204, driver (null)
+[gazebo-1] 
+[gazebo-1] pci id for fd 57: 10de:2204, driver (null)
+[gazebo-1] pci id for fd 58: 10de:2204, driver (null)
+[gazebo-1] libEGL warning: egl: failed to create dri2 screen
+[gazebo-1] libEGL warning: pci id for fd 55: 10de:2204, driver (null)
+[gazebo-1] 
+[parameter_bridge-2] [INFO] [1795436235.242204344] [ros_gz_bridge]: Passing message from ROS geometry_msgs/msg/Twist to Gazebo gz.msgs.Twist (showing msg only once per type)
+[INFO] [1795436248.898313456] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.150307899] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.180235164] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.212540222] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.253735373] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.282059095] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.308416624] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.347396060] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.376039772] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.407677712] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.443893654] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.482757219] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.510758174] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.544021475] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.573161764] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.608571224] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.648980532] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.683862708] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.712015934] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.752054898] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.781953934] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.805973177] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.833834827] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.870493595] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.901853606] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.935689535] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436249.966515058] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436250.002084360] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436250.034660296] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436250.066593667] [experimental_follower]: path finished (end); stopping
+[INFO] [1795436250.098255915] [experimental_follower]: path finished (end); stopping
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [image_bridge-3]: sending signal 'SIGINT' to process[image_bridge-3]
+[INFO] [parameter_bridge-2]: sending signal 'SIGINT' to process[parameter_bridge-2]
+[INFO] [gazebo-1]: sending signal 'SIGINT' to process[gazebo-1]
+[parameter_bridge-2] [INFO] [1795436250.102385119] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[image_bridge-3] [INFO] [1795436250.102382212] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[image_bridge-3] [INFO] [1795436250.104486738] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[parameter_bridge-2] [INFO] [1795436250.104853280] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [parameter_bridge-2]: process has finished cleanly [pid 1515]
+[INFO] [image_bridge-3]: process has finished cleanly [pid 1517]
+[ERROR] [gazebo-1]: process has died [pid 1514, exit code -2, cmd 'ruby /opt/ros/jazzy/opt/gz_tools_vendor/bin/gz sim -r -s /ws/install_lab/line_follower_bringup/share/line_follower_bringup/worlds/line_track.sdf --force-version 8'].
+[INFO] [launch]: process[gazebo-1] was required: shutting down launched system

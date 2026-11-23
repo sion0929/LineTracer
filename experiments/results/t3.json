@@ -1,0 +1,13 @@
+{
+ "name": "t3",
+ "args": [],
+ "complete": false,
+ "progress_m": 2.62,
+ "progress_pct": 16.7,
+ "lap_sec": null,
+ "wall_sec": 34.4,
+ "lat_mean": 0.004,
+ "lat_p95": 0.0098,
+ "lat_max": 0.0101,
+ "reason": "stalled at 2.62m"
+}

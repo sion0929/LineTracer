@@ -1,0 +1,13 @@
+{
+ "name": "t5",
+ "args": [],
+ "complete": false,
+ "progress_m": 2.819,
+ "progress_pct": 18.0,
+ "lap_sec": null,
+ "wall_sec": 15.2,
+ "lat_mean": 0.0056,
+ "lat_p95": 0.0579,
+ "lat_max": 0.0816,
+ "reason": "off line >0.08m at 2.84m"
+}

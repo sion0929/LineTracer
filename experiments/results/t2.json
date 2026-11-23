@@ -1,0 +1,13 @@
+{
+ "name": "t2",
+ "args": [],
+ "complete": false,
+ "progress_m": 2.767,
+ "progress_pct": 17.6,
+ "lap_sec": null,
+ "wall_sec": 15.4,
+ "lat_mean": 0.0064,
+ "lat_p95": 0.0653,
+ "lat_max": 0.0935,
+ "reason": "off line >0.08m at 2.79m"
+}

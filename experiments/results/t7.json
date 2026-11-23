@@ -1,0 +1,20 @@
+{
+ "name": "t7",
+ "args": [
+  "--ld-min",
+  "0.04",
+  "--ld-gain",
+  "0.2",
+  "--alat",
+  "0.15"
+ ],
+ "complete": false,
+ "progress_m": 2.633,
+ "progress_pct": 16.8,
+ "lap_sec": null,
+ "wall_sec": 34.8,
+ "lat_mean": 0.031,
+ "lat_p95": 0.0531,
+ "lat_max": 0.0531,
+ "reason": "stalled at 2.63m"
+}

@@ -1,0 +1,20 @@
+{
+ "name": "t9",
+ "args": [
+  "--ld-min",
+  "0.04",
+  "--ld-gain",
+  "0.2",
+  "--alat",
+  "0.15"
+ ],
+ "complete": false,
+ "progress_m": 2.664,
+ "progress_pct": 17.0,
+ "lap_sec": null,
+ "wall_sec": 16.9,
+ "lat_mean": 0.0079,
+ "lat_p95": 0.0708,
+ "lat_max": 0.0955,
+ "reason": "off line >0.08m at 2.67m"
+}
