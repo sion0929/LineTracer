@@ -547,7 +547,10 @@ class Follower(Node):
         seg = np.hypot(np.diff(rx), np.diff(ry))
         arc = np.r_[0, np.cumsum(seg)]
         remaining = arc[-1]
-        ld = self.a.ld_min + self.a.ld_gain * max(self.v_prev, 0.0)
+        racing = self.a.racing_line and self.racing_supported(pts, arc)
+        guarded = self.a.racing_line and not racing
+        lookahead_speed = min(self.v_prev, 0.10) if guarded else self.v_prev
+        ld = self.a.ld_min + self.a.ld_gain * max(lookahead_speed, 0.0)
         i = min(int(np.searchsorted(arc, ld)), len(rx) - 1)
         tx, ty = rx[i], ry[i]
         alpha = math.atan2(ty, tx)
@@ -561,7 +564,7 @@ class Follower(Node):
             return
         if self.a.reactive_recovery:
             stalled = self.stalled() if self.recovery_turn is None else False
-            support_radius = self.a.racing_corridor + 0.02 if self.a.racing_line else 0.065
+            support_radius = self.a.racing_corridor + 0.02 if racing else 0.065
             supported = remaining >= 0.16 and np.hypot(rx[0], ry[0]) < support_radius
             turn_too_far = abs(alpha) > self.a.rotate_angle
             lost = stalled or near_end or turn_too_far or (self.recovery_turn is not None and not supported)
@@ -575,7 +578,7 @@ class Follower(Node):
                 self.recovery_path = None
                 self.recovery_axis = None
                 self.motion_anchor = None
-        if self.a.racing_line:
+        if racing:
             self.track_racing(pts, ld)
             return
         if reason in ('end', 'unknown') and near_end:
@@ -598,9 +601,10 @@ class Follower(Node):
             k_ahead = float(np.max(np.abs(hd[win:] - hd[:-win]))) / self.a.preview
         elif len(hd) > 1:
             k_ahead = abs(hd[-1] - hd[0]) / max(arc[-1], 1e-3)
-        v = self.a.vmax
+        v = min(self.a.vmax, 0.10) if guarded else self.a.vmax
+        lateral_accel = min(self.a.alat, 0.10) if guarded else self.a.alat
         if k_ahead > 1e-3:
-            v = min(v, math.sqrt(self.a.alat / k_ahead))
+            v = min(v, math.sqrt(lateral_accel / k_ahead))
         if k_ahead >= 3.0:
             v = min(v, 0.10)
         if reason != 'length':
@@ -616,6 +620,18 @@ class Follower(Node):
             if abs(w) >= self.a.wmax:
                 v = min(v, self.a.wmax / max(abs(curv), 1e-3))
         self.set_motion(v, w)
+
+    @staticmethod
+    def racing_supported(points, arc):
+        """Keep the proven centerline controller near abrupt turns or a short map."""
+        if arc[-1] < 0.24:
+            return False
+        stations = np.linspace(0.0, 0.24, 4)
+        sample = np.column_stack((np.interp(stations, arc, points[:, 0]),
+                                  np.interp(stations, arc, points[:, 1])))
+        segments = np.diff(sample, axis=0)
+        heading = np.unwrap(np.arctan2(segments[:, 1], segments[:, 0]))
+        return bool(np.max(np.abs(np.diff(heading))) < 0.24)
 
     def track_racing(self, centerline, lookahead):
         plan = plan_path(
