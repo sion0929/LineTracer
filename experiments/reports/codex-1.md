@@ -169,3 +169,7 @@
 - 결과 `experiments/results/DS-A_20261123-231015_race-guard/results.csv`, `01_{01,02,03}/result.json`, `drive{1,2,3}.npz`. 전 후보 3회씩 결과 JSON에서 숫자를 확인했다. 0.24 m/s 및 급커브 보호 없는 0.18 m/s는 각각 0/3이었다.
 - 전 회차 최대 횡오차는 12 cm 아래였다. 바퀴 접촉은 총 20회, 5.28초로 남아 있어 무접촉 주행은 확인되지 않았다. 채점기는 여러 방향의 선이 만나는 지점에서도 접촉을 집계한다.
 - 최종 단위 테스트 3/3, Python 컴파일 통과. 공식 월드와 모델에 대한 작업 트랙 변경 없음.
+
+## 2026-11-23 23:20 KST — 공유 랜덤 맵 생성기 확인
+
+- `git merge dev/two-track`은 이미 최신이었다. 공유 생성기 `532e0c8`과 병합 `90a4c59`가 브랜치에 포함됐다. 저장소의 `experiments/worlds/gen_world.py`로 normal 시드 3, 장애물 2개, 중심선 16.57 m를 생성했다. 생성물은 `experiments/worlds/generated/lead_verified_normal_3.{sdf,stl,json}`이다.
