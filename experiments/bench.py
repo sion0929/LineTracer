@@ -19,6 +19,7 @@ import threading
 from types import SimpleNamespace
 import time
 import traceback
+from uuid import uuid4
 import xml.etree.ElementTree as ET
 
 import numpy as np
@@ -28,10 +29,12 @@ BRINGUP = HERE.parent / "src/line_follower_bringup"
 OFF_SECONDS = 0.6
 FINISH_TOLERANCE = 0.12
 MAX_JOBS = 16
+BENCH_DOMAINS = range(30, 102)
 COLUMNS = (
     "name", "map", "profile", "backend", "complete", "progress_m", "progress_pct", "lap_sec",
     "sim_sec", "wall_sec", "lat_p95", "lat_mean", "lat_max", "collision_count",
     "avoidance_attempts", "avoided_count", "slip_count", "odom_windows", "reason",
+    "domain", "partition",
 )
 
 
@@ -259,11 +262,6 @@ def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy):
     def spawn(command, **kwargs):
         nonlocal follower, monitor
         if command[:3] == ["ros2", "launch", "line_follower_bringup"]:
-            # Older evaluators generate their own partition; use our slot for both
-            # run_eval's subsequent Gazebo subscription and its follower process.
-            partition = job["partition"]
-            kwargs["env"]["GZ_PARTITION"] = partition
-            os.environ["GZ_PARTITION"] = partition
             return sim
         if command[:2] == [sys.executable, str(folder / "follower.py")]:
             flags = command[2:] if Path(job["follower"]) == HERE / "follower.py" else job["args"]
@@ -282,7 +280,7 @@ def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy):
     sys.argv = [
         str(HERE / "run_eval.py"), "--name", name, "--limit", str(job["limit"]),
         "--stall", str(job["stall"]), "--off", str(job["off"]),
-        "--domain", os.environ["ROS_DOMAIN_ID"], "--", *job["args"],
+        "--", *job["args"],
     ]
     try:
         run_eval.main()
@@ -325,7 +323,6 @@ def evaluate(job_path):
     result = {key: job[key] for key in ("name", "map", "profile", "args")}
     result.update(complete=False, domain=int(os.environ["ROS_DOMAIN_ID"]),
                   partition=os.environ["GZ_PARTITION"], backend=job.get("backend", "obstacle"))
-    job["partition"] = result["partition"]
     resources = str(BRINGUP / "models")
     if os.environ.get("GZ_SIM_RESOURCE_PATH"):
         resources += os.pathsep + os.environ["GZ_SIM_RESOURCE_PATH"]
@@ -443,13 +440,16 @@ def evaluate(job_path):
     return int(result["reason"].startswith("error:"))
 
 
-def job_lanes(jobs):
-    domain = int(os.environ.get("ROS_DOMAIN_ID", "13"))
-    partition = os.environ.get("GZ_PARTITION", "lf_c")
-    # The first lane retains the coordinator identity. Additional lanes use a set
-    # disjoint from the lab's course domains (10–13, 20).
-    domains = [domain] + [candidate for candidate in range(31, 31 + MAX_JOBS) if candidate != domain]
-    return [(d, partition if i == 0 else f"{partition}_bench_{d}") for i, d in enumerate(domains[:jobs])]
+def job_contexts(count):
+    """Assign each run its own domain and a partition namespaced to the matrix."""
+    coordinator = int(os.environ.get("ROS_DOMAIN_ID") or "13")
+    prefix = os.environ.get("GZ_PARTITION") or os.environ.get("LAB_NAME") or "lf_c"
+    domains = [domain for domain in BENCH_DOMAINS if domain != coordinator]
+    if not 1 <= count <= len(domains):
+        raise ValueError(f"matrix must have 1–{len(domains)} runs for distinct ROS domains")
+    batch = uuid4().hex[:12]
+    return [(domain, f"{prefix}_{batch}_{index:03d}")
+            for index, domain in enumerate(domains[:count], 1)]
 
 
 def run_matrix(maps, profiles, output, jobs=1, limit=300, stall=20, off=0.08,
@@ -463,6 +463,7 @@ def run_matrix(maps, profiles, output, jobs=1, limit=300, stall=20, off=0.08,
         track = Track(path)
         if backend == "run_eval" and track.world != "line_track":
             raise ValueError(f"{path}: run_eval requires the world name line_track; use --backend obstacle")
+    contexts = iter(job_contexts(len(maps) * len(profiles)))
     follower = Path(follower).resolve(strict=True)
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -470,19 +471,19 @@ def run_matrix(maps, profiles, output, jobs=1, limit=300, stall=20, off=0.08,
     for i, path in enumerate(maps, 1):
         for j, (profile, args) in enumerate(profiles.items(), 1):
             name = f"{i:02d}_{j:02d}"
+            domain, partition = next(contexts)
             folder = output / name
             folder.mkdir(exist_ok=False)
             job_path = folder / "job.json"
             atomic_json(job_path, dict(
                 name=name, map=str(path), profile=profile, args=args, limit=limit,
                 stall=stall, off=off, startup=startup, follower=str(follower), backend=backend,
+                domain=domain, partition=partition,
             ))
-            inputs.append(job_path)
-    lanes = job_lanes(min(jobs, len(inputs)))
+            inputs.append((job_path, domain, partition))
     stopping = threading.Event()
 
-    def run_lane(lane, paths):
-        domain, partition = lane
+    def run_job(job_path, domain, partition):
         # Concurrent invocations in the same container must never reuse a domain.
         with Path(f"/tmp/line-follower-bench-{domain}.lock").open("a") as lock:
             while not stopping.is_set():
@@ -493,34 +494,34 @@ def run_matrix(maps, profiles, output, jobs=1, limit=300, stall=20, off=0.08,
                     stopping.wait(0.25)
             env = dict(os.environ, ROS_DOMAIN_ID=str(domain), GZ_PARTITION=partition,
                        LAB_NAME=os.environ.get("LAB_NAME", "lf_c"), ROS2CLI_NO_DAEMON="1")
-            for job_path in paths:
-                if stopping.is_set():
-                    break
-                with (job_path.parent / "worker.log").open("w") as log:
-                    proc = subprocess.Popen([sys.executable, __file__, "--run-job", str(job_path)],
-                                            stdout=log, stderr=subprocess.STDOUT, env=env,
-                                            start_new_session=True, pass_fds=(lock.fileno(),))
-                    while proc.poll() is None and not stopping.wait(0.25):
-                        pass
-                    if proc.poll() is None:
-                        proc.terminate()
-                    proc.wait()
+            if stopping.is_set():
+                return
+            with (job_path.parent / "worker.log").open("w") as log:
+                proc = subprocess.Popen([sys.executable, __file__, "--run-job", str(job_path)],
+                                        stdout=log, stderr=subprocess.STDOUT, env=env,
+                                        start_new_session=True, pass_fds=(lock.fileno(),))
+                while proc.poll() is None and not stopping.wait(0.25):
+                    pass
+                if proc.poll() is None:
+                    proc.terminate()
+                proc.wait()
 
-    with ThreadPoolExecutor(max_workers=len(lanes)) as pool:
-        futures = [pool.submit(run_lane, lane, inputs[i::len(lanes)]) for i, lane in enumerate(lanes)]
+    with ThreadPoolExecutor(max_workers=min(jobs, len(inputs))) as pool:
+        futures = [pool.submit(run_job, *job) for job in inputs]
         try:
             for future in futures:
                 future.result()
         finally:
             stopping.set()
     results = []
-    for job_path in inputs:
+    for job_path, domain, partition in inputs:
         result_path = job_path.with_name("result.json")
         if result_path.is_file():
             results.append(json.loads(result_path.read_text()))
         else:
             job = json.loads(job_path.read_text())
             results.append(dict(name=job["name"], map=job["map"], profile=job["profile"],
+                                backend=job["backend"], domain=domain, partition=partition,
                                 complete=False, reason="error: worker exited, see worker.log"))
     with (output / "results.csv").open("w", newline="") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=COLUMNS, extrasaction="ignore")
