@@ -1,0 +1,277 @@
+{
+  "test": {
+    "easy_301": {
+      "frames": 120,
+      "small_unet_iou": {
+        "background": 0.9977159165058036,
+        "line": 0.8697695679928472,
+        "obstacle": 0.9814262811970823
+      },
+      "opencv_iou": {
+        "background": 0.9941181185517974,
+        "line": 0.32878629590167147,
+        "obstacle": 0.0
+      },
+      "small_unet_confusion": [
+        [
+          35392722,
+          41762,
+          12737
+        ],
+        [
+          22026,
+          431918,
+          410
+        ],
+        [
+          4500,
+          473,
+          957452
+        ]
+      ],
+      "opencv_confusion": [
+        [
+          35446721,
+          500,
+          0
+        ],
+        [
+          43019,
+          411335,
+          0
+        ],
+        [
+          166208,
+          796217,
+          0
+        ]
+      ],
+      "obstacle_audit": {
+        "obstacle_free_frames": 77,
+        "false_obstacle_frames": 3,
+        "max_false_obstacle_pixels": 28
+      }
+    },
+    "hard_303": {
+      "frames": 120,
+      "small_unet_iou": {
+        "background": 0.9940194493381395,
+        "line": 0.8655654544686857,
+        "obstacle": 0.9248037516185273
+      },
+      "opencv_iou": {
+        "background": 0.9865754582605213,
+        "line": 0.3098535385089442,
+        "obstacle": 0.0
+      },
+      "small_unet_confusion": [
+        [
+          34596836,
+          55897,
+          34821
+        ],
+        [
+          32415,
+          573998,
+          596
+        ],
+        [
+          85020,
+          242,
+          1484175
+        ]
+      ],
+      "opencv_confusion": [
+        [
+          34687046,
+          508,
+          0
+        ],
+        [
+          59979,
+          547030,
+          0
+        ],
+        [
+          411507,
+          1157930,
+          0
+        ]
+      ],
+      "obstacle_audit": {
+        "obstacle_free_frames": 48,
+        "false_obstacle_frames": 1,
+        "max_false_obstacle_pixels": 40
+      }
+    },
+    "normal_302": {
+      "frames": 120,
+      "small_unet_iou": {
+        "background": 0.9966725426098231,
+        "line": 0.8664445248058411,
+        "obstacle": 0.9712298730765687
+      },
+      "opencv_iou": {
+        "background": 0.982368742913483,
+        "line": 0.3624572030550435,
+        "obstacle": 0.0
+      },
+      "small_unet_confusion": [
+        [
+          34894619,
+          50613,
+          21605
+        ],
+        [
+          26431,
+          503153,
+          307
+        ],
+        [
+          17849,
+          206,
+          1349217
+        ]
+      ],
+      "opencv_confusion": [
+        [
+          34966435,
+          402,
+          0
+        ],
+        [
+          50956,
+          478935,
+          0
+        ],
+        [
+          576209,
+          791063,
+          0
+        ]
+      ],
+      "obstacle_audit": {
+        "obstacle_free_frames": 77,
+        "false_obstacle_frames": 1,
+        "max_false_obstacle_pixels": 4
+      }
+    },
+    "line_track": {
+      "frames": 180,
+      "small_unet_iou": {
+        "background": 0.9972424510588604,
+        "line": 0.8356272004096079,
+        "obstacle": 0.0
+      },
+      "opencv_iou": {
+        "background": 0.9982480647794463,
+        "line": 0.8744668181174285,
+        "obstacle": null
+      },
+      "small_unet_confusion": [
+        [
+          54433825,
+          92808,
+          10629
+        ],
+        [
+          47082,
+          711575,
+          81
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "opencv_confusion": [
+        [
+          54533596,
+          3666,
+          0
+        ],
+        [
+          92041,
+          666697,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "obstacle_audit": {
+        "obstacle_free_frames": 180,
+        "false_obstacle_frames": 8,
+        "max_false_obstacle_pixels": 9601
+      }
+    },
+    "heldout_random_pooled": {
+      "frames": 360,
+      "small_unet_iou": {
+        "background": 0.9961470551203068,
+        "line": 0.867058290197863,
+        "obstacle": 0.9549663568965213
+      },
+      "opencv_iou": {
+        "background": 0.9876957590906601,
+        "line": 0.3313374247384779,
+        "obstacle": 0.0
+      },
+      "small_unet_confusion": [
+        [
+          104884177,
+          148272,
+          69163
+        ],
+        [
+          80872,
+          1509069,
+          1313
+        ],
+        [
+          107369,
+          921,
+          3790844
+        ]
+      ],
+      "opencv_confusion": [
+        [
+          105100202,
+          1410,
+          0
+        ],
+        [
+          153954,
+          1437300,
+          0
+        ],
+        [
+          1153924,
+          2745210,
+          0
+        ]
+      ]
+    }
+  },
+  "latency": {
+    "onnx_cpu": {
+      "threads": 4,
+      "samples": 480,
+      "mean_ms": 5.338214904062018,
+      "median_ms": 5.239022499154089,
+      "p95_ms": 7.189543900676654,
+      "fps": 187.32853921618405
+    },
+    "pytorch_cuda": {
+      "device": "NVIDIA GeForce RTX 3090",
+      "samples": 480,
+      "mean_ms": 4.190125066755476,
+      "median_ms": 4.147554504015716,
+      "p95_ms": 5.7700899556948535,
+      "fps": 238.65636086474296
+    }
+  }
+}

@@ -88,7 +88,7 @@ def rasterize(points, inverse_depth, label, mask, depth):
     mask[region][closer] = label
 
 
-def render_mask(meshes, body_position, body_rotation):
+def render_mask(meshes, body_position, body_rotation, *, return_depth=False):
     camera = body_position + body_rotation @ CAMERA_OFFSET
     mask = np.zeros((HEIGHT, WIDTH), dtype=np.uint8)
     depth = np.zeros_like(mask, dtype=np.float32)
@@ -101,4 +101,6 @@ def render_mask(meshes, body_position, body_rotation):
                 inverse = 1 / vertices[:, 0]
                 points = CENTER - FOCAL * vertices[:, 1:] * inverse[:, None]
                 rasterize(points, inverse, label, mask, depth)
+    if return_depth:
+        return mask, np.divide(1.0, depth, out=np.zeros_like(depth), where=depth > 0)
     return mask
