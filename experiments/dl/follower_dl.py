@@ -31,6 +31,7 @@ from sensor_msgs.msg import Image, Imu
 # bench.py executes this file directly from the repository root.
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from experiments.dl.corridor import guarded_speed, near_bend, recovery_motion_supported, wheel_aware_path
 from experiments.dl.detour import camera_boxes, choose_detour, transform_boxes
 from experiments.dl.infer import Segmenter
 
@@ -93,6 +94,10 @@ class Follower(Node):
         self.detour = None
         self.detours_started = 0
         self.detours_finished = 0
+        self.guarded_frames = 0
+        self.offset_frames = 0
+        self.recovery_brake_frames = 0
+        self.recovery_line = np.empty((0, 2))
         self.processing_times = deque(maxlen=3000)
         self.inference_times = deque(maxlen=3000)
         self.image_stamps = deque(maxlen=3000)
@@ -313,6 +318,14 @@ class Follower(Node):
         if self.recovery_turn is None:
             self.recovery_turn = math.copysign(1.0, turn_hint or self.w_prev or 1.0)
             self.recovery_yaw = self.pose[2]
+            if self.a.corner_guard:
+                x, y, _ = self.pose
+                ix, iy = int((x - ORIGIN) / RES), int((y - ORIGIN) / RES)
+                cells = round(0.25 / RES)
+                x0, x1 = max(0, ix - cells), min(GRID, ix + cells + 1)
+                y0, y1 = max(0, iy - cells), min(GRID, iy + cells + 1)
+                rows, cols = np.nonzero(self.grid[y0:y1, x0:x1] == 1)
+                self.recovery_line = ORIGIN + RES * (np.column_stack((cols + x0, rows + y0)) + 0.5)
             if path is not None and math.dist(self.pose[:2], path[-1]) < 0.10:
                 heading = self.pose[2] + turn_hint
                 if len(path) >= 3:
@@ -338,6 +351,13 @@ class Follower(Node):
                 self.recovery_path = approach
                 if self.follow_recovery_path(limit):
                     return
+        if self.a.corner_guard and not recovery_motion_supported(
+                self.recovery_line, self.pose[:2], self.pose[2] + camera_angle):
+            self.recovery_brake_frames += 1
+            if yaw_from_start * self.recovery_turn >= 1.10:
+                self.recovery_turn = -self.recovery_turn
+            self.set_motion(0.0, self.recovery_turn * min(limit, 0.34))
+            return
         self.steer_recovery(camera_angle, limit, 0.045, 0.25)
 
     def corner_approach(self):
@@ -653,6 +673,12 @@ class Follower(Node):
         if self.a.avoid and self.start_detour(pts):
             self.follow_detour()
             return
+        # Keep the raw map trace for loss detection and recovery.
+        bend = self.a.corner_guard and near_bend(pts)
+        target_path = pts
+        if bend and self.a.corridor_path and len(pts) >= 8:
+            target_path = wheel_aware_path(pts, 0.10, bend=True)
+            self.offset_frames += target_path is not pts
         # robot-frame path
         c, s = math.cos(yaw), math.sin(yaw)
         rx = c * (pts[:, 0] - x) + s * (pts[:, 1] - y)
@@ -663,6 +689,9 @@ class Follower(Node):
         ld = self.a.ld_min + self.a.ld_gain * max(self.v_prev, 0.0)
         i = min(int(np.searchsorted(arc, ld)), len(rx) - 1)
         tx, ty = rx[i], ry[i]
+        if target_path is not pts:
+            dx, dy = target_path[i] - (x, y)
+            tx, ty = c * dx + s * dy, -s * dx + c * dy
         alpha = math.atan2(ty, tx)
         if remaining >= 0.12:
             self.gap_origin = None
@@ -714,7 +743,13 @@ class Follower(Node):
             v = min(v, 0.10)
         if reason != 'length':
             v = min(v, math.sqrt(2 * self.a.decel * max(0.0, remaining - 0.03)))
-        if abs(alpha) > self.a.rotate_angle:
+        rotate_angle = self.a.rotate_angle
+        if bend:
+            guarded = guarded_speed(pts, v, alpha, bend=True)
+            self.guarded_frames += guarded < v
+            v = guarded
+            rotate_angle = min(rotate_angle, 0.72)
+        if abs(alpha) > rotate_angle:
             v = 0.0
             w = math.copysign(min(self.a.wmax, self.a.k_rot * abs(alpha)), alpha)
         else:
@@ -750,6 +785,8 @@ def main():
     p.add_argument('--avoid-speed', type=float, default=0.10)
     p.add_argument('--avoid-trigger', type=float, default=0.56)
     p.add_argument('--avoid-padding', type=float, default=0.025)
+    p.add_argument('--corner-guard', action='store_true')
+    p.add_argument('--corridor-path', action='store_true')
     p.add_argument('--vmax', type=float, default=0.22)
     p.add_argument('--wmax', type=float, default=1.5)
     p.add_argument('--alat', type=float, default=0.25)
@@ -793,6 +830,8 @@ def main():
                                 reanchors=n.reanchors, inference_times=n.inference_times,
                                 processing_times=n.processing_times, image_stamps=n.image_stamps,
                                 detours_started=n.detours_started, detours_finished=n.detours_finished)
+        print(f"DL corridor: brake_frames={n.guarded_frames} offset_frames={n.offset_frames} "
+              f"recovery_brake_frames={n.recovery_brake_frames}", flush=True)
         if n.processing_times:
             seconds = np.asarray(n.processing_times)
             infer = np.asarray(n.inference_times)
