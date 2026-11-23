@@ -16,6 +16,7 @@ import signal
 import subprocess
 import sys
 import threading
+from types import SimpleNamespace
 import time
 import traceback
 import xml.etree.ElementTree as ET
@@ -28,7 +29,7 @@ OFF_SECONDS = 0.6
 FINISH_TOLERANCE = 0.12
 MAX_JOBS = 16
 COLUMNS = (
-    "name", "map", "profile", "complete", "progress_m", "progress_pct", "lap_sec",
+    "name", "map", "profile", "backend", "complete", "progress_m", "progress_pct", "lap_sec",
     "sim_sec", "wall_sec", "lat_p95", "lat_mean", "lat_max", "collision_count",
     "avoidance_attempts", "avoided_count", "slip_count", "odom_windows", "reason",
 )
@@ -226,6 +227,91 @@ def atomic_json(path, value):
     temp.replace(path)
 
 
+def run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy):
+    """Run the original scorer with this worker's world and output directory."""
+    import run_eval
+
+    np.save(folder / "gt.npy", np.column_stack((track.xy, track.arc)))
+    name = "legacy"
+    out = folder / "results"
+    score, slip = Score(track, job), SlipMonitor()
+    stopping = threading.Event()
+    faults = []
+    follower = None
+    monitor = None
+
+    def collect():
+        cursor = origin = truth[-1][0]
+        try:
+            while not stopping.is_set():
+                rclpy.spin_once(probe, timeout_sec=0.05)
+                current = truth[-1]
+                if current[0] - cursor < 0.049:
+                    continue
+                cursor = current[0]
+                wheel = min(odom, key=lambda sample: abs(sample[0] - cursor), default=None)
+                slip.observe(current, wheel)
+                # Monitor detours observed during the run; run_eval owns termination.
+                score.observe(cursor - origin, current[1:3])
+        except Exception as error:
+            faults.append(error)
+
+    def spawn(command, **kwargs):
+        nonlocal follower, monitor
+        if command[:3] == ["ros2", "launch", "line_follower_bringup"]:
+            # Older evaluators generate their own partition; use our slot for both
+            # run_eval's subsequent Gazebo subscription and its follower process.
+            partition = job["partition"]
+            kwargs["env"]["GZ_PARTITION"] = partition
+            os.environ["GZ_PARTITION"] = partition
+            return sim
+        if command[:2] == [sys.executable, str(folder / "follower.py")]:
+            flags = command[2:] if Path(job["follower"]) == HERE / "follower.py" else job["args"]
+            follower = subprocess.Popen([sys.executable, job["follower"], *flags], **kwargs)
+            monitor = threading.Thread(target=collect)
+            monitor.start()
+            return follower
+        raise RuntimeError(f"unsupported run_eval subprocess: {command!r}")
+
+    # This module instance is isolated in the per-job subprocess. The source
+    # and Python's process-global subprocess module are untouched.
+    saved = run_eval.HERE, run_eval.subprocess, sys.argv
+    run_eval.HERE = folder
+    run_eval.subprocess = SimpleNamespace(Popen=spawn, STDOUT=subprocess.STDOUT,
+                                          TimeoutExpired=subprocess.TimeoutExpired)
+    sys.argv = [
+        str(HERE / "run_eval.py"), "--name", name, "--limit", str(job["limit"]),
+        "--stall", str(job["stall"]), "--off", str(job["off"]),
+        "--domain", os.environ["ROS_DOMAIN_ID"], "--", *job["args"],
+    ]
+    try:
+        run_eval.main()
+    finally:
+        run_eval.HERE, run_eval.subprocess, sys.argv = saved
+        stopping.set()
+        if monitor:
+            monitor.join()
+    if faults:
+        raise RuntimeError(f"telemetry collection failed: {faults[0]}")
+    result = json.loads((out / f"{name}.json").read_text())
+    if follower is not None and follower.returncode not in (0, -signal.SIGINT, -signal.SIGTERM,
+                                                           -signal.SIGKILL, 130):
+        raise RuntimeError(f"follower exited with status {follower.returncode}; see results/legacy.log")
+    trajectory = out / f"{name}_traj.npy"
+    if trajectory.is_file():
+        (folder / "trajectory.npy").symlink_to(trajectory.relative_to(folder))
+    contacts = collisions.copy()
+    result.pop("name")
+    result.update(
+        collision_count=len(contacts), collided=sorted(contacts),
+        avoidance_attempts=len(score.avoidance),
+        avoided_count=sum(passed and key not in contacts for key, passed in score.avoidance.items()),
+        slip_count=len(slip.events), slip_events=slip.events, odom_windows=slip.windows,
+        sim_sec=round(score.history[-1][0], 3) if score.history else None,
+    )
+    return result
+
+
 def evaluate(job_path):
     import rclpy
     from rclpy.qos import qos_profile_sensor_data
@@ -238,7 +324,8 @@ def evaluate(job_path):
     folder = job_path.parent
     result = {key: job[key] for key in ("name", "map", "profile", "args")}
     result.update(complete=False, domain=int(os.environ["ROS_DOMAIN_ID"]),
-                  partition=os.environ["GZ_PARTITION"])
+                  partition=os.environ["GZ_PARTITION"], backend=job.get("backend", "obstacle"))
+    job["partition"] = result["partition"]
     resources = str(BRINGUP / "models")
     if os.environ.get("GZ_SIM_RESOURCE_PATH"):
         resources += os.pathsep + os.environ["GZ_SIM_RESOURCE_PATH"]
@@ -303,46 +390,49 @@ def evaluate(job_path):
                     if time.monotonic() >= deadline or any(p.poll() is not None for p in (sim, bridge, camera)):
                         raise RuntimeError(f"startup failed: pose={bool(truth)}, odom={bool(odom)}, "
                                            f"camera={camera_ready}, missing contact topics={sorted(missing)}")
-                score, slip = Score(track, job), SlipMonitor()
-                origin = cursor = truth[-1][0]
-                start = last_update = time.monotonic()
-                follower = stack.enter_context(process([sys.executable, job["follower"], *job["args"]], log))
-                while True:
-                    rclpy.spin_once(probe, timeout_sec=0.05)
-                    now_wall = time.monotonic()
-                    if now_wall - last_update > 25 or now_wall - start > max(60, job["limit"] * 8):
-                        raise RuntimeError("Gazebo pose stalled or exceeded the wall-clock cap")
-                    if sim.poll() is not None or follower.poll() is not None:
-                        raise RuntimeError("Gazebo or follower exited before scoring finished")
-                    current = truth[-1]
-                    if current[0] - cursor < 0.049:
-                        continue
-                    cursor = current[0]
-                    last_update = now_wall
-                    wheel = min(tuple(odom), key=lambda sample: abs(sample[0] - cursor), default=None)
-                    slip.observe(current, wheel)
-                    reason = score.observe(cursor - origin, current[1:3])
-                    if reason:
-                        break
-                # Keep the contact subscriber alive while Gazebo flushes notifications for the last tick.
-                time.sleep(0.12)
-                contacts = collisions.copy()
-                trajectory = np.array(score.history)
-                np.save(folder / "trajectory.npy", trajectory)
-                errors = trajectory[:, 4]
-                result.update(
-                    complete=score.complete, reason=reason, progress_m=round(score.progress, 3),
-                    progress_pct=round(100 * score.progress / track.arc[-1], 2),
-                    lap_sec=round(trajectory[-1, 0] - score.moved_at, 3) if score.complete else None,
-                    sim_sec=round(trajectory[-1, 0], 3), wall_sec=round(last_update - start, 3),
-                    lat_p95=round(float(np.percentile(errors, 95)), 4),
-                    lat_mean=round(float(errors.mean()), 4), lat_max=round(float(errors.max()), 4),
-                    collision_count=len(contacts), collided=sorted(contacts),
-                    avoidance_attempts=len(score.avoidance),
-                    avoided_count=sum(passed and name not in contacts
-                                      for name, passed in score.avoidance.items()),
-                    slip_count=len(slip.events), slip_events=slip.events, odom_windows=slip.windows,
-                )
+                if result["backend"] == "run_eval":
+                    result.update(run_legacy(job, folder, track, sim, probe, truth, odom, collisions, rclpy))
+                else:
+                    score, slip = Score(track, job), SlipMonitor()
+                    origin = cursor = truth[-1][0]
+                    start = last_update = time.monotonic()
+                    follower = stack.enter_context(process([sys.executable, job["follower"], *job["args"]], log))
+                    while True:
+                        rclpy.spin_once(probe, timeout_sec=0.05)
+                        now_wall = time.monotonic()
+                        if now_wall - last_update > 25 or now_wall - start > max(60, job["limit"] * 8):
+                            raise RuntimeError("Gazebo pose stalled or exceeded the wall-clock cap")
+                        if sim.poll() is not None or follower.poll() is not None:
+                            raise RuntimeError("Gazebo or follower exited before scoring finished")
+                        current = truth[-1]
+                        if current[0] - cursor < 0.049:
+                            continue
+                        cursor = current[0]
+                        last_update = now_wall
+                        wheel = min(tuple(odom), key=lambda sample: abs(sample[0] - cursor), default=None)
+                        slip.observe(current, wheel)
+                        reason = score.observe(cursor - origin, current[1:3])
+                        if reason:
+                            break
+                    # Keep the contact subscriber alive while Gazebo flushes notifications for the last tick.
+                    time.sleep(0.12)
+                    contacts = collisions.copy()
+                    trajectory = np.array(score.history)
+                    np.save(folder / "trajectory.npy", trajectory)
+                    errors = trajectory[:, 4]
+                    result.update(
+                        complete=score.complete, reason=reason, progress_m=round(score.progress, 3),
+                        progress_pct=round(100 * score.progress / track.arc[-1], 2),
+                        lap_sec=round(trajectory[-1, 0] - score.moved_at, 3) if score.complete else None,
+                        sim_sec=round(trajectory[-1, 0], 3), wall_sec=round(last_update - start, 3),
+                        lat_p95=round(float(np.percentile(errors, 95)), 4),
+                        lat_mean=round(float(errors.mean()), 4), lat_max=round(float(errors.max()), 4),
+                        collision_count=len(contacts), collided=sorted(contacts),
+                        avoidance_attempts=len(score.avoidance),
+                        avoided_count=sum(passed and name not in contacts
+                                          for name, passed in score.avoidance.items()),
+                        slip_count=len(slip.events), slip_events=slip.events, odom_windows=slip.windows,
+                    )
         finally:
             rclpy.shutdown()
     except (Exception, KeyboardInterrupt) as error:
@@ -363,12 +453,16 @@ def job_lanes(jobs):
 
 
 def run_matrix(maps, profiles, output, jobs=1, limit=300, stall=20, off=0.08,
-               startup=60, follower=HERE / "follower.py"):
+               startup=60, follower=HERE / "follower.py", backend="run_eval"):
     if not 1 <= jobs <= MAX_JOBS or min(limit, stall, off, startup) <= 0:
         raise ValueError(f"jobs must be in 1–{MAX_JOBS} and timing/offset limits must be positive")
+    if backend not in ("run_eval", "obstacle"):
+        raise ValueError(f"unknown scoring backend {backend!r}")
     maps = [Path(p).resolve(strict=True) for p in maps]
     for path in maps:
-        Track(path)
+        track = Track(path)
+        if backend == "run_eval" and track.world != "line_track":
+            raise ValueError(f"{path}: run_eval requires the world name line_track; use --backend obstacle")
     follower = Path(follower).resolve(strict=True)
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -381,7 +475,7 @@ def run_matrix(maps, profiles, output, jobs=1, limit=300, stall=20, off=0.08,
             job_path = folder / "job.json"
             atomic_json(job_path, dict(
                 name=name, map=str(path), profile=profile, args=args, limit=limit,
-                stall=stall, off=off, startup=startup, follower=str(follower),
+                stall=stall, off=off, startup=startup, follower=str(follower), backend=backend,
             ))
             inputs.append(job_path)
     lanes = job_lanes(min(jobs, len(inputs)))
@@ -462,6 +556,8 @@ def main():
     parser.add_argument("--off", type=float, default=0.08)
     parser.add_argument("--startup", type=float, default=60)
     parser.add_argument("--follower", type=Path, default=HERE / "follower.py")
+    parser.add_argument("--backend", choices=("run_eval", "obstacle"), default="run_eval",
+                        help="score with run_eval.py (default) or allow bounded obstacle detours")
     options = parser.parse_args()
     profiles = {}
     try:
@@ -471,7 +567,7 @@ def main():
                 raise ValueError(f"empty or duplicate profile {name!r}")
             profiles[name] = shlex.split(args)
         results = run_matrix(options.maps, profiles, options.output, options.jobs, options.limit,
-                             options.stall, options.off, options.startup, options.follower)
+                             options.stall, options.off, options.startup, options.follower, options.backend)
     except (OSError, ValueError) as error:
         parser.error(str(error))
     print_table(results)
