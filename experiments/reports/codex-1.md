@@ -278,3 +278,32 @@
 
 - **0/20 완주**, 평균 최대 진행률 **48.18%**, 인프라 오류 0건. 실패 중 16건은 완주 전에 follower가 종료 T자임을 기록했고, 3건은 코너에서 정체했으며, 1건은 코너에서 통로를 이탈했다. 분류에는 실패 시작 위치 전후 0.25 m/0.18 m의 기준선 방향을 사용했다. 코너 판정 임계는 방향 변화 35°다. [벤치 요약](../results/DS-A_20261124-022833_random20-baseline/summary.json) · [시드별 분류 CSV](../results/DS-A_20261124-022833_random20-baseline/failures.csv)
 - 이탈한 시드 13은 최대 9.314 m(58.97%), 횡오차 p95 2.57 cm·최대 12.83 cm였다. 이탈 시작점 주변 기준선 방향 변화는 56.2°였고, 시계열에서 전진 명령 중앙값 0.045 m/s와 회전 명령 중앙값 0.123 rad/s를 확인했다. [텔레메트리 JSON](../results/DS-A_20261124-022833_random20-baseline/seed13/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-022833_random20-baseline/seed13/01_01/telemetry.png)
+
+### 동일 랜덤 20맵 후보 검증 완료 · 04:16 KST
+
+- 후보 `e9ac065`는 **8/20 완주**, 평균 최대 진행률 **67.12%**로 기준선보다 **18.94%p** 더 진행했다. 완주 평균 223.06초, 인프라 오류 0건이다. 완주 시드는 03, 05, 08, 09, 11, 12, 16, 17이다. [벤치 요약](../results/DS-A_20261124-024302_random20-candidate/summary.json) · [시드별 실패 분류와 텔레메트리 수치](../results/DS-A_20261124-024302_random20-candidate/failures.csv)
+- 기준선 종점 오인 16건 중 10건, 코너 정체 3건 중 2건에서 이전 최대 진행을 0.25 m 이상 넘었다. 후보 실패는 종점 오인 6건, 이탈 5건(코너 3건), 320초 제한 1건이었다.
+- 시드 3은 기준선 3.569 m에서 후보 16.159 m 완주로 개선됐고, 랩타임 316.12초, 정지 110.69초, 횡오차 p95 2.08 cm, 바퀴 접촉 13회·12.72초였다. 시드 0은 11.644 m에서 7.006 m로 감소했고 후보 최대 횡오차는 13.83 cm였다. [시드 3 비교 PNG](../results/DS-A_20261124-024302_random20-candidate/compare-seed03.png) · [시드 0 비교 PNG](../results/DS-A_20261124-024302_random20-candidate/compare-seed00.png)
+
+| 시드 | 기준선 진행 / 분류 | 후보 진행 / 분류 | 진행 차이(%p) | 기준선 / 후보 JSON |
+| --- | --- | --- | ---: | --- |
+| seed00 | 75.08% / `false_terminal` | 45.18% / `departure` | -29.90 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed00/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed00/01_01/telemetry.json) |
+| seed01 | 72.99% / `false_terminal` | 89.79% / `false_terminal` | +16.80 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed01/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed01/01_01/telemetry.json) |
+| seed02 | 71.61% / `false_terminal` | 21.54% / `corner_departure` | -50.07 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed02/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed02/01_01/telemetry.json) |
+| seed03 | 21.93% / `corner_stall` | 99.29% / `complete` | +77.36 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed03/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed03/01_01/telemetry.json) |
+| seed04 | 24.24% / `corner_stall` | 45.46% / `other` | +21.22 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed04/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed04/01_01/telemetry.json) |
+| seed05 | 34.63% / `false_terminal` | 99.23% / `complete` | +64.60 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed05/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed05/01_01/telemetry.json) |
+| seed06 | 51.75% / `false_terminal` | 21.78% / `false_terminal` | -29.97 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed06/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed06/01_01/telemetry.json) |
+| seed07 | 18.87% / `corner_stall` | 19.89% / `corner_departure` | +1.02 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed07/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed07/01_01/telemetry.json) |
+| seed08 | 49.93% / `false_terminal` | 99.24% / `complete` | +49.31 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed08/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed08/01_01/telemetry.json) |
+| seed09 | 27.32% / `false_terminal` | 99.23% / `complete` | +71.91 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed09/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed09/01_01/telemetry.json) |
+| seed10 | 26.25% / `false_terminal` | 19.49% / `corner_departure` | -6.76 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed10/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed10/01_01/telemetry.json) |
+| seed11 | 46.29% / `false_terminal` | 99.22% / `complete` | +52.93 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed11/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed11/01_01/telemetry.json) |
+| seed12 | 75.43% / `false_terminal` | 99.25% / `complete` | +23.82 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed12/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed12/01_01/telemetry.json) |
+| seed13 | 58.97% / `corner_departure` | 55.84% / `false_terminal` | -3.13 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed13/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed13/01_01/telemetry.json) |
+| seed14 | 29.32% / `false_terminal` | 31.89% / `false_terminal` | +2.57 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed14/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed14/01_01/telemetry.json) |
+| seed15 | 69.52% / `false_terminal` | 53.37% / `false_terminal` | -16.15 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed15/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed15/01_01/telemetry.json) |
+| seed16 | 52.94% / `false_terminal` | 99.27% / `complete` | +46.33 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed16/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed16/01_01/telemetry.json) |
+| seed17 | 45.56% / `false_terminal` | 99.28% / `complete` | +53.72 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed17/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed17/01_01/telemetry.json) |
+| seed18 | 54.81% / `false_terminal` | 88.09% / `departure` | +33.28 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed18/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed18/01_01/telemetry.json) |
+| seed19 | 56.11% / `false_terminal` | 56.11% / `false_terminal` | +0.00 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed19/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed19/01_01/telemetry.json) |
