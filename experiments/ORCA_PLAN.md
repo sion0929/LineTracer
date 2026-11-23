@@ -6,6 +6,18 @@
 2. `tools/lab_env.sh`의 `NAME=line_follower_lab` → `NAME=${LAB_NAME:-line_follower_lab}` 로 바꿔 커밋 (워크트리마다 컨테이너 분리).
 3. 각 에이전트는 `dev/two-track`에서 자기 워크트리/브랜치를 만들어 작업.
 
+## 편성표 (Orca에 생성 완료)
+| 이름 | 에이전트 | Orca 워크트리 / 탭 | 브랜치 | LAB_NAME | ROS_DOMAIN_ID | GZ_PARTITION |
+|---|---|---|---|---|---|---|
+| LEAD | Claude Code (충북대 게이트웨이) | `LEAD · 오케스트레이터` (메인 체크아웃) / 탭 `LEAD · Claude(CBNU)` | `dev/two-track` | lf_lead | 10 | lf_lead |
+| Codex-1 | Codex | `A · 추종기 (Codex-1)` = `a-follower` | `track/a-follower` | lf_a | 11 | lf_a |
+| Codex-2 | Codex | `B · 딥러닝 인식 (Codex-2)` = `b-dlseg` | `track/b-dlseg` | lf_b | 12 | lf_b |
+| Codex-3 | Codex | `C · 맵·채점·스윕 (Codex-3)` = `c-bench` | `track/c-bench` | lf_c | 13 | lf_c |
+| DS-A / DS-B / DS-C | DeepSeek V4.1 Flash eco (`opencode run`) | 상주 탭 없음: 각 Codex가 자기 워크트리에서 일회성으로 호출 | 커밋 안 함 | 호출한 Codex 것 사용 | 호출한 Codex 것 | 호출한 Codex 것 |
+| DS-NIGHT | DeepSeek (프롬프트 D) | `c-bench`에 탭 `DS-NIGHT · 야간스윕` (sweep.py 완성 후 생성) | 커밋 안 함 | lf_sweep | 20 | lf_sweep |
+
+워커 결과 파일 규칙: `experiments/results/<DS-이름>_<YYYYMMDD-HHMM>_<내용>.{json,log,md}`.
+
 ## 공통 컨텍스트 (모든 에이전트 프롬프트 맨 앞에 붙이기)
 ```
 [공통 컨텍스트] 한국어로 보고할 것.
