@@ -1,0 +1,5 @@
+name,map,profile,complete,progress_m,progress_pct,lap_sec,sim_sec,wall_sec,lat_p95,lat_mean,lat_max,collision_count,avoidance_attempts,avoided_count,slip_count,odom_windows,reason
+01_01,/ws/src/line_follower_bringup/worlds/line_track.sdf,default,False,2.663,16.96,,15.54,15.539,0.0761,0.0086,0.0814,0,0,0,2,51,off line at 2.67 m
+02_01,/ws/experiments/worlds/generated/easy_0.sdf,default,False,2.921,18.84,,34.592,34.692,0.0255,0.0152,0.0255,0,0,0,0,115,stalled at 2.92 m
+03_01,/ws/experiments/worlds/generated/normal_9.sdf,default,False,2.564,16.61,,34.12,34.311,0.0401,0.0245,0.0401,0,0,0,1,113,stalled at 2.56 m
+04_01,/ws/experiments/worlds/generated/hard_14.sdf,default,False,2.693,16.99,,15.616,15.713,0.0709,0.0072,0.1153,0,0,0,1,52,off line at 2.83 m
