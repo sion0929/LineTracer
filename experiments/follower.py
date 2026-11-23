@@ -74,6 +74,16 @@ class Follower(Node):
         self.trail = []
         self.last_odom = None
         self.path = None
+        self.gap_origin = None
+        self.camera_line = None
+        self.camera_tangent = None
+        self.fresh_cells = None
+        self.recovery_turn = None
+        self.recovery_yaw = None
+        self.recovery_path = None
+        self.recovery_axis = None
+        self.motion_anchor = None
+        self.reanchors = 0
         self.cmd = Twist()
         self.v_prev = 0.0
         self.w_prev = 0.0
@@ -185,6 +195,9 @@ class Follower(Node):
         ok = (ix >= 0) & (ix < GRID) & (iy >= 0) & (iy < GRID)
         gi, gj = iy[ok & ~dark], ix[ok & ~dark]
         li, lj = iy[ok & dark], ix[ok & dark]
+        if self.a.reactive_recovery:
+            self.fresh_cells = (gi, gj, li, lj)
+            self.camera_line, self.camera_tangent = self.visible_line(lx[dark], ly[dark])
         sc = self.score
         sc[gi, gj] = np.maximum(sc[gi, gj] - self.a.miss, -self.a.clamp)
         sc[li, lj] = np.minimum(sc[li, lj] + self.a.hit, self.a.clamp)
@@ -192,6 +205,136 @@ class Follower(Node):
             self.grid[a_, b_] = (sc[a_, b_] > 0).astype(np.int8)
         self.frames += 1
         self.control()
+
+    @staticmethod
+    def visible_line(x, y):
+        """Select the nearest band of projected line pixels for camera-only steering."""
+        visible = (x > 0.24) & (x < 0.65) & (abs(y) < 0.30)
+        if np.count_nonzero(visible) < 15:
+            return None, None
+        x, y = x[visible], y[visible]
+        near = x <= np.quantile(x, 0.20) + 0.05
+        if np.count_nonzero(near) < 10:
+            return None, None
+        target = (float(np.median(x[near])), float(np.median(y[near])))
+        points = np.column_stack((x, y))
+        local = points[np.linalg.norm(points - target, axis=1) < 0.12]
+        if len(local) < 10:
+            return target, None
+        values, vectors = np.linalg.eigh(np.cov(local, rowvar=False))
+        tangent = vectors[:, -1] if values[-1] > max(0.0003, 5 * values[0]) else None
+        return target, tangent
+
+    def reanchor_local_map(self):
+        """Replace stale local evidence with the latest camera projection."""
+        if self.fresh_cells is None:
+            return
+        x, y, _ = self.pose
+        ix, iy = math.floor((x - ORIGIN) / RES), math.floor((y - ORIGIN) / RES)
+        radius = math.ceil(0.34 / RES)
+        x0, x1 = max(0, ix - radius), min(GRID, ix + radius + 1)
+        y0, y1 = max(0, iy - radius), min(GRID, iy + radius + 1)
+        if x0 < x1 and y0 < y1:
+            dx = ORIGIN + (np.arange(x0, x1) + 0.5) * RES - x
+            dy = ORIGIN + (np.arange(y0, y1) + 0.5) * RES - y
+            local = dy[:, None] ** 2 + dx ** 2 <= 0.34 ** 2
+            self.score[y0:y1, x0:x1][local] = 0
+            self.grid[y0:y1, x0:x1][local] = -1
+        gi, gj, li, lj = self.fresh_cells
+        self.score[gi, gj] = -self.a.miss
+        self.grid[gi, gj] = 0
+        self.score[li, lj] = self.a.hit
+        self.grid[li, lj] = 1
+        self.path = None
+        self.reanchors += 1
+
+    def stalled(self):
+        x, y, yaw = self.pose
+        now = time.monotonic()
+        if self.motion_anchor is not None:
+            start_x, start_y, start_yaw, since = self.motion_anchor
+            turned = abs(math.remainder(yaw - start_yaw, 2 * math.pi)) >= 0.16
+            if math.hypot(x - start_x, y - start_y) < 0.018 and not turned:
+                return now - since > 1.25
+        self.motion_anchor = (x, y, yaw, now)
+        return False
+
+    def react_to_camera(self, turn_hint=0.0, path=None):
+        if self.recovery_turn is None:
+            self.recovery_turn = math.copysign(1.0, turn_hint or self.w_prev or 1.0)
+            self.recovery_yaw = self.pose[2]
+            if path is not None and math.dist(self.pose[:2], path[-1]) < 0.10:
+                heading = self.pose[2] + turn_hint
+                if len(path) >= 3:
+                    self.recovery_axis = (path[0], heading)
+                tail = self.gap_path(path[-1], self.pose[2] + turn_hint)
+                if tail is not None and math.dist(self.pose[:2], tail[0]) <= 0.20:
+                    self.recovery_path = tail
+            self.reanchor_local_map()
+        limit = min(self.a.wmax, 0.5)
+        if self.recovery_path is not None and self.follow_recovery_path(limit):
+            return
+        yaw_from_start = math.remainder(self.pose[2] - self.recovery_yaw, 2 * math.pi)
+        camera_angle = math.atan2(self.camera_line[1], self.camera_line[0]) if self.camera_line is not None else None
+        if camera_angle is None or abs(yaw_from_start + camera_angle) > 1.35:
+            if yaw_from_start * self.recovery_turn >= 1.10:
+                self.recovery_turn = -self.recovery_turn
+            self.set_motion(0.0, self.recovery_turn * min(limit, 0.34))
+            return
+        if self.recovery_axis is not None and self.camera_tangent is not None:
+            approach = self.corner_approach()
+            if approach is not None:
+                self.recovery_axis = None
+                self.recovery_path = approach
+                if self.follow_recovery_path(limit):
+                    return
+        self.steer_recovery(camera_angle, limit, 0.045, 0.25)
+
+    def corner_approach(self):
+        """Intersect the last mapped approach with the visible exit of a corner."""
+        x, y, yaw = self.pose
+        origin, heading = self.recovery_axis
+        incoming = np.array((math.cos(heading), math.sin(heading)))
+        rotation = np.array(((math.cos(yaw), -math.sin(yaw)), (math.sin(yaw), math.cos(yaw))))
+        outgoing = rotation @ self.camera_tangent
+        cross = incoming[0] * outgoing[1] - incoming[1] * outgoing[0]
+        if abs(cross) < 0.55:
+            return None
+        observed = np.array((x, y)) + rotation @ self.camera_line - origin
+        along = (observed[0] * outgoing[1] - observed[1] * outgoing[0]) / cross
+        current = np.dot((x, y) - origin, incoming)
+        distance = along - current
+        if not 0.065 <= distance <= 0.36:
+            return None
+        start = origin + current * incoming
+        return np.linspace(start, start + (distance - 0.025) * incoming,
+                           math.ceil(distance / self.a.step))
+
+    def follow_recovery_path(self, limit):
+        x, y, yaw = self.pose
+        path = self.recovery_path
+        nearby = path[:12] - (x, y)
+        distance = np.hypot(nearby[:, 0], nearby[:, 1])
+        i = int(np.argmin(distance))
+        if distance[i] < 0.065:
+            path = self.recovery_path = path[i:]
+            if len(path) == 1 and distance[i] <= 0.025:
+                self.recovery_path = None
+                return False
+            target = path[min(4, len(path) - 1)]
+        else:
+            target = path[0]
+        dx, dy = target - (x, y)
+        angle = math.remainder(math.atan2(dy, dx) - yaw, 2 * math.pi)
+        self.steer_recovery(angle, limit, min(0.05, math.hypot(dx, dy) * 0.8), 0.60)
+        return True
+
+    def steer_recovery(self, angle, limit, speed, max_angle):
+        w = max(-limit, min(limit, 1.8 * angle))
+        if abs(angle) > 0.10:
+            self.recovery_turn = math.copysign(1.0, angle)
+        v = min(speed, self.a.vmax) if abs(angle) < max_angle else 0.0
+        self.set_motion(v, w)
 
     # ---------------------------------------------------------------- tracing
     def line_at(self, px, py):
@@ -267,8 +410,15 @@ class Follower(Node):
             centers = [float(np.mean(cl)) for cl in clusters]
             best = min(centers, key=abs)
             if abs(best) > math.radians(25) and self.tee_arms(px, py, h, clusters, centers):
-                end_reason = 'tee'
-                break
+                tail_x, tail_y = pts[max(0, len(pts) - 9)]
+                incoming = math.atan2(py - tail_y, px - tail_x) if len(pts) > 1 else h
+                continuation = self.forward_continuation(px, py, incoming, angles)
+                if continuation is None:
+                    if self.transverse_bar(px, py, incoming, angles):
+                        end_reason = 'tee'
+                        break
+                else:
+                    best = math.remainder(incoming + continuation - h, 2 * math.pi)
             h = h + best
             px, py = px + step * math.cos(h), py + step * math.sin(h)
             pts.append((px, py))
@@ -287,6 +437,66 @@ class Follower(Node):
                 support.add(math.copysign(1, center))
         return len(support) == 2
 
+    def forward_continuation(self, px, py, heading, angles):
+        """Check for a straight arm beyond a noisy intersection."""
+        forward = angles[abs(angles) <= math.radians(25)]
+        hits = []
+        for reach in (0.065, 0.11):
+            hits = [offset for offset in forward
+                    if self.line_at(px + reach * math.cos(heading + offset),
+                                    py + reach * math.sin(heading + offset)) == 1]
+            if not hits:
+                return None
+        return min(hits, key=abs)
+
+    def transverse_bar(self, px, py, heading, angles):
+        """Require evidence on both sides of the incoming line."""
+        side = angles[angles >= math.radians(55)]
+        reach = 0.075
+        return all(any(self.line_at(px + reach * math.cos(heading + sign * offset),
+                                    py + reach * math.sin(heading + sign * offset)) == 1
+                       for offset in side) for sign in (-1, 1))
+
+    def gap_path(self, endpoint, heading):
+        """Find a nearby fragment with enough mapped line to continue tracing."""
+        end_x, end_y = endpoint
+        angles = np.radians([0, 10, -10, 20, -20, 30, -30, 40, -40, 50, -50, 60, -60])
+        for radius in (0.06, 0.085, 0.11, 0.135, 0.16):
+            for offset in angles:
+                bearing = heading + offset
+                px = end_x + radius * math.cos(bearing)
+                py = end_y + radius * math.sin(bearing)
+                if self.line_at(px, py) != 1:
+                    continue
+                seed = self.snap(px, py, radius=0.015)
+                if seed is None:
+                    continue
+                tail, _ = self.trace(*seed, bearing)
+                if len(tail) > math.ceil(0.09 / self.a.step) and np.linalg.norm(tail[-1] - tail[0]) > 0.055:
+                    return tail
+        return None
+
+    def recover_gap(self, pts, heading):
+        x, y, yaw = self.pose
+        if self.gap_origin is not None and math.dist((x, y), self.gap_origin) >= 0.14:
+            return False
+        tail = self.gap_path(pts[-1], heading)
+        if tail is None:
+            return False
+        target = tail[0]
+        distance = math.dist((x, y), target)
+        if not 0.025 < distance <= 0.20:
+            return False
+        if self.gap_origin is None:
+            self.gap_origin = (x, y)
+        bearing = math.atan2(target[1] - y, target[0] - x)
+        angle = math.remainder(bearing - yaw, 2 * math.pi)
+        limit = min(self.a.wmax, 0.5)
+        angular = max(-limit, min(limit, 1.5 * angle))
+        speed = min(self.a.vmax, 0.045, distance * 0.5) if abs(angle) < 0.65 else 0.0
+        self.set_motion(speed, angular)
+        return True
+
     # ---------------------------------------------------------------- control
     def control(self):
         x, y, yaw = self.pose
@@ -295,6 +505,9 @@ class Follower(Node):
             return
         sp = self.start_point(x, y, yaw)
         if sp is None:
+            if self.a.reactive_recovery and self.frames > 5:
+                self.react_to_camera()
+                return
             self.cmd = Twist()
             return
         pts, reason = self.trace(*sp)
@@ -317,6 +530,11 @@ class Follower(Node):
                         pts, reason = retry, retry_reason
                         break
         if len(pts) < 2:
+            if reason == 'tee' and math.hypot(sp[0] - x, sp[1] - y) < self.a.stop_dist:
+                self.finished = True
+            elif self.a.reactive_recovery:
+                self.react_to_camera(math.remainder(sp[2] - yaw, 2 * math.pi))
+                return
             self.cmd = Twist()
             return
         self.path = pts
@@ -327,17 +545,40 @@ class Follower(Node):
         seg = np.hypot(np.diff(rx), np.diff(ry))
         arc = np.r_[0, np.cumsum(seg)]
         remaining = arc[-1]
+        ld = self.a.ld_min + self.a.ld_gain * max(self.v_prev, 0.0)
+        i = min(int(np.searchsorted(arc, ld)), len(rx) - 1)
+        tx, ty = rx[i], ry[i]
+        alpha = math.atan2(ty, tx)
+        if remaining >= 0.12:
+            self.gap_origin = None
         near_end = remaining < self.a.stop_dist and np.hypot(rx[-1], ry[-1]) < self.a.stop_dist
         if reason == 'tee' and near_end:
             self.get_logger().info('terminal T reached; stopping')
             self.finished = True
             self.cmd = Twist()
             return
+        if self.a.reactive_recovery:
+            stalled = self.stalled() if self.recovery_turn is None else False
+            supported = remaining >= 0.16 and np.hypot(rx[0], ry[0]) < 0.065
+            turn_too_far = abs(alpha) > self.a.rotate_angle
+            lost = stalled or near_end or turn_too_far or (self.recovery_turn is not None and not supported)
+            if reason != 'tee' and lost:
+                hint = math.atan2(ry[-1] - ry[0], rx[-1] - rx[0])
+                self.react_to_camera(alpha if turn_too_far else hint, None if turn_too_far else pts)
+                return
+            if self.recovery_turn is not None:
+                self.recovery_turn = None
+                self.recovery_yaw = None
+                self.recovery_path = None
+                self.recovery_axis = None
+                self.motion_anchor = None
         if reason in ('end', 'unknown') and near_end:
-            # A short mapped curve can terminate at the edge of the camera view.
-            # Turn toward its tangent so the continuation can enter the image.
             dx, dy = rx[-1] - rx[0], ry[-1] - ry[0]
             angle = math.atan2(dy, dx)
+            if self.a.gap_recovery and self.recover_gap(pts, yaw + angle):
+                return
+            # A short mapped curve can terminate at the edge of the camera view.
+            # Turn toward its tangent so the continuation can enter the image.
             w = 0.0
             if math.hypot(dx, dy) >= 0.02 and 0.15 <= abs(angle) <= 1.2:
                 w = max(-0.4, min(0.4, 1.5 * angle))
@@ -354,14 +595,10 @@ class Follower(Node):
         v = self.a.vmax
         if k_ahead > 1e-3:
             v = min(v, math.sqrt(self.a.alat / k_ahead))
+        if k_ahead >= 3.0:
+            v = min(v, 0.10)
         if reason != 'length':
             v = min(v, math.sqrt(2 * self.a.decel * max(0.0, remaining - 0.03)))
-        # lookahead target
-        ld = self.a.ld_min + self.a.ld_gain * max(self.v_prev, 0.0)
-        i = int(np.searchsorted(arc, ld))
-        i = min(i, len(rx) - 1)
-        tx, ty = rx[i], ry[i]
-        alpha = math.atan2(ty, tx)
         if abs(alpha) > self.a.rotate_angle:
             v = 0.0
             w = math.copysign(min(self.a.wmax, self.a.k_rot * abs(alpha)), alpha)
@@ -406,6 +643,10 @@ def main():
     p.add_argument('--probe', type=float, default=0.03)
     p.add_argument('--horizon', type=float, default=0.8)
     p.add_argument('--stop-dist', type=float, default=0.06)
+    p.add_argument('--gap-recovery', action='store_true',
+                   help='try a bounded low-speed approach to a supported nearby line fragment')
+    p.add_argument('--reactive-recovery', action='store_true',
+                   help='refresh the local map and steer using the latest camera observation when tracking fails')
     p.add_argument('--dump', default='')
     p.add_argument('--latency', type=float, default=0.04)
     p.add_argument('--imu-yaw', type=int, default=1)
@@ -426,7 +667,8 @@ def main():
     finally:
         if a.dump:
             np.savez_compressed(a.dump, grid=n.grid, path=n.path if n.path is not None else np.zeros((0, 2)),
-                                pose=np.array(n.pose or (0, 0, 0)), trail=np.array(n.trail), cmds=np.array(n.cmds))
+                                pose=np.array(n.pose or (0, 0, 0)), trail=np.array(n.trail), cmds=np.array(n.cmds),
+                                reanchors=n.reanchors)
         try:
             n.pub.publish(Twist())
         except Exception:
