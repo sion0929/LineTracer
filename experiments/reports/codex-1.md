@@ -307,3 +307,17 @@
 | seed17 | 45.56% / `false_terminal` | 99.28% / `complete` | +53.72 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed17/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed17/01_01/telemetry.json) |
 | seed18 | 54.81% / `false_terminal` | 88.09% / `departure` | +33.28 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed18/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed18/01_01/telemetry.json) |
 | seed19 | 56.11% / `false_terminal` | 56.11% / `false_terminal` | +0.00 | [기준선](../results/DS-A_20261124-022833_random20-baseline/seed19/01_01/telemetry.json) · [후보](../results/DS-A_20261124-024302_random20-candidate/seed19/01_01/telemetry.json) |
+
+### 공식 트랙 회귀 5회 완료 · 04:33 KST
+
+- `e9ac065` 무옵션 OpenCV follower로 공식 **5/5 완주**했다. 평균 178.15초(175.82–180.94초), 횡오차 p95 최대 1.80 cm, 각 회차 바퀴 접촉 6회·1.74–2.00초였다. 인프라 오류는 0건이다. 이번 후보의 공식 회귀 표본은 5회이며, 기존 G1 9/10은 기준선 기록이다. [벤치 요약](../results/DS-A_20261124-024302_generalization-official5/summary.json) · [공식 회귀 비교 PNG](../results/DS-A_20261124-024302_generalization-official5/compare-official5.png)
+
+| 회차 | 최대 진행(m) | 랩타임(초) | 횡오차 p95 / 최대(cm) | 속도 p95(m/s) | 정지(초) | 바퀴 접촉 횟수 / 시간(초) | 텔레메트리 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| official01 | 15.579 | 178.09 | 1.70 / 3.45 | 0.1008 | 0.66 | 6 / 1.88 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official01/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official01/01_01/telemetry.png) |
+| official02 | 15.575 | 175.82 | 1.75 / 3.15 | 0.1008 | 0.66 | 6 / 1.80 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official02/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official02/01_01/telemetry.png) |
+| official03 | 15.582 | 180.94 | 1.80 / 3.18 | 0.1007 | 0.66 | 6 / 1.98 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official03/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official03/01_01/telemetry.png) |
+| official04 | 15.582 | 177.57 | 1.58 / 3.23 | 0.1008 | 0.66 | 6 / 1.74 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official04/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official04/01_01/telemetry.png) |
+| official05 | 15.581 | 178.33 | 1.71 / 3.30 | 0.1008 | 0.66 | 6 / 2.00 | [JSON](../results/DS-A_20261124-024302_generalization-official5/official05/01_01/telemetry.json) · [PNG](../results/DS-A_20261124-024302_generalization-official5/official05/01_01/telemetry.png) |
+
+- 랜덤 진행률이 향상됐고 공식 회귀 5회를 모두 통과해 일반화 수정을 이 브랜치의 무옵션 기본 동작으로 유지했다. 레이싱은 보류 상태다.
