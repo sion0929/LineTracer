@@ -15,7 +15,7 @@ LAB_NAME=lf_c ROS_DOMAIN_ID=13 GZ_PARTITION=lf_c \
   --jobs 2 --output experiments/worlds/generated/bench_example
 ```
 
-맵과 프로필의 모든 조합을 평가한다. 첫 실행 슬롯은 지정된 ROS 도메인과 Gazebo 파티션을 쓴다. 다음 슬롯은 예약 범위 31–46의 별도 도메인과 관리 파티션을 쓴다. 각 평가에 자체 시뮬레이터와 ROS 브리지가 있다. 명령은 빈 결과 디렉터리에서 시작한다. 반려된 실행과 정상적인 주행 실패는 표의 `reason` 필드에서 확인할 수 있다.
+맵과 프로필의 모든 조합을 평가한다. 첫 실행 슬롯은 지정된 ROS 도메인과 Gazebo 파티션을 쓴다. 다음 슬롯은 예약 범위 31–46의 별도 도메인과 관리 파티션을 쓴다. 각 평가에 자체 시뮬레이터와 ROS 브리지가 있다. 명령은 빈 결과 디렉터리에서 시작한다. 표의 `reason` 필드에서 이탈, 정체, 시뮬레이터 오류 등의 종료 원인을 확인할 수 있다.
 
 - `results.csv`와 터미널 표를 생성한다. 각 실행의 `result.json`, `trajectory.npy`, `run.log`는 번호로 구분된 하위 디렉터리에 있다.
 - 기존 기준에 따라 8 cm를 넘는 이탈이 0.6 s 지속되면 실패하고, 도착 12 cm 이내면 완료한다. 시간과 랩타임은 시뮬레이션 시간으로 계산한다. 랩타임은 2 cm 진행부터 완료까지다. 횡오차는 순서가 있는 중심선의 지역 투영을 사용한다.
@@ -40,9 +40,32 @@ PYTHONPATH=/ws/experiments/sweeps/.deps:${PYTHONPATH:-} \
   python3 experiments/sweep.py \
   experiments/worlds/generated/easy_0.sdf \
   experiments/worlds/generated/normal_3.sdf \
-  --jobs 2 --trials 10 --output experiments/sweeps/2026-11-23
+  --jobs 2 --trials 10 --output experiments/sweeps/2026-11-23-full
 ```
 
 `--trials`는 기존 완료 trial을 포함한 목표 유효 횟수다. 같은 맵 경로·내용, follower, 채점 코드, 시드와 시간 설정으로 같은 폴더를 넘기면 SQLite 기록에서 이어간다. 중단 시 남은 RUNNING trial은 FAIL로 정리한다. 시험 결과는 `study.sqlite3`, `config.json`, 자동 갱신되는 `summary.md`, 개별 `trial_NNNN/results.csv`에서 확인한다. 인프라 오류가 세 번 연속 발생하면 중단한다.
 
 점수는 완주 수에 최대 0.99점의 속도·정밀도 보너스를 더한다. 같은 완주 수에서는 완주한 맵의 평균 랩타임에 0.79, 모든 맵의 평균 횡오차 p95에 0.20을 배정한다. 첫 trial은 follower 기본값으로 실행한다.
+
+## 2026-11-23 결과 재현
+
+랩 컨테이너의 `/ws`에서 다음 시드와 상자 수로 생성한다.
+
+```bash
+python3 experiments/worlds/gen_world.py --seed 0 --difficulty easy --obstacles 0
+python3 experiments/worlds/gen_world.py --seed 9 --difficulty normal --obstacles 1
+python3 experiments/worlds/gen_world.py --seed 14 --difficulty hard --obstacles 2
+
+LAB_NAME=lf_c ROS_DOMAIN_ID=13 GZ_PARTITION=lf_c \
+  python3 experiments/bench.py src/line_follower_bringup/worlds/line_track.sdf \
+  experiments/worlds/generated/{easy_0,normal_9,hard_14}.sdf \
+  --jobs 2 --limit 140 --output experiments/worlds/generated/baseline_repro
+
+export PYTHONPATH=/ws/experiments/sweeps/.deps:${PYTHONPATH:-}
+args=(experiments/worlds/generated/{easy_0,normal_9}.sdf --jobs 2 --limit 32 \
+      --stall 8 --output experiments/sweeps/2026-11-23-repro)
+LAB_NAME=lf_c ROS_DOMAIN_ID=13 GZ_PARTITION=lf_c python3 experiments/sweep.py "${args[@]}" --trials 3
+LAB_NAME=lf_c ROS_DOMAIN_ID=13 GZ_PARTITION=lf_c python3 experiments/sweep.py "${args[@]}" --trials 10
+```
+
+스윕 검증용 32초 제한은 재개와 결과 저장을 확인하기 위한 설정이다. 전체 코스의 속도와 완주율에 맞춰 튜닝할 때는 충분한 `--limit`과 별도의 결과 폴더를 사용한다.
