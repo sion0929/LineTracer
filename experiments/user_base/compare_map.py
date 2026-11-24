@@ -56,6 +56,26 @@ def main(dump, run, out, world_json=None):
     R = np.array([[np.cos(yaw0), -np.sin(yaw0)], [np.sin(yaw0), np.cos(yaw0)]])
     to_world = lambda p: p @ R.T + np.array([x0, y0])  # noqa: E731
     wcells = to_world(cells)
+    # reference-point correction: the node's odom origin need not coincide with the true
+    # spawn point. Fit a pure translation using only map cells seen in the first 1.5 m
+    # of the track (start straight), then compare shapes from that common reference.
+    start = dense(centre[centre[:, 2] <= 1.5, :2]) if (centre[:, 2] <= 1.5).sum() > 1 else dense(centre[:8, :2])
+    near = nearest(wcells, start) < 0.15
+    if near.sum() > 50:
+        from_pts = wcells[near]
+        shift = np.zeros(2)
+        for _ in range(10):
+            try:
+                from scipy.spatial import cKDTree
+                idx = cKDTree(start).query(from_pts + shift)[1]
+            except ImportError:
+                idx = np.array([np.argmin(((start - p) ** 2).sum(1)) for p in from_pts + shift])
+            shift = (start[idx] - from_pts).mean(0)
+        # along a straight only the perpendicular part is observable; keep it bounded
+        ref_shift = shift
+    else:
+        ref_shift = np.zeros(2)
+    wcells_ref = wcells + ref_shift
     est = to_world(poses[:, 1:3]) if len(poses) else np.zeros((0, 2))
 
     lines = [dense(centre[:, :2])]
@@ -65,6 +85,7 @@ def main(dump, run, out, world_json=None):
     gt = np.vstack(lines)
 
     err = nearest(wcells, gt)                   # map cell -> nearest true line point
+    err_ref = nearest(wcells_ref, gt)           # same, after the start-reference correction
     seen_gt = gt[nearest(gt, wcells) < 0.015]   # true line covered by the map
     ok1, ok3 = (err < 0.01).mean(), (err < 0.03).mean()
 
@@ -145,6 +166,8 @@ def main(dump, run, out, world_json=None):
         txt.append(f"node pose vs true path (spatial): median {np.median(drift)*100:.1f} cm, max {drift.max()*100:.1f} cm")
     if not world_json:
         txt.append("note: official track GT = centre line only; T bars at start/finish show as >3 cm.")
+    txt.append(f"after start-reference correction (shift {ref_shift[0]*100:+.1f}, {ref_shift[1]*100:+.1f} cm): "
+               f"<1 cm {(err_ref<.01).mean():.1%}, <3 cm {(err_ref<.03).mean():.1%}, median {np.median(err_ref)*100:.2f} cm")
     txt.append(f"after best rigid alignment (removes global drift): <1 cm {(err_al<.01).mean():.1%}, "
                f"<3 cm {(err_al<.03).mean():.1%}, median {np.median(err_al)*100:.2f} cm")
     s.text(0, 1, "\n".join(txt), va="top", family="monospace", fontsize=10)
@@ -155,6 +178,9 @@ def main(dump, run, out, world_json=None):
                    gt_covered=round(covered, 4), max_progress_m=round(reach, 3),
                    drift_max_cm=round(float(drift.max()) * 100, 1) if drift is not None else None,
                    drift_median_cm=round(float(np.median(drift)) * 100, 1) if drift is not None else None,
+                   ref_shift_cm=[round(float(v) * 100, 1) for v in ref_shift],
+                   ref_within_1cm=round(float((err_ref < .01).mean()), 4),
+                   ref_within_3cm=round(float((err_ref < .03).mean()), 4),
                    aligned_within_1cm=round(float((err_al < .01).mean()), 4),
                    aligned_within_3cm=round(float((err_al < .03).mean()), 4))
     print(json.dumps(summary))
