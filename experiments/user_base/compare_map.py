@@ -30,7 +30,11 @@ def dense(poly, step=0.005):
 
 
 def nearest(points, ref, chunk=4000):
-    from numpy.lib.stride_tricks import sliding_window_view  # noqa: F401
+    try:
+        from scipy.spatial import cKDTree
+        return cKDTree(ref).query(points)[0]
+    except ImportError:
+        pass
     d = np.empty(len(points))
     for i in range(0, len(points), chunk):
         p = points[i:i + chunk]
@@ -64,16 +68,36 @@ def main(dump, run, out, world_json=None):
     seen_gt = gt[nearest(gt, wcells) < 0.015]   # true line covered by the map
     ok1, ok3 = (err < 0.01).mean(), (err < 0.03).mean()
 
-    # drift: node's own pose estimate vs truth, matched in time
-    t_true = c["t"]
+    # drift: node's own pose estimate vs the true path, measured spatially (the two logs
+    # start at different times, so time matching would inflate it)
     drift = None
     if len(poses) > 5:
-        tp = poses[:, 0] - poses[0, 0]
-        tt = t_true - t_true[0]
-        k = np.searchsorted(tt, tp).clip(0, len(tt) - 1)
-        true_xy = np.column_stack((c["x"][k], c["y"][k]))
-        drift = np.linalg.norm(est - true_xy, axis=1)
+        true_xy = np.column_stack((c["x"], c["y"]))
+        drift = nearest(est, true_xy)
+        k = np.array([np.argmin(((true_xy - e) ** 2).sum(1)) for e in est])
         drift_s = c["s"][k]
+
+    # shape quality independent of global drift: best rigid fit (ICP) of the map onto the truth
+    def icp(src, ref, it=30):
+        R_, T_ = np.eye(2), np.zeros(2)
+        cur = src.copy()
+        for _ in range(it):
+            try:
+                from scipy.spatial import cKDTree
+                idx = cKDTree(ref).query(cur)[1]
+            except ImportError:
+                idx = np.array([np.argmin(((ref - p) ** 2).sum(1)) for p in cur])
+            m = ref[idx]
+            mc, cc = m.mean(0), cur.mean(0)
+            U, _, Vt = np.linalg.svd((cur - cc).T @ (m - mc))
+            r = (U @ Vt).T
+            if np.linalg.det(r) < 0:
+                Vt[-1] *= -1
+                r = (U @ Vt).T
+            cur = (cur - cc) @ r.T + mc
+        return cur
+    aligned = icp(wcells, gt)
+    err_al = nearest(aligned, gt)
 
     fig = plt.figure(figsize=(16, 10))
     g = fig.add_gridspec(2, 3, width_ratios=(1.6, 1, 1))
@@ -102,8 +126,8 @@ def main(dump, run, out, world_json=None):
     if drift is not None:
         d.plot(drift_s, drift * 100, lw=1)
         d.set_xlabel("distance along line s [m]")
-        d.set_ylabel("pose drift [cm]")
-        d.set_title(f"node pose vs truth (max {drift.max()*100:.1f} cm)")
+        d.set_ylabel("distance to true path [cm]")
+        d.set_title(f"node's pose estimate vs true path (median {np.median(drift)*100:.1f}, max {drift.max()*100:.1f} cm)")
         d.grid(alpha=.3)
 
     s = fig.add_subplot(g[1, 1:])
@@ -118,16 +142,21 @@ def main(dump, run, out, world_json=None):
            f"true line covered by the map (≤1.5 cm): {covered:.1%}  (only what the camera has seen so far)",
            ]
     if drift is not None:
-        txt.append(f"node pose drift: median {np.median(drift)*100:.1f} cm, max {drift.max()*100:.1f} cm")
+        txt.append(f"node pose vs true path (spatial): median {np.median(drift)*100:.1f} cm, max {drift.max()*100:.1f} cm")
     if not world_json:
         txt.append("note: official track GT = centre line only; T bars at start/finish show as >3 cm.")
+    txt.append(f"after best rigid alignment (removes global drift): <1 cm {(err_al<.01).mean():.1%}, "
+               f"<3 cm {(err_al<.03).mean():.1%}, median {np.median(err_al)*100:.2f} cm")
     s.text(0, 1, "\n".join(txt), va="top", family="monospace", fontsize=10)
     fig.tight_layout()
     fig.savefig(out, dpi=110)
     summary = dict(cells=int(len(cells)), within_1cm=round(ok1, 4), within_3cm=round(ok3, 4),
                    median_cm=round(float(np.median(err)) * 100, 2), p95_cm=round(float(np.percentile(err, 95)) * 100, 2),
                    gt_covered=round(covered, 4), max_progress_m=round(reach, 3),
-                   drift_max_cm=round(float(drift.max()) * 100, 1) if drift is not None else None)
+                   drift_max_cm=round(float(drift.max()) * 100, 1) if drift is not None else None,
+                   drift_median_cm=round(float(np.median(drift)) * 100, 1) if drift is not None else None,
+                   aligned_within_1cm=round(float((err_al < .01).mean()), 4),
+                   aligned_within_3cm=round(float((err_al < .03).mean()), 4))
     print(json.dumps(summary))
     return summary
 
