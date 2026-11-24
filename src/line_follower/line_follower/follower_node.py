@@ -53,6 +53,9 @@ class FollowerNode(Node):
         self.declare_parameter('lookahead_min', 0.10, rng(0.04, 0.5, 'pure pursuit lookahead at zero speed [m]'))
         self.declare_parameter('lookahead_gain', 0.30, rng(0.0, 2.0, 'lookahead growth per m/s [s]'))
         self.declare_parameter('finish_min_dist', 10.0, rng(0.0, 30.0, 'travel before the finish T is accepted [m]'))
+        self.declare_parameter('steady_rock', 0.08, rng(0.0, 1.0, 'max body rocking for the full camera range'))
+        self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
+        self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
         # Track-specific speed plan: [s_from, s_to, v_max, ...] with s = distance driven [m].
         # Outside these windows v_max applies. Tuned for the provided line_track world.
         self.declare_parameter('speed_profile', [0.0], ParameterDescriptor(
@@ -194,8 +197,11 @@ class FollowerNode(Node):
             bgr = cv2.resize(bgr, (vision.W, vision.H))
         ts = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
         # while the body rocks or the robot is on the hill, only trust the near ground
-        steady = self.rock < 0.08 and abs(self.pitch_f) < math.radians(3.0)
-        out = self.perception.process(bgr, gray, self.pitch_at(ts), vision.X_FAR if steady else 0.50)
+        gp = self.get_parameter
+        steady = (self.rock < gp('steady_rock').value
+                  and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value))
+        x_far = vision.X_FAR if steady else min(vision.X_FAR, gp('x_far_unsteady').value)
+        out = self.perception.process(bgr, gray, self.pitch_at(ts), x_far)
         self.last_obstacle = out.obstacle
         out.pitch = self.pitch_at(ts)
         self.last_observation = out

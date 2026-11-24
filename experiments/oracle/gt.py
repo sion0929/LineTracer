@@ -7,7 +7,6 @@ Progress      tracks the robot's arc position on the centre line
 import json
 import math
 import os
-import threading
 from pathlib import Path
 
 import numpy as np
@@ -36,28 +35,41 @@ def load_route():
     return c, arc
 
 
-class Truth:
-    def __init__(self, model="turtlebot3_waffle_pi"):
-        from gz.transport13 import Node
-        from gz.msgs10.pose_v_pb2 import Pose_V
-        self.model = model
-        self.pose = None
-        self.lock = threading.Lock()
-        self.node = Node()
-        self.node.subscribe(Pose_V, "/world/line_track/dynamic_pose/info", self.cb)
+def _truth_proc(model, shared):
+    """Child process: gz-transport subscriber (kept out of the rclpy process, where its
+    callback thread occasionally crashed the node with SIGSEGV)."""
+    import time
+    from gz.transport13 import Node
+    from gz.msgs10.pose_v_pb2 import Pose_V
 
-    def cb(self, msg):
+    def cb(msg):
         for p in msg.pose:
-            if p.name == self.model:
+            if p.name == model:
                 q = p.orientation
                 yaw = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
-                with self.lock:
-                    self.pose = (p.position.x, p.position.y, yaw)
+                with shared.get_lock():
+                    shared[0], shared[1], shared[2], shared[3] = p.position.x, p.position.y, yaw, 1.0
                 return
 
+    node = Node()
+    node.subscribe(Pose_V, "/world/line_track/dynamic_pose/info", cb)
+    parent = os.getppid()
+    while os.getppid() == parent:
+        time.sleep(0.5)
+
+
+class Truth:
+    def __init__(self, model="turtlebot3_waffle_pi"):
+        import multiprocessing as mp
+        ctx = mp.get_context("spawn")
+        self.shared = ctx.Array("d", 4)
+        self.proc = ctx.Process(target=_truth_proc, args=(model, self.shared), daemon=True)
+        self.proc.start()
+
     def get(self):
-        with self.lock:
-            return self.pose
+        with self.shared.get_lock():
+            x, y, yaw, ok = self.shared[:]
+        return (x, y, yaw) if ok else None
 
 
 class Progress:
@@ -72,7 +84,10 @@ class Progress:
         d = np.linalg.norm(self.c[lo:hi] - np.asarray(xy[:2]), axis=1)
         k = lo + int(np.argmin(d))
         self.s = max(self.s, float(self.arc[k]))
-        return k, float(d.min())
+        # distance to the polyline, not to its vertices (the official gt.npy is 0.22 m sparse)
+        seg = self.c[max(lo, k - 2):min(hi, k + 3)]
+        off = float(seg_distance(np.asarray(xy[:2], float)[None], seg)[0]) if len(seg) >= 2 else float(d.min())
+        return k, off
 
 
 def to_frame(pts, pose):

@@ -36,7 +36,7 @@ import run_oracle  # noqa: E402  (sets up the package path; its main() starts th
 Base = run_oracle.OracleNode if os.environ.get("SHADOW_ORACLE") == "1" else run_oracle.fn.FollowerNode
 
 D = np.array([0.15, 0.30, 0.45, 0.60, 0.80])
-FIELDS = ("t", "travel", "s", "turn_back", "turn_ahead", "slope", "end", "plen", "robot_off", "pitch")
+FIELDS = ("t", "travel", "s", "turn_back", "turn_ahead", "slope", "end", "plen", "robot_off", "pitch", "rock")
 
 
 def resample(rp, dists):
@@ -101,10 +101,35 @@ class ShadowNode(Base):
         end = {"open": 0, "t": 1, "len": 2}.get(self.path_end, 3) if len(self.path) >= 2 else -1
         self.rows.append((t, self.travel, s, self.heading_change(k, -0.6, 0.0),
                           self.heading_change(k, 0.0, 0.8), float(self.slope[k]), end, plen,
-                          robot_off, float(self.pitch_f)))
+                          robot_off, float(self.pitch_f), float(getattr(self, 'rock', np.nan))))
         self.errs.append(err)
+        self.snapshot(plen, robot_off)
         if len(self.rows) % 60 == 0:
             self.save()
+
+    def snapshot(self, plen, robot_off):
+        """SHADOW_SNAP=1: dump BEV masks + map crop when the route runs short before a turn
+        (the 'route stops at a sharp corner' failure), at most 8 per run, 0.3 s apart (SHADOW_SNAP_PLEN sets the length threshold)."""
+        if os.environ.get("SHADOW_SNAP") != "1" or getattr(self, "n_snap", 0) >= 8:
+            return
+        t = self.get_clock().now().nanoseconds * 1e-9
+        if plen > float(os.environ.get("SHADOW_SNAP_PLEN", "0.20")) or self.rows[-1][4] < 60 \
+                or t - getattr(self, "t_snap", -9) < 0.3:
+            return
+        from line_follower.line_map import C0, RES
+        self.n_snap = getattr(self, "n_snap", 0) + 1
+        self.t_snap = t
+        px, py, _ = self.pose
+        ix, iy, r = round(px / RES) + C0, round(py / RES) + C0, round(1.0 / RES)
+        obs = self.last_observation
+        np.savez_compressed(gt.job_dir() / f"snap{self.n_snap}.npz",
+                            grid=np.asarray(self.map.grid[iy - r:iy + r + 1, ix - r:ix + r + 1]),
+                            origin=np.array([(ix - r - C0) * RES, (iy - r - C0) * RES]), res=RES,
+                            pose=np.array(self.pose), truth=np.array(self.truth.get() or (0, 0, 0)),
+                            path=np.asarray(self.path, float).reshape(-1, 2),
+                            line=np.asarray(obs.line) if obs is not None else np.zeros(1),
+                            valid=np.asarray(obs.valid) if obs is not None else np.zeros(1),
+                            route=self.route[:, :2], t=t, plen=plen, robot_off=robot_off)
 
     def save(self):
         if not self.rows:
