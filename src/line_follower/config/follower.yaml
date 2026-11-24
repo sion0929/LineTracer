@@ -1,0 +1,19 @@
+/**:
+  ros__parameters:
+    use_sim_time: true
+follower_node:
+  ros__parameters:
+    v_max: 0.25
+    v_min: 0.06
+    a_lat: 0.25
+    a_dec: 0.3
+    a_acc: 0.6
+    v_hill: 0.30
+    omega_max: 3.0
+    lookahead_min: 0.10
+    lookahead_gain: 0.30
+    finish_min_dist: 14.0
+    debug_image: false
+    # track-specific top speeds by distance driven [m]: (from, to, v_max) triples.
+    # Fast only on the long straights; v_max elsewhere. Tuned for line_track.
+    speed_profile: [7.2, 10.1, 0.7,  12.8, 14.0, 0.45,  14.0, 30.0, 0.7]

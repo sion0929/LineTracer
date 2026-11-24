@@ -1,0 +1,11 @@
+FROM rp/ros2:jazzy-lab
+
+# line_follower package (world and robot/track models are bundled unchanged)
+COPY src/line_follower /ws/src/line_follower
+RUN . /opt/ros/jazzy/setup.sh && cd /ws && colcon build && rm -rf build log
+
+# source the workspace for every command (the base image's ROS/GZ env is kept)
+RUN sed -i 's|^exec "\$@"|source /ws/install/setup.bash --\nexec "$@"|' /ros_entrypoint.sh \
+ && echo 'source /ws/install/setup.bash' >> /root/.bashrc
+WORKDIR /ws
+CMD ["ros2", "launch", "line_follower", "line_follower.launch.py"]
