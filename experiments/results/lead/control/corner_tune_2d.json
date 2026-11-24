@@ -1,0 +1,596 @@
+{
+ "base(user)": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 10,
+  "episodes": 30,
+  "mean_progress": 64.5,
+  "lap": 76.1,
+  "by_diff": {
+   "easy": 2,
+   "normal": 5,
+   "hard": 3
+  }
+ },
+ "alat0.25_vc9.0_piv60_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 10,
+  "episodes": 30,
+  "mean_progress": 64.5,
+  "lap": 76.1,
+  "by_diff": {
+   "easy": 2,
+   "normal": 5,
+   "hard": 3
+  }
+ },
+ "alat0.25_vc9.0_piv60_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 11,
+  "episodes": 30,
+  "mean_progress": 70.3,
+  "lap": 75.4,
+  "by_diff": {
+   "easy": 4,
+   "normal": 5,
+   "hard": 2
+  }
+ },
+ "alat0.25_vc9.0_piv40_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 16,
+  "episodes": 30,
+  "mean_progress": 73.6,
+  "lap": 77.0,
+  "by_diff": {
+   "easy": 3,
+   "normal": 9,
+   "hard": 4
+  }
+ },
+ "alat0.25_vc9.0_piv40_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 18,
+  "episodes": 30,
+  "mean_progress": 73.9,
+  "lap": 75.9,
+  "by_diff": {
+   "easy": 3,
+   "normal": 10,
+   "hard": 5
+  }
+ },
+ "alat0.25_vc0.1_piv60_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 12,
+  "episodes": 30,
+  "mean_progress": 69.4,
+  "lap": 76.3,
+  "by_diff": {
+   "easy": 3,
+   "normal": 6,
+   "hard": 3
+  }
+ },
+ "alat0.25_vc0.1_piv60_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 10,
+  "episodes": 30,
+  "mean_progress": 69.4,
+  "lap": 75.4,
+  "by_diff": {
+   "easy": 0,
+   "normal": 7,
+   "hard": 3
+  }
+ },
+ "alat0.25_vc0.1_piv40_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 10,
+  "episodes": 30,
+  "mean_progress": 67.1,
+  "lap": 75.7,
+  "by_diff": {
+   "easy": 0,
+   "normal": 8,
+   "hard": 2
+  }
+ },
+ "alat0.25_vc0.1_piv40_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 13,
+  "episodes": 30,
+  "mean_progress": 64.9,
+  "lap": 76.4,
+  "by_diff": {
+   "easy": 2,
+   "normal": 8,
+   "hard": 3
+  }
+ },
+ "alat0.25_vc0.06_piv60_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 11,
+  "episodes": 30,
+  "mean_progress": 67.6,
+  "lap": 75.6,
+  "by_diff": {
+   "easy": 3,
+   "normal": 7,
+   "hard": 1
+  }
+ },
+ "alat0.25_vc0.06_piv60_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 11,
+  "episodes": 30,
+  "mean_progress": 72.9,
+  "lap": 76.4,
+  "by_diff": {
+   "easy": 1,
+   "normal": 5,
+   "hard": 5
+  }
+ },
+ "alat0.25_vc0.06_piv40_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 8,
+  "episodes": 30,
+  "mean_progress": 61.7,
+  "lap": 76.0,
+  "by_diff": {
+   "easy": 2,
+   "normal": 4,
+   "hard": 2
+  }
+ },
+ "alat0.25_vc0.06_piv40_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 10,
+  "episodes": 30,
+  "mean_progress": 68.5,
+  "lap": 79.1,
+  "by_diff": {
+   "easy": 4,
+   "normal": 2,
+   "hard": 4
+  }
+ },
+ "alat0.12_vc9.0_piv60_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 9,
+  "episodes": 30,
+  "mean_progress": 63.4,
+  "lap": 81.3,
+  "by_diff": {
+   "easy": 1,
+   "normal": 8,
+   "hard": 0
+  }
+ },
+ "alat0.12_vc9.0_piv60_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 11,
+  "episodes": 30,
+  "mean_progress": 63.8,
+  "lap": 80.0,
+  "by_diff": {
+   "easy": 3,
+   "normal": 7,
+   "hard": 1
+  }
+ },
+ "alat0.12_vc9.0_piv40_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 15,
+  "episodes": 30,
+  "mean_progress": 72.4,
+  "lap": 81.2,
+  "by_diff": {
+   "easy": 6,
+   "normal": 7,
+   "hard": 2
+  }
+ },
+ "alat0.12_vc9.0_piv40_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 13,
+  "episodes": 30,
+  "mean_progress": 75.7,
+  "lap": 83.3,
+  "by_diff": {
+   "easy": 4,
+   "normal": 5,
+   "hard": 4
+  }
+ },
+ "alat0.12_vc0.1_piv60_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 9,
+  "episodes": 30,
+  "mean_progress": 63.4,
+  "lap": 81.3,
+  "by_diff": {
+   "easy": 1,
+   "normal": 8,
+   "hard": 0
+  }
+ },
+ "alat0.12_vc0.1_piv60_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 11,
+  "episodes": 30,
+  "mean_progress": 63.8,
+  "lap": 80.0,
+  "by_diff": {
+   "easy": 3,
+   "normal": 7,
+   "hard": 1
+  }
+ },
+ "alat0.12_vc0.1_piv40_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 15,
+  "episodes": 30,
+  "mean_progress": 72.4,
+  "lap": 81.2,
+  "by_diff": {
+   "easy": 6,
+   "normal": 7,
+   "hard": 2
+  }
+ },
+ "alat0.12_vc0.1_piv40_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.1,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 13,
+  "episodes": 30,
+  "mean_progress": 75.7,
+  "lap": 83.3,
+  "by_diff": {
+   "easy": 4,
+   "normal": 5,
+   "hard": 4
+  }
+ },
+ "alat0.12_vc0.06_piv60_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 8,
+  "episodes": 30,
+  "mean_progress": 66.7,
+  "lap": 83.4,
+  "by_diff": {
+   "easy": 3,
+   "normal": 3,
+   "hard": 2
+  }
+ },
+ "alat0.12_vc0.06_piv60_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 11,
+  "episodes": 30,
+  "mean_progress": 67.7,
+  "lap": 81.7,
+  "by_diff": {
+   "easy": 3,
+   "normal": 6,
+   "hard": 2
+  }
+ },
+ "alat0.12_vc0.06_piv40_w3.0": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 12,
+  "episodes": 30,
+  "mean_progress": 72.8,
+  "lap": 83.0,
+  "by_diff": {
+   "easy": 4,
+   "normal": 6,
+   "hard": 2
+  }
+ },
+ "alat0.12_vc0.06_piv40_w1.5": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.12,
+   "v_corner": 0.06,
+   "brake_d": 0.1,
+   "pivot_deg": 40.0,
+   "pivot_gain": 2.5,
+   "w_max": 1.5,
+   "ld_min": 0.1,
+   "ld_gain": 0.3
+  },
+  "complete": 13,
+  "episodes": 30,
+  "mean_progress": 72.9,
+  "lap": 83.0,
+  "by_diff": {
+   "easy": 4,
+   "normal": 7,
+   "hard": 2
+  }
+ },
+ "ld0.06": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.06,
+   "ld_gain": 0.3
+  },
+  "complete": 9,
+  "episodes": 30,
+  "mean_progress": 66.5,
+  "lap": 74.3,
+  "by_diff": {
+   "easy": 2,
+   "normal": 5,
+   "hard": 2
+  }
+ },
+ "ld0.14": {
+  "params": {
+   "v_max": 0.25,
+   "a_lat": 0.25,
+   "v_corner": 9.0,
+   "brake_d": 0.1,
+   "pivot_deg": 60.0,
+   "pivot_gain": 2.5,
+   "w_max": 3.0,
+   "ld_min": 0.14,
+   "ld_gain": 0.3
+  },
+  "complete": 8,
+  "episodes": 30,
+  "mean_progress": 54.3,
+  "lap": 78.2,
+  "by_diff": {
+   "easy": 1,
+   "normal": 5,
+   "hard": 2
+  }
+ }
+}
