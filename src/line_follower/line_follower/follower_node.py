@@ -60,6 +60,9 @@ class FollowerNode(Node):
         self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
+        self.declare_parameter('map_skip_pitch_deg', 0.0, rng(0.0, 30.0, 'do not write the map while |pitch| exceeds this (tipping over a ramp edge) [deg], 0 = off'))
+        self.declare_parameter('deck_xfar', 0.0, rng(0.0, 1.0, 'camera range while standing on a raised deck (climbed, not yet descended) [m], 0 = off'))
+        self.declare_parameter('climb_slip', 0.0, rng(0.0, 0.3, 'fraction of /odom distance lost to wheel slip while climbing'))
         self.declare_parameter('scan_match', False)          # nudge the pose so fresh line pixels sit on the map (scanmatch.py)
         self.declare_parameter('scan_gain', 0.5, rng(0.0, 1.0, 'fraction of the matched correction applied per frame'))
         self.declare_parameter('relink_radius', 0.0, rng(0.0, 0.2, 'look this far for the line when the remembered path no longer matches the map [m], 0 = off'))
@@ -157,6 +160,12 @@ class FollowerNode(Node):
             ds = math.hypot(dx, dy)
             if dx * math.cos(oyaw) + dy * math.sin(oyaw) < 0.0:
                 ds = -ds
+            slip = self.get_parameter('climb_slip').value
+            if slip > 0.0 and self.pitch_f > math.radians(2.0) and ds > 0.0:
+                # climbing: the wheels spin a little, /odom overstates the distance (~6-7 %
+                # measured against ground truth on 4-9 deg ramps). Left uncorrected it shifts
+                # the map along the track, which becomes a sideways offset after a turn.
+                ds *= 1.0 - slip
             if self.imu_yaw is not None:
                 if self.yaw_off is None:
                     self.yaw_off = wrap(self.pose[2] - self.imu_yaw)
@@ -216,6 +225,16 @@ class FollowerNode(Node):
                   and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value))
         self.rocking = (not steady) and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value)
         x_far = vision.X_FAR if steady else min(vision.X_FAR, gp('x_far_unsteady').value)
+        # raised deck: after a climb and before the matching descent the ground beyond the
+        # edge lies below the plane the robot stands on, so far lines project too close
+        # (3 cm lower at 0.8 m -> ~18 cm short). Trust only the near ground up there.
+        if self.pitch_f > math.radians(3.0):
+            self.on_deck = True
+        elif self.pitch_f < -math.radians(3.0):
+            self.on_deck = False
+        deck = gp('deck_xfar').value
+        if deck > 0.0 and getattr(self, 'on_deck', False):
+            x_far = min(x_far, deck)
         add_only = None
         if (not steady and gp('far_add_unsteady').value and x_far < vision.X_FAR
                 and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value)):
@@ -261,7 +280,11 @@ class FollowerNode(Node):
                 self.scanmatch = ScanMatcher(gain=gp('scan_gain').value)
             if self.scanmatch.correct(self, out.line, out.valid, pose_ts):
                 pose_ts = self.pose_at(ts)
-        self.map.update(out.line, out.valid, pose_ts, add_only)
+        skip = gp('map_skip_pitch_deg').value
+        if not (skip > 0.0 and abs(self.pitch_f) > math.radians(skip)):
+            # (while the body tips over a ramp edge the camera-to-ground angle is unknown:
+            # such frames drew corners 13-19 cm off. Keep the map from the good frames.)
+            self.map.update(out.line, out.valid, pose_ts, add_only)
         self.replan()
         if self.get_parameter('debug_image').value:
             self.publish_debug()
