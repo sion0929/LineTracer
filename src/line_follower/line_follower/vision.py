@@ -4,6 +4,8 @@ Robot frame: x forward from the wheel axle, y to the left.
 Camera: 76 mm ahead of the axle, 103 mm above the ground, looking straight ahead.
 """
 import math
+import os
+
 import numpy as np
 import cv2
 
@@ -15,7 +17,9 @@ FX = (W / 2.0) / math.tan(HFOV / 2.0)
 CX, CY = (W - 1) / 2.0, (H - 1) / 2.0
 
 RES = 0.005                  # metres per BEV / map cell
-X_NEAR, X_FAR = 0.31, 0.85   # forward range seen by the camera (from the axle)
+X_NEAR = 0.31                # forward range seen by the camera (from the axle)
+# LF_X_FAR (dev experiments): how far ahead the BEV reaches; the camera sees further
+X_FAR = float(os.environ.get('LF_X_FAR', '0.85'))
 Y_HALF = 0.55
 BW = int(round(2 * Y_HALF / RES))
 BH = int(round((X_FAR - X_NEAR) / RES))

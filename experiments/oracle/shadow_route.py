@@ -103,17 +103,22 @@ class ShadowNode(Base):
                           self.heading_change(k, 0.0, 0.8), float(self.slope[k]), end, plen,
                           robot_off, float(self.pitch_f), float(getattr(self, 'rock', np.nan))))
         self.errs.append(err)
-        self.snapshot(plen, robot_off)
+        self.snapshot(plen, robot_off, err)
         if len(self.rows) % 60 == 0:
             self.save()
 
-    def snapshot(self, plen, robot_off):
+    def snapshot(self, plen, robot_off, err=None):
         """SHADOW_SNAP=1: dump BEV masks + map crop when the route runs short before a turn
         (the 'route stops at a sharp corner' failure), at most 8 per run, 0.3 s apart (SHADOW_SNAP_PLEN sets the length threshold)."""
         if os.environ.get("SHADOW_SNAP") != "1" or getattr(self, "n_snap", 0) >= 8:
             return
         t = self.get_clock().now().nanoseconds * 1e-9
-        if plen > float(os.environ.get("SHADOW_SNAP_PLEN", "0.20")) or self.rows[-1][4] < 60 \
+        lim = os.environ.get("SHADOW_SNAP_ERR")
+        if lim is not None:                       # trigger on route error instead of length
+            e = np.nanmax(err) if err is not None and np.isfinite(err).any() else 0.0
+            if e < float(lim) or t - getattr(self, "t_snap", -9) < 0.2:
+                return
+        elif plen > float(os.environ.get("SHADOW_SNAP_PLEN", "0.20")) or self.rows[-1][4] < 60 \
                 or t - getattr(self, "t_snap", -9) < 0.3:
             return
         from line_follower.line_map import C0, RES

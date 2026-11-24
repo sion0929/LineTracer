@@ -56,6 +56,8 @@ class FollowerNode(Node):
         self.declare_parameter('steady_rock', 0.08, rng(0.0, 1.0, 'max body rocking for the full camera range'))
         self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
+        self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
+        self.declare_parameter('far_add_unsteady', False)   # rocking on flat ground: far range add-only (fills unseen line, never erases)
         # Track-specific speed plan: [s_from, s_to, v_max, ...] with s = distance driven [m].
         # Outside these windows v_max applies. Tuned for the provided line_track world.
         self.declare_parameter('speed_profile', [0.0], ParameterDescriptor(
@@ -84,6 +86,7 @@ class FollowerNode(Node):
         self.path = []              # line ahead of the robot, odom frame, ~2 cm spacing
         self.path_end = 'open'
         self.t_point = None         # finish T position (odom)
+        self.rocking = False        # body rocking on flat ground (camera range is cut)
         self.done = False
         self.v_cmd = 0.0
         self.w_cmd = 0.0
@@ -200,12 +203,21 @@ class FollowerNode(Node):
         gp = self.get_parameter
         steady = (self.rock < gp('steady_rock').value
                   and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value))
+        self.rocking = (not steady) and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value)
         x_far = vision.X_FAR if steady else min(vision.X_FAR, gp('x_far_unsteady').value)
+        add_only = None
+        if (not steady and gp('far_add_unsteady').value and x_far < vision.X_FAR
+                and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value)):
+            # rocking on flat ground: the far part is projected well but the pose used to
+            # write it is less certain -> let it only fill line the map has not seen yet
+            add_only = np.zeros((vision.BH, vision.BW), np.uint8)
+            add_only[:max(0, int(round((vision.X_FAR - x_far) / vision.RES)))] = 255
+            x_far = vision.X_FAR
         out = self.perception.process(bgr, gray, self.pitch_at(ts), x_far)
         self.last_obstacle = out.obstacle
         out.pitch = self.pitch_at(ts)
         self.last_observation = out
-        self.map.update(out.line, out.valid, self.pose_at(ts))
+        self.map.update(out.line, out.valid, self.pose_at(ts), add_only)
         self.replan()
         if self.get_parameter('debug_image').value:
             self.publish_debug()
@@ -333,6 +345,11 @@ class FollowerNode(Node):
 
         # drive: the controller plugin turns the path ahead into (v, w)
         v, w = self.controller.compute(rp, dt)
+        cap = self.get_parameter('rock_v_cap').value
+        if cap > 0.0 and self.rocking and v > cap:
+            # perception is degraded (near range only): slow down until the body settles,
+            # gently, so the braking itself does not keep the body rocking
+            v = max(cap, self.v_cmd - 0.4 * dt)
         self.v_cmd, self.w_cmd = v, w
         cmd.linear.x, cmd.angular.z = v, w
         self.cmd_pub.publish(cmd)

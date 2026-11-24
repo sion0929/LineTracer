@@ -17,6 +17,8 @@ PATCH = 520                  # window written per frame (covers the whole camera
 
 _ANGLES = np.deg2rad(np.arange(-100, 101, 4))
 _CONE = np.deg2rad(np.arange(-32, 33, 4))
+ADD_GAP = 0.06               # add-only observations stay this far from known line [m]
+_ADD_KERNEL = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * round(ADD_GAP / RES) + 1,) * 2)
 
 
 class LineMap:
@@ -24,8 +26,14 @@ class LineMap:
         self.grid = np.zeros((SIZE, SIZE), np.uint8)
         self.last = None
 
-    def update(self, bev_mask, bev_valid, pose):
-        """Overwrite the part of the map currently seen by the camera."""
+    def update(self, bev_mask, bev_valid, pose, add_only=None):
+        """Overwrite the part of the map currently seen by the camera.
+
+        add_only (BEV mask, optional): there the observation is less trusted. It never
+        erases, and adds line only where the map has no line within ADD_GAP (fills what
+        was never seen, e.g. a corner arc, without drawing a second, shifted copy of a
+        known line).
+        """
         px, py, th = pose
         ox = int(round(px / RES)) + C0 - PATCH // 2
         oy = int(round(py / RES)) + C0 - PATCH // 2
@@ -44,7 +52,15 @@ class LineMap:
         val = cv2.warpAffine(bev_valid, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST)
         win = self.grid[oy:oy + PATCH, ox:ox + PATCH]
         seen = val > 0
-        win[seen] = np.where(obs[seen] > 100, 255, 0)
+        if add_only is not None:
+            add = cv2.warpAffine(add_only, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST) > 0
+            known = cv2.dilate((win > 0).astype(np.uint8), _ADD_KERNEL) > 0
+            new = add & seen & (obs > 100) & ~known
+            seen &= ~add
+            win[seen] = np.where(obs[seen] > 100, 255, 0)
+            win[new] = 255
+        else:
+            win[seen] = np.where(obs[seen] > 100, 255, 0)
         self.last = (ox, oy, obs > 100, seen)       # for the debug image
 
     def hit(self, X, Y):
