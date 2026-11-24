@@ -160,3 +160,5 @@ python3 experiments/worlds/summarize_suite.py out/general200 experiments/worlds/
 
 - 그룹별 목록은 `list_<그룹>.txt`, 미리보기는 `preview_<그룹>.png`다.
 - 결과 집계는 `python3 experiments/worlds/summarize_cases.py <bench 출력> [--by-name]`로 한다. 실패 위치를 케이스 구간 앞, 구간 안, 구간 뒤로 나눠 센다.
+
+**기준선 3회 반복 (2026-11-25, rule, 1,002회):** 항상 성공 251, 들쭉날쭉 27, 항상 실패 56. 목록은 `suites/cases/list_base3_{always,flaky,never}.txt`, 맵별 결과는 `experiments/results/lead/base3_permap.json`에 있다. 인지 수정은 `never`를 줄이고 `always`를 깨지 않는지로 판정한다. 1회 실행은 그룹당 ±3개 흔들리므로 그것만으로 판정하지 않는다.
