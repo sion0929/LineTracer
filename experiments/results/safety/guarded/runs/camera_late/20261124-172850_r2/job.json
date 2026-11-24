@@ -1,0 +1,8 @@
+{
+  "scenario": "camera_late",
+  "rep": 2,
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "map_json": null,
+  "stack": "guarded",
+  "install": "/ws/install_g"
+}

@@ -29,5 +29,8 @@ setup(
     install_requires=['setuptools'],
     tests_require=['pytest'],
     zip_safe=True,
-    entry_points={'console_scripts': ['follower_node = line_follower.follower_node:main']},
+    entry_points={'console_scripts': [
+        'follower_node = line_follower.follower_node:main',
+        'safety_guard = line_follower.safety_guard:main',
+    ]},
 )

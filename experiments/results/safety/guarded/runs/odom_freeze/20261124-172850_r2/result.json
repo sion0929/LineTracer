@@ -1,0 +1,110 @@
+{
+  "scenario": "odom_freeze",
+  "item": "3",
+  "doc": "/odom frozen (relay SIGSTOP), camera alive",
+  "rep": 2,
+  "stack": "guarded",
+  "domain": 84,
+  "partition": "lf_g_odom_freeze_9d1b6433",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 4.187,
+  "t_start_sim": 1.016,
+  "follower_returncode": null,
+  "end_reason": "window",
+  "fault": {
+    "kind": "relay_stop",
+    "t": 22.668,
+    "wall": 25.835024118423462,
+    "progress": 4.008
+  },
+  "safety_events": [
+    {
+      "wall": 6.815,
+      "sim": 3.64,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 26.336,
+      "sim": 23.168,
+      "state": "STOP",
+      "reason": "odom timeout (0.51 s)"
+    }
+  ],
+  "children_exit": {
+    "guard": 0,
+    "follower": 0
+  },
+  "first": {
+    "clock_wall": 2.355,
+    "odom_wall": 3.186,
+    "image_wall": 4.192,
+    "image_sim": 1.016,
+    "cmd_wall": 6.775,
+    "nonzero_cmd_wall": 6.775,
+    "nonzero_cmd_sim": 3.6
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 2.36,
+  "first_motion_wall": 5.527,
+  "max_progress_m": 4.136,
+  "sim_observed_s": 51.67,
+  "v_at_t0": 0.25,
+  "w_at_t0": -0.009,
+  "disp_1s": 0.128,
+  "disp_2s": 0.128,
+  "disp_5s": 0.128,
+  "path_after_t0_m": 0.128,
+  "disp_end_m": 0.128,
+  "yaw_turned_after_t0_rad": 0.01,
+  "t_stop_after_t0": 0.64,
+  "v_end": 0.0,
+  "w_end": -0.0,
+  "max_lateral_after_t0_m": 0.003,
+  "progress_at_t0": 4.008,
+  "progress_end": 4.136,
+  "z_min_after_t0": 0.01,
+  "left_mat": false,
+  "moving_time_after_t0_s": 0.6,
+  "observed_after_t0_s": 30.02,
+  "cmd_msgs_after_t0": 3001,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 30.02,
+  "cmd_before_t0": [
+    0.25,
+    -0.013
+  ],
+  "cmd_v_max": 0.25,
+  "cmd_w_absmax": 3.0,
+  "cmd_frac_v_over_hw": 0.0,
+  "cmd_frac_w_over_hw": 0.002,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.002,
+  "gt_v_max": 0.294,
+  "gt_w_absmax": 1.046,
+  "gt_frac_v_over_hw": 0.005,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "cmd_first_zero_after_fault_s": 0.501,
+  "cmd_last_nonzero_after_fault_s": 0.492,
+  "stop_path_m": 0.128,
+  "stop_disp_m": 0.128,
+  "first_motion_after_stack_start_s": 1.34,
+  "first_nonzero_cmd_after_stack_start_s": 2.59,
+  "first_nonzero_cmd": [
+    0.25,
+    0.0157
+  ],
+  "first_2s_max_dv_per_msg": 0.0,
+  "candidate_at_first_nonzero": [
+    0.25,
+    0.0157
+  ],
+  "first_1p5s_gt_max_accel": 1.16
+}

@@ -1,0 +1,152 @@
+{
+  "scenario": "camera_loss",
+  "item": "2",
+  "doc": "SIGKILL the image bridge: blind distance/time, does it stop?",
+  "rep": 1,
+  "stack": "guarded",
+  "domain": 85,
+  "partition": "lf_g_camera_loss_d557ddcc",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 3.082,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "window",
+  "fault": {
+    "kind": "camera_sigkill",
+    "t": 40.64,
+    "wall": 43.701815366744995,
+    "progress": 7.862
+  },
+  "safety_events": [
+    {
+      "wall": 4.017,
+      "sim": 0.936,
+      "state": "GATE",
+      "reason": "odom: no data yet; imu: no data yet; image: no data yet"
+    },
+    {
+      "wall": 4.029,
+      "sim": 0.956,
+      "state": "GATE",
+      "reason": "image: no data yet"
+    },
+    {
+      "wall": 4.049,
+      "sim": 0.976,
+      "state": "STOP",
+      "reason": "no command yet"
+    },
+    {
+      "wall": 4.152,
+      "sim": 1.088,
+      "state": "STOP",
+      "reason": "recovering from: no command yet"
+    },
+    {
+      "wall": 4.463,
+      "sim": 1.4,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 7.068,
+      "sim": 3.992,
+      "state": "STOP",
+      "reason": "command timeout (0.30 s)"
+    },
+    {
+      "wall": 7.099,
+      "sim": 4.032,
+      "state": "STOP",
+      "reason": "recovering from: command timeout (0.32 s)"
+    },
+    {
+      "wall": 7.404,
+      "sim": 4.324,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 44.702,
+      "sim": 41.628,
+      "state": "STOP",
+      "reason": "image timeout (1.01 s)"
+    }
+  ],
+  "children_exit": {
+    "guard": 0,
+    "follower": 0
+  },
+  "first": {
+    "clock_wall": 2.339,
+    "odom_wall": 3.081,
+    "image_wall": 3.112,
+    "image_sim": 0.036,
+    "cmd_wall": 4.016,
+    "nonzero_cmd_wall": 4.464,
+    "nonzero_cmd_sim": 1.4
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 1.612,
+  "first_motion_wall": 4.677,
+  "max_progress_m": 8.242,
+  "sim_observed_s": 80.64,
+  "v_at_t0": 0.375,
+  "w_at_t0": 0.045,
+  "disp_1s": 0.378,
+  "disp_2s": 0.38,
+  "disp_5s": 0.38,
+  "path_after_t0_m": 0.38,
+  "disp_end_m": 0.38,
+  "yaw_turned_after_t0_rad": 0.03,
+  "t_stop_after_t0": 1.17,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.003,
+  "progress_at_t0": 7.862,
+  "progress_end": 8.242,
+  "z_min_after_t0": 0.008,
+  "left_mat": false,
+  "moving_time_after_t0_s": 1.09,
+  "observed_after_t0_s": 40.02,
+  "cmd_msgs_after_t0": 4007,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 40.11,
+  "cmd_before_t0": [
+    0.326,
+    -0.0
+  ],
+  "cmd_v_max": 0.431,
+  "cmd_w_absmax": 3.0,
+  "cmd_frac_v_over_hw": 0.033,
+  "cmd_frac_w_over_hw": 0.001,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.01,
+  "gt_v_max": 0.419,
+  "gt_w_absmax": 1.302,
+  "gt_frac_v_over_hw": 0.036,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "cmd_first_zero_after_fault_s": 1.001,
+  "cmd_last_nonzero_after_fault_s": 0.985,
+  "stop_path_m": 0.38,
+  "stop_disp_m": 0.38,
+  "first_motion_after_stack_start_s": 1.6,
+  "first_nonzero_cmd_after_stack_start_s": 1.38,
+  "first_nonzero_cmd": [
+    0.016,
+    0.0013
+  ],
+  "first_2s_max_dv_per_msg": 0.02,
+  "candidate_at_first_nonzero": [
+    0.25,
+    -0.0409
+  ],
+  "first_1p5s_gt_max_accel": 0.82
+}

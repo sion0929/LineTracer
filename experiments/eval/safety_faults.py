@@ -14,9 +14,20 @@ Run inside the lab container from /ws (paths below are relative to the workspace
   python3 experiments/eval/safety_faults.py run obstacles --repeat 2 --jobs 2   # G2 boxes via bench.py
   python3 experiments/eval/safety_faults.py summarize
 
+Guarded stack (follower -> /line_follower/cmd_raw -> safety_guard -> /cmd_vel, started by
+experiments/user_base/run_guarded.py): add --stack guarded. Follower faults (sigint, sigterm,
+sigkill) then hit only the follower process and the guard must stop the robot; guard_* faults
+hit only the guard, stack_* the run_guarded.py wrapper (forwards to both, like Ctrl-C).
+
+  python3 experiments/eval/safety_faults.py run sigint camera_loss --stack guarded --gz-prefix lf_g \
+      --install install_g --repeat 2 --jobs 2
+  python3 experiments/eval/safety_faults.py summarize --stack guarded
+  python3 experiments/eval/safety_faults.py compare          # raw vs guarded markdown table
+
 Isolation: each run gets its own ROS_DOMAIN_ID from --domains (default 84-89, checked to be
-empty first) and its own GZ_PARTITION (lf_s_<scenario>_<id>). Results go to
-experiments/results/safety/runs/<scenario>/<stamp>_r<k>/{result.json,trace.npz,*.log}.
+empty first) and its own GZ_PARTITION (<gz-prefix>_<scenario>_<id>, default prefix lf_s).
+Results go to experiments/results/safety/runs/<scenario>/<stamp>_r<k>/{result.json,trace.npz,*.log}
+(guarded: experiments/results/safety/guarded/runs/...).
 """
 
 import argparse
@@ -52,10 +63,13 @@ import gen_world  # noqa: E402
 BRINGUP = WS / "src/line_follower_bringup"
 OFFICIAL = BRINGUP / "worlds/line_track.sdf"
 RUN_USER = EXP / "user_base/run_user.py"
+RUN_GUARDED = EXP / "user_base/run_guarded.py"
 RULE_YAML = WS / "src/line_follower/config/rule.yaml"
 OUT = EXP / "results/safety"
 MAPS = OUT / "maps"
 RUNS = OUT / "runs"
+GUARDED_OUT = OUT / "guarded"
+STACK_RUNS = {"raw": RUNS, "guarded": GUARDED_OUT / "runs"}
 INSTALL = WS / "install_s"
 ROBOT = "turtlebot3_waffle_pi"
 # Real TurtleBot3 Waffle Pi limits (ROBOTIS e-Manual / turtlebot3 teleop constants).
@@ -131,6 +145,17 @@ SCENARIOS = {
                           doc="control: easy_22 geometry (identical centreline/markings) without boxes"),
     "nobox_normal_28": dict(item="6", world="gen:normal:28:0", duration=200, end="finish", stall=25,
                             doc="control: normal_28 geometry without boxes"),
+    # guarded stack only (--stack guarded)
+    "guard_sigint": dict(item="1g", world="official", trigger=("progress", 7.85), fault="guard_sigint",
+                         window=8, stack="guarded", doc="SIGINT the safety guard on the fastest straight"),
+    "guard_sigkill": dict(item="1g", world="official", trigger=("progress", 7.85), fault="guard_sigkill",
+                          window=8, stack="guarded",
+                          doc="SIGKILL the safety guard (no zero possible: gz keeps the last command)"),
+    "stack_sigint": dict(item="1g", world="official", trigger=("progress", 7.85), fault="stack_sigint",
+                         window=8, stack="guarded",
+                         doc="SIGINT run_guarded.py: forwarded to follower and guard (Ctrl-C)"),
+    "gate_hold": dict(item="8g", world="official", gate_delay=20.0, duration=45, stack="guarded",
+                      doc="guard start gate 20 s while the follower runs and ramps from t=0"),
 }
 ORDER = list(SCENARIOS)
 
@@ -303,13 +328,19 @@ def run_job(job_path):
     job = json.loads(Path(job_path).read_text())
     folder = Path(job_path).parent
     sc = SCENARIOS[job["scenario"]]
-    res = dict(scenario=job["scenario"], item=sc["item"], doc=sc["doc"], rep=job["rep"],
+    stack = job.get("stack", "raw")
+    guarded = stack == "guarded"
+    install = Path(job.get("install") or INSTALL)
+    res = dict(scenario=job["scenario"], item=sc["item"], doc=sc["doc"], rep=job["rep"], stack=stack,
                domain=int(os.environ["ROS_DOMAIN_ID"]), partition=os.environ["GZ_PARTITION"],
                world=job["world"], ok=False)
     os.environ["GZ_SIM_RESOURCE_PATH"] = os.pathsep.join(
         filter(None, [str(BRINGUP / "models"), os.environ.get("GZ_SIM_RESOURCE_PATH")]))
     os.environ["ROS_LOG_DIR"] = str(folder / "ros")
     os.environ["LF_PARAMS"] = str(RULE_YAML)
+    pidfile = folder / "pids.json"
+    if guarded:
+        os.environ.update(LF_GUARDED_PIDS=str(pidfile), LF_START_DELAY=str(sc.get("gate_delay", 0.0)))
     world_path = Path(job["world"])
     track = bench.Track(world_path)
     mat = (0.0, 0.0, 3.3, 3.3)
@@ -352,6 +383,21 @@ def run_job(job_path):
         first.setdefault("clock_wall", time.time() - wall0)
 
     image_sub = [None]
+    cand_rows, safety_events = [], []
+
+    def on_cand(m):
+        cand_rows.append((time.time() - wall0, latest_sim(), m.linear.x, m.angular.z))
+
+    def on_safety(m):
+        try:
+            st = json.loads(m.data)
+        except ValueError:
+            return
+        if not safety_events or (safety_events[-1]["state"], safety_events[-1]["reason"].split(" (")[0]) != \
+                (st.get("state"), str(st.get("reason", "")).split(" (")[0]):
+            sim = latest_sim()                   # NaN before the first ground-truth pose
+            safety_events.append(dict(wall=round(time.time() - wall0, 3), sim=round(sim, 3) if sim == sim else None,
+                                      state=st.get("state"), reason=str(st.get("reason", ""))))
 
     def on_image(_m):
         first.setdefault("image_wall", time.time() - wall0)
@@ -381,6 +427,10 @@ def run_job(job_path):
     probe.create_subscription(Odometry, "/odom", on_odom, qos_profile_sensor_data)
     probe.create_subscription(Clock, "/clock", on_clock, qos_profile_sensor_data)
     image_sub[0] = probe.create_subscription(Image, "/camera/image_raw", on_image, qos_profile_sensor_data)
+    if guarded:
+        from std_msgs.msg import String
+        probe.create_subscription(Twist, "/line_follower/cmd_raw", on_cand, 50)
+        probe.create_subscription(String, "/line_follower/safety", on_safety, 50)
 
     def spin(sec=0.02):
         rclpy.spin_once(probe, timeout_sec=sec)
@@ -399,7 +449,7 @@ def run_job(job_path):
                 return procs[name]
 
             if sc.get("launch"):
-                launch_cmd = (f"source {INSTALL}/setup.bash && exec ros2 launch line_follower "
+                launch_cmd = (f"source {install}/setup.bash && exec ros2 launch line_follower "
                               f"line_follower.launch.py gui:=false start_delay:={sc['start_delay']}")
                 wall0 = time.time()
                 start("launch", ["bash", "-c", launch_cmd])
@@ -431,8 +481,10 @@ def run_job(job_path):
                     src = "/odom" if kind == "odom" else "/imu"
                     start("relay", [sys.executable, __file__, "--relay", src, f"{src}_relay", kind])
                     follower_args = ["-r", f"{src}:={src}_relay"]
+                    os.environ["LF_GUARD_ARGS"] = " ".join(follower_args)    # guard watches the same input
                     time.sleep(1.0)
-                start("follower", [sys.executable, str(RUN_USER), *follower_args])
+                res["stack_started_wall"] = round(time.time() - wall0, 3)
+                start("follower", [sys.executable, str(RUN_GUARDED if guarded else RUN_USER), *follower_args])
 
             # ---------------- observation loop ----------------
             t_start = None          # sim time the follower was started (launch: first GT sample)
@@ -479,10 +531,18 @@ def run_job(job_path):
                         fault.update(t=cur[0], wall=time.time() - wall0, progress=round(s, 3))
                         k = fault["kind"]
                         target = {"follower": "follower", "bridge": "bridge", "camera": "camera",
-                                  "relay": "relay", "imubridge": "imubridge"}[k.split("_")[0]]
+                                  "relay": "relay", "imubridge": "imubridge", "guard": "guard",
+                                  "stack": "stack"}[k.split("_")[0]]
                         sig = {"sigint": signal.SIGINT, "sigterm": signal.SIGTERM, "sigkill": signal.SIGKILL,
                                "stop": signal.SIGSTOP}[k.split("_")[1]]
-                        os.killpg(procs[target].pid, sig)
+                        if guarded and target in ("follower", "guard"):
+                            # one child of run_guarded.py only; the other keeps running
+                            fault["pid"] = json.loads(pidfile.read_text())[target]
+                            os.kill(fault["pid"], sig)
+                        elif target == "stack":
+                            os.kill(procs["follower"].pid, sig)        # the wrapper: it forwards
+                        else:
+                            os.killpg(procs[target].pid, sig)
 
                 # end conditions
                 if time.time() - wall0 > next_log_check:
@@ -506,10 +566,18 @@ def run_job(job_path):
                     end_reason = f"stalled {sc['stall']} s at {best_prog:.2f} m"
                 if end_reason:
                     break
-                if "t" in fault and "follower" in procs and "exit_wall" not in fault \
-                        and procs["follower"].poll() is not None:
-                    fault["exit_wall"] = time.time() - wall0
-                    fault["exit_after_s"] = round(fault["exit_wall"] - fault["wall"], 3)
+                if "t" in fault and "follower" in procs and "exit_wall" not in fault:
+                    if fault.get("pid"):
+                        try:
+                            os.kill(fault["pid"], 0)
+                            gone = False
+                        except ProcessLookupError:
+                            gone = True
+                    else:
+                        gone = procs["follower"].poll() is not None
+                    if gone:
+                        fault["exit_wall"] = time.time() - wall0
+                        fault["exit_after_s"] = round(fault["exit_wall"] - fault["wall"], 3)
                 if "follower" in procs and procs["follower"].poll() is not None and "t" not in fault:
                     end_reason = f"follower exited early ({procs['follower'].returncode})"
                     break
@@ -517,7 +585,7 @@ def run_job(job_path):
             # follower exit after the fault (signals)
             if "follower" in procs:
                 f = procs["follower"]
-                if "t" in fault and fault["kind"].startswith("follower"):
+                if "t" in fault and fault["kind"].startswith(("follower", "stack")) and not fault.get("pid"):
                     try:
                         f.wait(10)
                     except subprocess.TimeoutExpired:
@@ -540,8 +608,13 @@ def run_job(job_path):
     gt = np.array(gt_rows, float).reshape(-1, 8)            # t x y z yaw progress lateral wall
     cmd = np.array(cmd_rows, float).reshape(-1, 4)          # wall sim v w
     odom = np.array(odom_rows, float).reshape(-1, 4)
-    np.savez_compressed(folder / "trace.npz", gt=gt, cmd=cmd, odom=odom)
+    cand = np.array(cand_rows, float).reshape(-1, 4)        # wall sim v w (guarded: follower candidate)
+    np.savez_compressed(folder / "trace.npz", gt=gt, cmd=cmd, odom=odom, cand=cand)
     res["fault"] = fault
+    if guarded:
+        res["safety_events"] = safety_events[:200]
+        log_text = (folder / "follower.log").read_text(errors="replace") if (folder / "follower.log").is_file() else ""
+        res["children_exit"] = {n: int(c) for n, c in re.findall(r"run_guarded: (\w+) exited with code (-?\d+)", log_text)}
     res["first"] = {k: round(v, 3) for k, v in first.items() if v == v}
     flog = folder / ("launch.log" if sc.get("launch") else "follower.log")
     text = flog.read_text(errors="replace") if flog.is_file() else ""
@@ -555,6 +628,7 @@ def run_job(job_path):
             res["first"]["follower_started_wall"] = round(float(m.group(1)) - wall0, 3)
     try:
         res.update(analyse(gt, cmd, res, sc, mat, track))
+        res.update(analyse_guard(gt, cmd, cand, res))
         if sc.get("obstacles"):
             res["boxes"] = boxes_report(gt, track, contacts)
             res["collision_count"] = sum(1 for b in res["boxes"] if b["contact"])
@@ -621,6 +695,52 @@ def stop_time(t, v, w, t0, hold=1.0):
         else:
             since = None
     return None
+
+
+def analyse_guard(gt, cmd, cand, res):
+    """Stop latency / distance after a fault and the start-gate ramp (both stacks)."""
+    out = {}
+    if len(gt) < 5:
+        return out
+    t = gt[:, 0]
+    v, w = speed_series(gt)
+    fault = res.get("fault", {})
+    if fault.get("t") is not None:
+        zero = (np.abs(cmd[:, 2]) < 1e-9) & (np.abs(cmd[:, 3]) < 1e-9) if len(cmd) else np.zeros(0, bool)
+        after = cmd[:, 0] >= fault["wall"] if len(cmd) else np.zeros(0, bool)
+        hit = np.nonzero(zero & after)[0]
+        out["cmd_first_zero_after_fault_s"] = round(float(cmd[hit[0], 0] - fault["wall"]), 3) if len(hit) else None
+        nonzero_after = np.nonzero(~zero & after)[0]
+        out["cmd_last_nonzero_after_fault_s"] = (round(float(cmd[nonzero_after[-1], 0] - fault["wall"]), 3)
+                                                 if len(nonzero_after) else None)
+        ts = stop_time(t, v, w, fault["t"], hold=1.0)
+        if ts is not None:
+            i0, i1 = int(np.searchsorted(t, fault["t"])), int(np.searchsorted(t, ts))
+            seg = gt[i0:i1 + 1]
+            out["stop_path_m"] = round(float(np.hypot(np.diff(seg[:, 1]), np.diff(seg[:, 2])).sum()), 3)
+            out["stop_disp_m"] = round(float(np.hypot(*(gt[min(i1, len(gt) - 1), 1:3] - gt[i0, 1:3]))), 3)
+    x0, y0 = gt[0, 1], gt[0, 2]
+    moving = np.nonzero(np.hypot(gt[:, 1] - x0, gt[:, 2] - y0) > 0.02)[0]
+    if res.get("stack_started_wall") is not None and len(moving):
+        out["first_motion_after_stack_start_s"] = round(float(gt[moving[0], 7] - res["stack_started_wall"]), 2)
+    if len(cmd):
+        nz = np.nonzero((np.abs(cmd[:, 2]) > 1e-9) | (np.abs(cmd[:, 3]) > 1e-9))[0]
+        if len(nz):
+            k = nz[0]
+            if res.get("stack_started_wall") is not None:
+                out["first_nonzero_cmd_after_stack_start_s"] = round(float(cmd[k, 0] - res["stack_started_wall"]), 2)
+            out["first_nonzero_cmd"] = [round(float(cmd[k, 2]), 4), round(float(cmd[k, 3]), 4)]
+            win = cmd[k - 1 if k else k:][cmd[k - 1 if k else k:, 0] <= cmd[k, 0] + 2.0]
+            out["first_2s_max_dv_per_msg"] = round(float(np.abs(np.diff(win[:, 2])).max()), 4) if len(win) > 1 else None
+            if len(cand):
+                j = int(np.argmin(np.abs(cand[:, 0] - cmd[k, 0])))
+                out["candidate_at_first_nonzero"] = [round(float(cand[j, 2]), 4), round(float(cand[j, 3]), 4)]
+    if len(moving):
+        i = moving[0]
+        first = (t >= t[i]) & (t <= t[i] + 1.5)
+        if first.sum() > 3:
+            out["first_1p5s_gt_max_accel"] = round(float(np.abs(np.diff(v[first]) / np.maximum(np.diff(t[first]), 1e-3)).max()), 2)
+    return out
 
 
 def analyse(gt, cmd, res, sc, mat, track):
@@ -746,9 +866,12 @@ def pick_domain(domains, held):
     return None, None
 
 
-def run_scenarios(names, repeat, jobs, domains):
+def run_scenarios(names, repeat, jobs, domains, stack="raw", gz_prefix="lf_s", install=None):
     if jobs > 2:
         raise SystemExit("at most 2 simulations at once")
+    wrong = [n for n in names if SCENARIOS[n].get("stack", stack) != stack]
+    if wrong:
+        raise SystemExit(f"scenarios {wrong} need --stack {SCENARIOS[wrong[0]]['stack']}")
     build_maps()
     stamp_ = time.strftime("%Y%m%d-%H%M%S")
     queue = []
@@ -756,9 +879,10 @@ def run_scenarios(names, repeat, jobs, domains):
         for name in names:
             sc = SCENARIOS[name]
             world, meta = world_for(sc.get("world", "official"))
-            folder = RUNS / name / f"{stamp_}_r{rep}"
+            folder = STACK_RUNS[stack] / name / f"{stamp_}_r{rep}"
             folder.mkdir(parents=True, exist_ok=False)
-            job = dict(scenario=name, rep=rep, world=str(world), map_json=str(meta) if meta else None)
+            job = dict(scenario=name, rep=rep, world=str(world), map_json=str(meta) if meta else None,
+                       stack=stack, install=str(install) if install else None)
             bench.atomic_json(folder / "job.json", job)
             queue.append(folder)
     held = set()
@@ -776,14 +900,14 @@ def run_scenarios(names, repeat, jobs, domains):
         try:
             job = json.loads((folder / "job.json").read_text())
             env = dict(os.environ, ROS_DOMAIN_ID=str(d), ROS2CLI_NO_DAEMON="1",
-                       GZ_PARTITION=f"lf_s_{job['scenario']}_{uuid4().hex[:8]}")
+                       GZ_PARTITION=f"{gz_prefix}_{job['scenario']}_{uuid4().hex[:8]}")
             t = time.monotonic()
             with (folder / "worker.log").open("w") as log:
                 proc = subprocess.Popen([sys.executable, __file__, "--run-job", str(folder / "job.json")],
                                         stdout=log, stderr=subprocess.STDOUT, env=env, start_new_session=True)
                 proc.wait()
             r = json.loads((folder / "result.json").read_text()) if (folder / "result.json").is_file() else {}
-            print(f"[{time.strftime('%H:%M:%S')}] {job['scenario']:16s} r{job['rep']} dom {d} "
+            print(f"[{time.strftime('%H:%M:%S')}] {stack} {job['scenario']:16s} r{job['rep']} dom {d} "
                   f"{time.monotonic() - t:5.0f}s ok={r.get('ok')} end={r.get('end_reason')} "
                   f"err={r.get('error', '')}", flush=True)
         finally:
@@ -796,35 +920,39 @@ def run_scenarios(names, repeat, jobs, domains):
         list(pool.map(one, queue))
 
 
-def run_obstacles(repeat, jobs):
+def run_obstacles(repeat, jobs, stack="raw", gz_prefix="lf_s"):
     """G2 subset with bench.py --backend obstacle (rule mode), repeated `repeat` times."""
     if jobs > 2:
         raise SystemExit("at most 2 simulations at once")
     maps = g2_maps() * repeat
-    os.environ.update(LF_PARAMS=str(RULE_YAML), LAB_NAME="lf_s", BENCH_DOMAIN_BASE="70",
-                      ROS_DOMAIN_ID=os.environ.get("ROS_DOMAIN_ID", "23"), GZ_PARTITION="lf_s_g2")
-    out = RUNS / "obstacles" / time.strftime("%Y%m%d-%H%M%S")
+    os.environ.update(LF_PARAMS=str(RULE_YAML), LAB_NAME=gz_prefix, BENCH_DOMAIN_BASE="70",
+                      ROS_DOMAIN_ID=os.environ.get("ROS_DOMAIN_ID", "23"), GZ_PARTITION=f"{gz_prefix}_g2")
+    out = STACK_RUNS[stack] / "obstacles" / time.strftime("%Y%m%d-%H%M%S")
     results = bench.run_matrix(maps, {"rule": []}, out, jobs=jobs, limit=300, stall=20, off=0.08,
-                               startup=90, follower=RUN_USER, backend="obstacle")
+                               startup=90, follower=RUN_GUARDED if stack == "guarded" else RUN_USER,
+                               backend="obstacle")
     bench.print_table(results)
     for r in results:
         r["scenario"], r["item"] = "obstacles", "6"
     bench.atomic_json(out / "obstacles.json", results)
 
 
-def summarize():
+def summarize(stack="raw"):
+    runs = STACK_RUNS[stack]
     rows = []
-    for path in sorted(RUNS.glob("*/*/result.json")):
+    for path in sorted(runs.glob("*/*/result.json")):
         r = json.loads(path.read_text())
         rows.append(r)
     rows.sort(key=lambda r: (ORDER.index(r["scenario"]) if r["scenario"] in ORDER else 99, r["rep"]))
     obstacles = []
-    for path in sorted(RUNS.glob("obstacles/*/*/result.json")):
+    for path in sorted(runs.glob("obstacles/*/*/result.json")):
         obstacles.append(json.loads(path.read_text()))
     keys = ("v_at_t0", "disp_1s", "disp_5s", "path_after_t0_m", "t_stop_after_t0", "v_end", "w_end",
             "yaw_turned_after_t0_rad", "max_lateral_after_t0_m", "progress_at_t0", "progress_end",
             "max_progress_m", "left_mat", "cmd_zero_after_t0", "cmd_last", "follower_returncode",
-            "finish_T_detected_travel", "reached_finish_travel", "end_reason")
+            "finish_T_detected_travel", "reached_finish_travel", "end_reason",
+            "cmd_first_zero_after_fault_s", "stop_path_m", "first_motion_after_stack_start_s",
+            "first_nonzero_cmd", "candidate_at_first_nonzero", "first_2s_max_dv_per_msg")
     for r in rows:
         print(f"{r['scenario']:16s} r{r['rep']} ok={r.get('ok')} " +
               " ".join(f"{k}={r.get(k)}" for k in keys if k in r), r.get("error", ""))
@@ -832,7 +960,55 @@ def summarize():
         print(f"obstacles {Path(r['map']).stem:16s} complete={r.get('complete')} prog={r.get('progress_m')}"
               f" hits={r.get('collision_count')} attempts={r.get('avoidance_attempts')}"
               f" avoided={r.get('avoided_count')} reason={r.get('reason')}")
-    bench.atomic_json(OUT / "all_results.json", {"runs": rows, "obstacles": obstacles})
+    bench.atomic_json((OUT if stack == "raw" else GUARDED_OUT) / "all_results.json",
+                      {"runs": rows, "obstacles": obstacles})
+
+
+def compare(names=None):
+    """Markdown table: raw stack (results/safety/runs) vs guarded stack, mean (min-max) per scenario."""
+    keys = (("disp_1s", "1 s 이동 m"), ("disp_5s", "5 s 이동 m"), ("t_stop_after_t0", "정지까지 s"),
+            ("stop_path_m", "정지 거리 m"), ("cmd_first_zero_after_fault_s", "첫 0 명령 s"),
+            ("path_after_t0_m", "관측 창 총 경로 m"), ("yaw_turned_after_t0_rad", "관측 창 회전 rad"),
+            ("observed_after_t0_s", "관측 창 s"), ("left_mat", "매트 이탈"))
+
+    def load(stack):
+        out = {}
+        for path in sorted(STACK_RUNS[stack].glob("*/*/result.json")):
+            r = json.loads(path.read_text())
+            trace = path.with_name("trace.npz")
+            if "stop_path_m" not in r and "cmd_first_zero_after_fault_s" not in r and trace.is_file():
+                d = np.load(trace)       # runs recorded before analyse_guard existed: same metrics
+                r.update(analyse_guard(d["gt"], d["cmd"], d["cand"] if "cand" in d.files else np.zeros((0, 4)), r))
+            if r.get("end_reason") == "trigger never reached":
+                skipped.append(f"{stack}/{r['scenario']} r{r['rep']}")   # no fault happened
+            elif r.get("ok"):
+                out.setdefault(r["scenario"], []).append(r)
+        return out
+
+    skipped = []
+
+    def cell(rows, key):
+        vals = [r.get(key) for r in rows]
+        if key == "left_mat":
+            return f"{sum(bool(v) for v in vals)}/{len(vals)}"
+        nums = [v for v in vals if isinstance(v, (int, float))]
+        miss = len(vals) - len(nums)
+        if not nums:
+            return "없음" if miss else "-"
+        txt = f"{np.mean(nums):.2f}" if len(nums) == 1 else f"{np.mean(nums):.2f} ({min(nums):.2f}–{max(nums):.2f})"
+        return txt + (f", {miss}회 없음" if miss else "")
+
+    raw, guarded = load("raw"), load("guarded")
+    names = names or [n for n in ORDER if n in guarded]
+    print("| 시나리오 | 스택 | 회수 | " + " | ".join(label for _, label in keys) + " |")
+    print("|---|---|---|" + "---|" * len(keys))
+    for name in names:
+        for stack, data in (("raw", raw), ("guarded", guarded)):
+            rows = data.get(name, [])
+            if rows:
+                print(f"| {name} | {stack} | {len(rows)} | " + " | ".join(cell(rows, k) for k, _ in keys) + " |")
+    if skipped:
+        print(f"\n(trigger never reached, left out: {', '.join(skipped)})")
 
 
 def main():
@@ -844,34 +1020,47 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("list")
     sub.add_parser("maps")
-    sub.add_parser("summarize")
+    sm = sub.add_parser("summarize")
+    sm.add_argument("--stack", choices=("raw", "guarded"), default="raw")
+    cp = sub.add_parser("compare")
+    cp.add_argument("scenarios", nargs="*")
     r = sub.add_parser("run")
     r.add_argument("scenarios", nargs="+", help="scenario names, 'all' or 'obstacles'")
     r.add_argument("--repeat", type=int, default=2)
     r.add_argument("--jobs", type=int, default=2)
     r.add_argument("--domains", default="84-89", help="ROS domain range for the runs (inclusive)")
+    r.add_argument("--stack", choices=("raw", "guarded"), default="raw",
+                   help="raw: run_user.py (follower publishes /cmd_vel); guarded: run_guarded.py")
+    r.add_argument("--gz-prefix", default="lf_s", help="GZ_PARTITION prefix")
+    r.add_argument("--install", type=Path, default=INSTALL, help="install space for the launch scenarios")
     a = ap.parse_args()
     if a.cmd == "list":
         for name in ORDER:
-            print(f"{name:16s} item {SCENARIOS[name]['item']:3s} {SCENARIOS[name]['doc']}")
+            only = f" [{SCENARIOS[name]['stack']} only]" if SCENARIOS[name].get("stack") else ""
+            print(f"{name:16s} item {SCENARIOS[name]['item']:3s} {SCENARIOS[name]['doc']}{only}")
         print(f"{'obstacles':16s} item 6   G2 subset {G2_SUBSET} via bench.py --backend obstacle")
         return 0
     if a.cmd == "maps":
         print(build_maps(), g2_maps())
         return 0
     if a.cmd == "summarize":
-        summarize()
+        summarize(a.stack)
+        return 0
+    if a.cmd == "compare":
+        compare(a.scenarios or None)
         return 0
     lo, hi = (int(v) for v in a.domains.split("-"))
-    names = ORDER if a.scenarios == ["all"] else a.scenarios
+    names = ([n for n in ORDER if SCENARIOS[n].get("stack", a.stack) == a.stack]
+             if a.scenarios == ["all"] else a.scenarios)
     if "obstacles" in names:
-        run_obstacles(a.repeat, a.jobs)
+        run_obstacles(a.repeat, a.jobs, a.stack, a.gz_prefix)
         names = [n for n in names if n != "obstacles"]
     unknown = set(names) - set(SCENARIOS)
     if unknown:
         ap.error(f"unknown scenarios {sorted(unknown)}")
     if names:
-        run_scenarios(names, a.repeat, a.jobs, list(range(lo, hi + 1)))
+        run_scenarios(names, a.repeat, a.jobs, list(range(lo, hi + 1)), a.stack, a.gz_prefix,
+                      a.install.resolve())
     return 0
 
 

@@ -1,0 +1,24 @@
+# safety_guard for the real TurtleBot3 Waffle Pi (launch safety:=real).
+# ROBOTIS limits 0.26 m/s, 1.82 rad/s; v and w are scaled together (curvature kept).
+safety_guard:
+  ros__parameters:
+    use_sim_time: false
+    start_delay: 20.0
+    cmd_timeout: 0.3
+    odom_timeout: 0.5
+    imu_timeout: 0.5
+    image_timeout: 0.5
+    frozen_timeout: 0.5
+    clock_timeout: 1.0
+    recover_time: 0.5
+    latch_after: 3.0         # a sensor gone for > 3 s is a fault: stay stopped until restart
+    max_linear: 0.26
+    max_angular: 1.82
+    max_linear_accel: 0.5
+    max_linear_decel: 1.0
+    max_angular_accel: 4.0
+    spin_budget: 8.0
+    spin_reset_distance: 0.3 # real travel that restarts the budget (short arcs between spins do not)
+    spin_linear: 0.02
+    spin_radius: 0.05
+    rate: 50.0

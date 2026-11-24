@@ -1,0 +1,125 @@
+{
+  "scenario": "guard_sigint",
+  "item": "1g",
+  "doc": "SIGINT the safety guard on the fastest straight",
+  "rep": 1,
+  "stack": "guarded",
+  "domain": 84,
+  "partition": "lf_g_guard_sigint_044c38b9",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 3.092,
+  "t_start_sim": 0.016,
+  "follower_returncode": 1,
+  "end_reason": "window",
+  "fault": {
+    "kind": "guard_sigint",
+    "t": 38.112,
+    "wall": 41.27968764305115,
+    "progress": 7.863,
+    "pid": 10343,
+    "exit_wall": 41.5863733291626,
+    "exit_after_s": 0.307
+  },
+  "safety_events": [
+    {
+      "wall": 4.02,
+      "sim": 0.932,
+      "state": "GATE",
+      "reason": "image: no data yet"
+    },
+    {
+      "wall": 4.241,
+      "sim": 1.152,
+      "state": "STOP",
+      "reason": "recovering from: image: no data yet"
+    },
+    {
+      "wall": 4.54,
+      "sim": 1.452,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 41.281,
+      "sim": 38.112,
+      "state": "EXIT",
+      "reason": "shutdown"
+    }
+  ],
+  "children_exit": {
+    "guard": 0,
+    "follower": 0
+  },
+  "first": {
+    "clock_wall": 2.342,
+    "odom_wall": 3.092,
+    "image_wall": 3.118,
+    "image_sim": 0.036,
+    "cmd_wall": 4.02,
+    "nonzero_cmd_wall": 4.54,
+    "nonzero_cmd_sim": 1.452
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 1.688,
+  "first_motion_wall": 4.76,
+  "max_progress_m": 7.876,
+  "sim_observed_s": 46.1,
+  "v_at_t0": 0.423,
+  "w_at_t0": 0.051,
+  "disp_1s": 0.013,
+  "disp_2s": 0.013,
+  "disp_5s": 0.013,
+  "path_after_t0_m": 0.014,
+  "disp_end_m": 0.013,
+  "yaw_turned_after_t0_rad": 0.0,
+  "t_stop_after_t0": 0.14,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.001,
+  "progress_at_t0": 7.863,
+  "progress_end": 7.876,
+  "z_min_after_t0": 0.009,
+  "left_mat": false,
+  "moving_time_after_t0_s": 0.1,
+  "observed_after_t0_s": 8.0,
+  "cmd_msgs_after_t0": 5,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 0.08,
+  "cmd_before_t0": [
+    0.517,
+    0.072
+  ],
+  "cmd_v_max": 0.517,
+  "cmd_w_absmax": 1.392,
+  "cmd_frac_v_over_hw": 0.043,
+  "cmd_frac_w_over_hw": 0.0,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.008,
+  "gt_v_max": 0.468,
+  "gt_w_absmax": 1.3,
+  "gt_frac_v_over_hw": 0.044,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "cmd_first_zero_after_fault_s": 0.001,
+  "cmd_last_nonzero_after_fault_s": null,
+  "stop_path_m": 0.013,
+  "stop_disp_m": 0.013,
+  "first_motion_after_stack_start_s": 1.67,
+  "first_nonzero_cmd_after_stack_start_s": 1.45,
+  "first_nonzero_cmd": [
+    0.008,
+    0.0006
+  ],
+  "first_2s_max_dv_per_msg": 0.016,
+  "candidate_at_first_nonzero": [
+    0.25,
+    -0.0458
+  ],
+  "first_1p5s_gt_max_accel": 0.65
+}

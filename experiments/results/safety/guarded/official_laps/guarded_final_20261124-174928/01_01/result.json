@@ -1,0 +1,51 @@
+{
+  "name": "01_01",
+  "map": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": true,
+  "domain": 70,
+  "partition": "lf_g_lap_e579f4b9cd26_001",
+  "backend": "run_eval",
+  "progress_m": 15.584,
+  "progress_pct": 99.3,
+  "lap_sec": 65.65,
+  "wall_sec": 69.0,
+  "lat_mean": 0.0106,
+  "lat_p95": 0.0296,
+  "lat_max": 0.04,
+  "reason": "finished",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 3,
+  "slip_events": [
+    {
+      "start_sim_sec": 9.676,
+      "windows": 1,
+      "peak_linear_mps": 0.131,
+      "peak_angular_radps": 0.005,
+      "end_sim_sec": 9.976
+    },
+    {
+      "start_sim_sec": 13.576,
+      "windows": 2,
+      "peak_linear_mps": 0.192,
+      "peak_angular_radps": 0.028,
+      "end_sim_sec": 14.176
+    },
+    {
+      "start_sim_sec": 60.976,
+      "windows": 2,
+      "peak_linear_mps": 0.039,
+      "peak_angular_radps": 0.693,
+      "end_sim_sec": 61.576
+    }
+  ],
+  "odom_windows": 229,
+  "sim_sec": 68.936,
+  "wheel_line_events": 5,
+  "wheel_line_sec": 0.78,
+  "max_progress_m": 15.579
+}

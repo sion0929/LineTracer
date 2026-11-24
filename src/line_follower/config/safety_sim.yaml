@@ -1,0 +1,24 @@
+# safety_guard, simulation default (launch safety:=sim). Generous: must not change the lap
+# (official track ~64 s, follower peaks 0.7 m/s and 3.0 rad/s). See line_follower/safety_guard.py.
+safety_guard:
+  ros__parameters:
+    use_sim_time: true
+    start_delay: 20.0        # no motion before 20 s of wall time (launch passes start_delay)
+    cmd_timeout: 0.3         # follower candidate older than this -> zero (follower crash / hang)
+    odom_timeout: 0.5
+    imu_timeout: 0.5
+    image_timeout: 1.0       # the simulated camera itself skips up to 0.46 s (13 Hz with 2 sims)
+    frozen_timeout: 1.0      # identical IMU samples / unchanged odom pose while driving
+    clock_timeout: 2.0       # /clock stopped this long (wall); sim stalls of 0.6 s were measured
+    recover_time: 0.3        # healthy this long -> drive again (a hiccup must not end the run)
+    latch_after: 0.0         # never latch a watchdog stop in the competition
+    max_linear: 1.0          # above the follower's 0.7 m/s
+    max_angular: 4.0         # above the follower's omega_max 3.0 rad/s
+    max_linear_accel: 1.0    # = the Gazebo DiffDrive limit (max_linear_acceleration 1.0)
+    max_linear_decel: 0.0    # off: the follower brakes hard into sharp corners
+    max_angular_accel: 0.0   # off: the follower changes w by up to 3 rad/s in one tick
+    spin_budget: 30.0        # the line search helps scoring: generous
+    spin_reset_distance: 0.3 # real travel that restarts the budget (short arcs between spins do not)
+    spin_linear: 0.02
+    spin_radius: 0.05
+    rate: 50.0

@@ -1,0 +1,44 @@
+{
+  "name": "01_01",
+  "map": "/ws/experiments/worlds/suites/general200/maps/normal_1055.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 70,
+  "partition": "lf_g_drive_c8247cc93140_001",
+  "backend": "run_eval",
+  "progress_m": 10.169,
+  "progress_pct": 57.3,
+  "lap_sec": null,
+  "wall_sec": 53.3,
+  "lat_mean": 0.0125,
+  "lat_p95": 0.0528,
+  "lat_max": 0.1431,
+  "reason": "off line >0.12m at 10.20m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 2,
+  "slip_events": [
+    {
+      "start_sim_sec": 10.256,
+      "windows": 1,
+      "peak_linear_mps": 0.117,
+      "peak_angular_radps": 0.012,
+      "end_sim_sec": 10.556
+    },
+    {
+      "start_sim_sec": 15.056,
+      "windows": 1,
+      "peak_linear_mps": 0.194,
+      "peak_angular_radps": 0.142,
+      "end_sim_sec": 15.356
+    }
+  ],
+  "odom_windows": 177,
+  "sim_sec": 53.24,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.96,
+  "max_progress_m": 10.202
+}

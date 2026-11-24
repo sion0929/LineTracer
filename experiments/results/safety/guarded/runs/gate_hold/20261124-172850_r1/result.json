@@ -1,0 +1,99 @@
+{
+  "scenario": "gate_hold",
+  "item": "8g",
+  "doc": "guard start gate 20 s while the follower runs and ramps from t=0",
+  "rep": 1,
+  "stack": "guarded",
+  "domain": 85,
+  "partition": "lf_g_gate_hold_08f49f1b",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 3.136,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "duration",
+  "fault": {
+    "kind": null
+  },
+  "safety_events": [
+    {
+      "wall": 7.116,
+      "sim": 3.98,
+      "state": "GATE",
+      "reason": "start delay (16.6 s left)"
+    },
+    {
+      "wall": 23.696,
+      "sim": 20.472,
+      "state": "RUN",
+      "reason": ""
+    }
+  ],
+  "children_exit": {
+    "guard": 0,
+    "follower": 0
+  },
+  "first": {
+    "clock_wall": 2.365,
+    "odom_wall": 3.136,
+    "image_wall": 3.166,
+    "image_sim": 0.036,
+    "cmd_wall": 7.042,
+    "nonzero_cmd_wall": 23.697,
+    "nonzero_cmd_sim": 20.472
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 20.708,
+  "first_motion_wall": 23.927,
+  "max_progress_m": 3.571,
+  "sim_observed_s": 45.04,
+  "v_at_t0": 0.047,
+  "w_at_t0": 0.004,
+  "disp_1s": 0.259,
+  "disp_2s": 0.502,
+  "disp_5s": 1.171,
+  "path_after_t0_m": 4.924,
+  "disp_end_m": 2.559,
+  "yaw_turned_after_t0_rad": 19.15,
+  "t_stop_after_t0": null,
+  "v_end": 0.213,
+  "w_end": -0.817,
+  "max_lateral_after_t0_m": 0.256,
+  "progress_at_t0": 0.025,
+  "progress_end": 3.571,
+  "z_min_after_t0": 0.009,
+  "left_mat": false,
+  "moving_time_after_t0_s": 24.01,
+  "observed_after_t0_s": 24.34,
+  "cmd_msgs_after_t0": 4119,
+  "cmd_last": [
+    0.214,
+    1.404
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 41.21,
+  "cmd_v_max": 0.25,
+  "cmd_w_absmax": 3.0,
+  "cmd_frac_v_over_hw": 0.0,
+  "cmd_frac_w_over_hw": 0.176,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.293,
+  "gt_v_max": 0.526,
+  "gt_w_absmax": 3.002,
+  "gt_frac_v_over_hw": 0.07,
+  "gt_frac_w_over_hw": 0.113,
+  "moved_before_first_image_m": 0.0,
+  "first_motion_after_stack_start_s": 20.79,
+  "first_nonzero_cmd_after_stack_start_s": 20.56,
+  "first_nonzero_cmd": [
+    0.02,
+    0.0016
+  ],
+  "first_2s_max_dv_per_msg": 0.02,
+  "candidate_at_first_nonzero": [
+    0.25,
+    0.0201
+  ],
+  "first_1p5s_gt_max_accel": 1.13
+}

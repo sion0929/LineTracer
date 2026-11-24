@@ -1,0 +1,131 @@
+{
+  "scenario": "sigterm",
+  "item": "1",
+  "doc": "SIGTERM the follower (docker stop / process manager)",
+  "rep": 2,
+  "stack": "guarded",
+  "domain": 85,
+  "partition": "lf_g_sigterm_d7f6229e",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 3.24,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "window",
+  "fault": {
+    "kind": "follower_sigterm",
+    "t": 38.82,
+    "wall": 42.136972188949585,
+    "progress": 7.856,
+    "pid": 11638,
+    "exit_wall": 42.4964337348938,
+    "exit_after_s": 0.359
+  },
+  "safety_events": [
+    {
+      "wall": 3.94,
+      "sim": 0.712,
+      "state": "GATE",
+      "reason": "odom: no data yet; image: no data yet"
+    },
+    {
+      "wall": 3.96,
+      "sim": 0.732,
+      "state": "STOP",
+      "reason": "no command yet"
+    },
+    {
+      "wall": 4.206,
+      "sim": 0.972,
+      "state": "STOP",
+      "reason": "recovering from: no command yet"
+    },
+    {
+      "wall": 4.52,
+      "sim": 1.292,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 42.54,
+      "sim": 39.22,
+      "state": "STOP",
+      "reason": "command timeout (0.32 s)"
+    }
+  ],
+  "children_exit": {
+    "follower": 0,
+    "guard": 0
+  },
+  "first": {
+    "clock_wall": 2.372,
+    "odom_wall": 3.24,
+    "image_wall": 3.267,
+    "image_sim": 0.036,
+    "cmd_wall": 3.94,
+    "nonzero_cmd_wall": 4.52,
+    "nonzero_cmd_sim": 1.292
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 1.512,
+  "first_motion_wall": 4.735,
+  "max_progress_m": 7.876,
+  "sim_observed_s": 46.81,
+  "v_at_t0": 0.416,
+  "w_at_t0": -0.013,
+  "disp_1s": 0.02,
+  "disp_2s": 0.02,
+  "disp_5s": 0.02,
+  "path_after_t0_m": 0.021,
+  "disp_end_m": 0.02,
+  "yaw_turned_after_t0_rad": 0.0,
+  "t_stop_after_t0": 0.64,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.001,
+  "progress_at_t0": 7.856,
+  "progress_end": 7.876,
+  "z_min_after_t0": 0.01,
+  "left_mat": false,
+  "moving_time_after_t0_s": 0.24,
+  "observed_after_t0_s": 8.01,
+  "cmd_msgs_after_t0": 407,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 8.0,
+  "cmd_before_t0": [
+    0.542,
+    -0.031
+  ],
+  "cmd_v_max": 0.558,
+  "cmd_w_absmax": 3.0,
+  "cmd_frac_v_over_hw": 0.032,
+  "cmd_frac_w_over_hw": 0.003,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.006,
+  "gt_v_max": 0.49,
+  "gt_w_absmax": 1.395,
+  "gt_frac_v_over_hw": 0.035,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "cmd_first_zero_after_fault_s": 0.003,
+  "cmd_last_nonzero_after_fault_s": 0.002,
+  "stop_path_m": 0.02,
+  "stop_disp_m": 0.019,
+  "first_motion_after_stack_start_s": 1.5,
+  "first_nonzero_cmd_after_stack_start_s": 1.28,
+  "first_nonzero_cmd": [
+    0.016,
+    0.0013
+  ],
+  "first_2s_max_dv_per_msg": 0.016,
+  "candidate_at_first_nonzero": [
+    0.25,
+    -0.0108
+  ],
+  "first_1p5s_gt_max_accel": 0.74
+}

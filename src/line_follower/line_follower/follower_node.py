@@ -1,16 +1,19 @@
 """Line follower node.
 
 camera image --(vision)--> ground line mask --(line_map)--> line map in the odom frame
-line map --(trace)--> path ahead of the robot --(pure pursuit)--> /cmd_vel
+line map --(trace)--> path ahead of the robot --(pure pursuit)--> command
 
-Only robot topics are used: /camera/image_raw, /odom, /cmd_vel.
+Robot topics used: /camera/image_raw, /odom, /imu. The command goes to /cmd_vel; the launch
+file (and experiments/user_base/run_guarded.py) remap it to the internal candidate topic
+/line_follower/cmd_raw, where safety_guard checks it and is the only /cmd_vel publisher.
+On SIGINT / SIGTERM the node publishes zero before its ROS context goes away.
 """
 import math
 import numpy as np
 import cv2
 import rclpy
-import rclpy.executors
 from rclpy.node import Node
+from rclpy.signals import SignalHandlerOptions
 from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.msg import ParameterDescriptor, FloatingPointRange
 from sensor_msgs.msg import Image, Imu
@@ -21,6 +24,7 @@ from . import vision
 from .line_map import LineMap, RES, C0
 from .perception import make_perception
 from .control import make_controller
+from .safety_guard import install_stop_handlers, publish_zeros, spin_until_stopped
 
 
 REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
@@ -365,31 +369,17 @@ class FollowerNode(Node):
         self.dbg_pub.publish(out)
 
 
-def main():
-    rclpy.init()
+def main(args=None):
+    # rclpy's default SIGINT/SIGTERM handlers shut the context down before `finally` runs,
+    # so the zero command used to fail (RCLError, swallowed) and the robot kept driving.
+    rclpy.init(args=args, signal_handler_options=SignalHandlerOptions.NO)
+    stop = install_stop_handlers()
     node = FollowerNode()
-    # rclpy occasionally fails to deserialise one incoming message under heavy load
-    # ("Unable to convert call argument '0' to Python object"). Losing that single message
-    # is harmless; letting it kill the node ends the run. Drop it and keep spinning.
-    executor = rclpy.executors.SingleThreadedExecutor()
-    executor.add_node(node)
-    dropped = 0
     try:
-        while rclpy.ok():
-            try:
-                executor.spin_once(timeout_sec=0.1)
-            except RuntimeError as error:
-                if 'Unable to convert' not in str(error) or dropped > 1000:
-                    raise
-                dropped += 1
-                node.get_logger().warning(f'dropped one undecodable message ({dropped})')
-    except KeyboardInterrupt:
-        pass
+        spin_until_stopped(node, stop)
     finally:
-        try:
-            node.cmd_pub.publish(Twist())
-        except Exception:
-            pass
+        node.v_cmd = node.w_cmd = 0.0
+        sent = publish_zeros(node.cmd_pub)
+        node.get_logger().info(f'exit: {sent} zero commands published')
         node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()
+        rclpy.try_shutdown()

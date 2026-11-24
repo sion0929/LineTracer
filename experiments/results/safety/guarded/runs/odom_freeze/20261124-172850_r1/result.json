@@ -1,0 +1,134 @@
+{
+  "scenario": "odom_freeze",
+  "item": "3",
+  "doc": "/odom frozen (relay SIGSTOP), camera alive",
+  "rep": 1,
+  "stack": "guarded",
+  "domain": 84,
+  "partition": "lf_g_odom_freeze_dec83fbc",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 4.189,
+  "t_start_sim": 1.012,
+  "follower_returncode": null,
+  "end_reason": "window",
+  "fault": {
+    "kind": "relay_stop",
+    "t": 25.548000000000002,
+    "wall": 28.719817638397217,
+    "progress": 4.007
+  },
+  "safety_events": [
+    {
+      "wall": 7.172,
+      "sim": 4.004,
+      "state": "GATE",
+      "reason": "clock stalled (2.45 s wall); odom: no data yet; imu: no data yet; image: no data yet"
+    },
+    {
+      "wall": 7.436,
+      "sim": 4.264,
+      "state": "GATE",
+      "reason": "odom: no data yet; image: no data yet"
+    },
+    {
+      "wall": 7.438,
+      "sim": 4.264,
+      "state": "GATE",
+      "reason": "image: no data yet"
+    },
+    {
+      "wall": 7.472,
+      "sim": 4.304,
+      "state": "STOP",
+      "reason": "recovering from: image: no data yet"
+    },
+    {
+      "wall": 7.839,
+      "sim": 4.664,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 29.232,
+      "sim": 26.048,
+      "state": "STOP",
+      "reason": "odom timeout (0.52 s)"
+    }
+  ],
+  "children_exit": {
+    "guard": 0,
+    "follower": 0
+  },
+  "first": {
+    "clock_wall": 2.364,
+    "odom_wall": 3.188,
+    "image_wall": 4.191,
+    "image_sim": 1.012,
+    "cmd_wall": 7.051,
+    "nonzero_cmd_wall": 7.84,
+    "nonzero_cmd_sim": 4.664
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 4.884,
+  "first_motion_wall": 8.056,
+  "max_progress_m": 4.139,
+  "sim_observed_s": 54.54,
+  "v_at_t0": 0.249,
+  "w_at_t0": 0.163,
+  "disp_1s": 0.132,
+  "disp_2s": 0.132,
+  "disp_5s": 0.132,
+  "path_after_t0_m": 0.132,
+  "disp_end_m": 0.132,
+  "yaw_turned_after_t0_rad": 0.07,
+  "t_stop_after_t0": 0.68,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.004,
+  "progress_at_t0": 4.007,
+  "progress_end": 4.139,
+  "z_min_after_t0": 0.01,
+  "left_mat": false,
+  "moving_time_after_t0_s": 0.6,
+  "observed_after_t0_s": 30.0,
+  "cmd_msgs_after_t0": 3005,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 30.09,
+  "cmd_before_t0": [
+    0.25,
+    0.138
+  ],
+  "cmd_v_max": 0.25,
+  "cmd_w_absmax": 2.845,
+  "cmd_frac_v_over_hw": 0.0,
+  "cmd_frac_w_over_hw": 0.002,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.001,
+  "gt_v_max": 0.288,
+  "gt_w_absmax": 1.117,
+  "gt_frac_v_over_hw": 0.008,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "cmd_first_zero_after_fault_s": 0.513,
+  "cmd_last_nonzero_after_fault_s": 0.492,
+  "stop_path_m": 0.132,
+  "stop_disp_m": 0.132,
+  "first_motion_after_stack_start_s": 3.87,
+  "first_nonzero_cmd_after_stack_start_s": 3.65,
+  "first_nonzero_cmd": [
+    0.096,
+    0.0099
+  ],
+  "first_2s_max_dv_per_msg": 0.096,
+  "candidate_at_first_nonzero": [
+    0.126,
+    0.013
+  ],
+  "first_1p5s_gt_max_accel": 0.5
+}

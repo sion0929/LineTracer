@@ -1,0 +1,86 @@
+{
+  "name": "03_01",
+  "map": "/ws/experiments/worlds/suites/stress50/maps/hard_7018.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 72,
+  "partition": "lf_g_drive_c8247cc93140_003",
+  "backend": "run_eval",
+  "progress_m": 2.808,
+  "progress_pct": 15.3,
+  "lap_sec": null,
+  "wall_sec": 21.8,
+  "lat_mean": 0.0223,
+  "lat_p95": 0.105,
+  "lat_max": 0.1364,
+  "reason": "off line >0.12m at 2.72m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 8,
+  "slip_events": [
+    {
+      "start_sim_sec": 10.412,
+      "windows": 1,
+      "peak_linear_mps": 0.181,
+      "peak_angular_radps": 0.012,
+      "end_sim_sec": 10.712
+    },
+    {
+      "start_sim_sec": 11.908,
+      "windows": 1,
+      "peak_linear_mps": 0.111,
+      "peak_angular_radps": 0.006,
+      "end_sim_sec": 12.208
+    },
+    {
+      "start_sim_sec": 14.608,
+      "windows": 2,
+      "peak_linear_mps": 0.244,
+      "peak_angular_radps": 0.027,
+      "end_sim_sec": 15.208
+    },
+    {
+      "start_sim_sec": 20.304,
+      "windows": 3,
+      "peak_linear_mps": 0.036,
+      "peak_angular_radps": 2.261,
+      "end_sim_sec": 21.204
+    },
+    {
+      "start_sim_sec": 21.504,
+      "windows": 3,
+      "peak_linear_mps": 0.07,
+      "peak_angular_radps": 2.03,
+      "end_sim_sec": 22.404
+    },
+    {
+      "start_sim_sec": 22.704,
+      "windows": 2,
+      "peak_linear_mps": 0.072,
+      "peak_angular_radps": 1.511,
+      "end_sim_sec": 23.304
+    },
+    {
+      "start_sim_sec": 24.204,
+      "windows": 1,
+      "peak_linear_mps": 0.07,
+      "peak_angular_radps": 1.516,
+      "end_sim_sec": 24.504
+    },
+    {
+      "start_sim_sec": 25.408,
+      "windows": 1,
+      "peak_linear_mps": 0.074,
+      "peak_angular_radps": 1.161,
+      "end_sim_sec": 25.708
+    }
+  ],
+  "odom_windows": 71,
+  "sim_sec": 21.732,
+  "wheel_line_events": 12,
+  "wheel_line_sec": 2.16,
+  "max_progress_m": 3.386
+}

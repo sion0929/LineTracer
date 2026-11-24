@@ -1,0 +1,137 @@
+{
+  "scenario": "sigkill",
+  "item": "1",
+  "doc": "SIGKILL the follower (= crash): does Gazebo keep the last /cmd_vel?",
+  "rep": 1,
+  "stack": "guarded",
+  "domain": 84,
+  "partition": "lf_g_sigkill_b475e07d",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 3.339,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "window",
+  "fault": {
+    "kind": "follower_sigkill",
+    "t": 41.588,
+    "wall": 44.905807971954346,
+    "progress": 7.855,
+    "pid": 5721,
+    "exit_wall": 44.94920039176941,
+    "exit_after_s": 0.043
+  },
+  "safety_events": [
+    {
+      "wall": 6.816,
+      "sim": 3.492,
+      "state": "STOP",
+      "reason": "no command yet"
+    },
+    {
+      "wall": 7.436,
+      "sim": 4.108,
+      "state": "STOP",
+      "reason": "recovering from: no command yet"
+    },
+    {
+      "wall": 7.736,
+      "sim": 4.4,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 45.216,
+      "sim": 41.888,
+      "state": "STOP",
+      "reason": "command timeout (0.32 s)"
+    },
+    {
+      "wall": 45.396,
+      "sim": 42.068,
+      "state": "STOP",
+      "reason": "image timeout (0.52 s)"
+    },
+    {
+      "wall": 45.596,
+      "sim": 42.268,
+      "state": "STOP",
+      "reason": "command timeout (0.70 s)"
+    }
+  ],
+  "children_exit": {
+    "follower": -9,
+    "guard": 0
+  },
+  "first": {
+    "clock_wall": 2.369,
+    "odom_wall": 3.339,
+    "image_wall": 3.499,
+    "image_sim": 0.176,
+    "cmd_wall": 6.775,
+    "nonzero_cmd_wall": 7.736,
+    "nonzero_cmd_sim": 4.4
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 4.652,
+  "first_motion_wall": 7.973,
+  "max_progress_m": 7.991,
+  "sim_observed_s": 49.58,
+  "v_at_t0": 0.411,
+  "w_at_t0": 0.036,
+  "disp_1s": 0.136,
+  "disp_2s": 0.136,
+  "disp_5s": 0.136,
+  "path_after_t0_m": 0.136,
+  "disp_end_m": 0.136,
+  "yaw_turned_after_t0_rad": 0.0,
+  "t_stop_after_t0": 0.46,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.001,
+  "progress_at_t0": 7.855,
+  "progress_end": 7.991,
+  "z_min_after_t0": 0.009,
+  "left_mat": false,
+  "moving_time_after_t0_s": 0.38,
+  "observed_after_t0_s": 8.01,
+  "cmd_msgs_after_t0": 400,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 7.99,
+  "cmd_before_t0": [
+    0.416,
+    -0.005
+  ],
+  "cmd_v_max": 0.488,
+  "cmd_w_absmax": 2.105,
+  "cmd_frac_v_over_hw": 0.037,
+  "cmd_frac_w_over_hw": 0.001,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.009,
+  "gt_v_max": 0.447,
+  "gt_w_absmax": 1.33,
+  "gt_frac_v_over_hw": 0.04,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "cmd_first_zero_after_fault_s": 0.31,
+  "cmd_last_nonzero_after_fault_s": 0.289,
+  "stop_path_m": 0.136,
+  "stop_disp_m": 0.136,
+  "first_motion_after_stack_start_s": 4.63,
+  "first_nonzero_cmd_after_stack_start_s": 4.4,
+  "first_nonzero_cmd": [
+    0.016,
+    0.0013
+  ],
+  "first_2s_max_dv_per_msg": 0.016,
+  "candidate_at_first_nonzero": [
+    0.25,
+    0.0198
+  ],
+  "first_1p5s_gt_max_accel": 0.68
+}

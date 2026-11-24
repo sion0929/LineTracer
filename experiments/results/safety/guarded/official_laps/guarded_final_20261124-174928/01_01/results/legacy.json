@@ -1,0 +1,13 @@
+{
+ "name": "legacy",
+ "args": [],
+ "complete": true,
+ "progress_m": 15.584,
+ "progress_pct": 99.3,
+ "lap_sec": 65.65,
+ "wall_sec": 69.0,
+ "lat_mean": 0.0106,
+ "lat_p95": 0.0296,
+ "lat_max": 0.04,
+ "reason": "finished"
+}

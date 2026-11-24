@@ -1,0 +1,113 @@
+{
+  "scenario": "sigint",
+  "item": "1",
+  "doc": "SIGINT the follower on the fastest straight (~0.5 m/s)",
+  "rep": 2,
+  "stack": "guarded",
+  "domain": 84,
+  "partition": "lf_g_sigint_d3d7bf1a",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "stack_started_wall": 3.203,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "window",
+  "fault": {
+    "kind": "follower_sigint",
+    "t": 38.268,
+    "wall": 41.54986906051636,
+    "progress": 7.853,
+    "pid": 11451,
+    "exit_wall": 41.830023765563965,
+    "exit_after_s": 0.28
+  },
+  "safety_events": [
+    {
+      "wall": 6.92,
+      "sim": 3.724,
+      "state": "RUN",
+      "reason": ""
+    },
+    {
+      "wall": 41.94,
+      "sim": 38.648,
+      "state": "STOP",
+      "reason": "command timeout (0.31 s)"
+    }
+  ],
+  "children_exit": {
+    "follower": 0,
+    "guard": 0
+  },
+  "first": {
+    "clock_wall": 2.377,
+    "odom_wall": 3.203,
+    "image_wall": 3.229,
+    "image_sim": 0.036,
+    "cmd_wall": 6.779,
+    "nonzero_cmd_wall": 6.779,
+    "nonzero_cmd_sim": 3.584
+  },
+  "finish_T_detected_travel": [],
+  "reached_finish_travel": [],
+  "first_motion_sim": 1.588,
+  "first_motion_wall": 4.775,
+  "max_progress_m": 7.868,
+  "sim_observed_s": 46.26,
+  "v_at_t0": 0.434,
+  "w_at_t0": 0.041,
+  "disp_1s": 0.015,
+  "disp_2s": 0.015,
+  "disp_5s": 0.015,
+  "path_after_t0_m": 0.015,
+  "disp_end_m": 0.015,
+  "yaw_turned_after_t0_rad": 0.0,
+  "t_stop_after_t0": 0.14,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.002,
+  "progress_at_t0": 7.853,
+  "progress_end": 7.868,
+  "z_min_after_t0": 0.009,
+  "left_mat": false,
+  "moving_time_after_t0_s": 0.1,
+  "observed_after_t0_s": 8.01,
+  "cmd_msgs_after_t0": 406,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 8.01,
+  "cmd_before_t0": [
+    0.541,
+    0.03
+  ],
+  "cmd_v_max": 0.541,
+  "cmd_w_absmax": 1.409,
+  "cmd_frac_v_over_hw": 0.043,
+  "cmd_frac_w_over_hw": 0.0,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.005,
+  "gt_v_max": 0.498,
+  "gt_w_absmax": 1.316,
+  "gt_frac_v_over_hw": 0.041,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "cmd_first_zero_after_fault_s": 0.002,
+  "cmd_last_nonzero_after_fault_s": null,
+  "stop_path_m": 0.014,
+  "stop_disp_m": 0.014,
+  "first_motion_after_stack_start_s": 1.57,
+  "first_nonzero_cmd_after_stack_start_s": 3.58,
+  "first_nonzero_cmd": [
+    0.25,
+    -0.0729
+  ],
+  "first_2s_max_dv_per_msg": 0.0,
+  "candidate_at_first_nonzero": [
+    0.25,
+    -0.0729
+  ],
+  "first_1p5s_gt_max_accel": 0.75
+}
