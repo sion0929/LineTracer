@@ -1,0 +1,21 @@
+"""Interface every control plugin implements."""
+
+
+class Controller:
+    """Compute one velocity command per control tick (50 Hz).
+
+    The node calls compute(rp, dt) only when a path of >= 2 points exists and the
+    finish has not been reached; search/creep and stopping stay in the shared node.
+
+    rp: list of (x, y) path points in the ROBOT frame (x forward, y left), ~2 cm apart,
+        nearest first. Useful node state: node.v_cmd, node.w_cmd (last command),
+        node.path_end ('open' | 't' | 'len'), node.t_point, node.travel,
+        node.pitch_f (filtered pitch), node.to_robot(X, Y).
+    Returns (v [m/s], w [rad/s]); the node publishes them on /cmd_vel.
+    """
+
+    def __init__(self, node):
+        self.node = node
+
+    def compute(self, rp, dt):
+        raise NotImplementedError

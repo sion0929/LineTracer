@@ -38,9 +38,10 @@ def bev_to_robot(col, row):
     return X_FAR - row * RES, Y_HALF - col * RES
 
 
-def line_mask(gray, theta=0.0, x_max=X_FAR, thresh_cap=125.0):
-    """Gray camera image -> (BEV line mask, BEV validity mask), both 0/255.
+def bev_warp(img, theta=0.0, x_max=X_FAR):
+    """Camera-image-sized array -> (BEV image, BEV validity mask 0/255).
 
+    Shared by every perception plugin so they all write the same ground grid.
     theta is the nose-up pitch of the camera relative to the ground [rad].
     Only ground closer than x_max is reported as seen (far cells are the most
     sensitive to pitch errors).
@@ -51,7 +52,13 @@ def line_mask(gray, theta=0.0, x_max=X_FAR, thresh_cap=125.0):
     valid = cv2.erode(valid, _ERODE, borderValue=0)
     if x_max < X_FAR:
         valid[:int((X_FAR - x_max) / RES), :] = 0
-    bev = cv2.warpPerspective(gray, m, (BW, BH), flags=cv2.INTER_LINEAR)
+    bev = cv2.warpPerspective(img, m, (BW, BH), flags=cv2.INTER_LINEAR)
+    return bev, valid
+
+
+def line_mask(gray, theta=0.0, x_max=X_FAR, thresh_cap=125.0):
+    """Gray camera image -> (BEV line mask, BEV validity mask), both 0/255 (rule plugin)."""
+    bev, valid = bev_warp(gray, theta, x_max)
     seen = valid > 0
     if not seen.any():
         return np.zeros((BH, BW), np.uint8), valid
