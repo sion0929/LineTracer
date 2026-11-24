@@ -22,6 +22,7 @@ from .line_map import LineMap, RES, C0
 from .perception import make_perception
 from .control import make_controller
 from . import terrain
+from .scanmatch import ScanMatcher
 from .perception.base import PerceptionOutput
 
 
@@ -59,8 +60,13 @@ class FollowerNode(Node):
         self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
+        self.declare_parameter('scan_match', False)          # nudge the pose so fresh line pixels sit on the map (scanmatch.py)
+        self.declare_parameter('scan_gain', 0.5, rng(0.0, 1.0, 'fraction of the matched correction applied per frame'))
+        self.declare_parameter('relink_radius', 0.0, rng(0.0, 0.2, 'look this far for the line when the remembered path no longer matches the map [m], 0 = off'))
         self.declare_parameter('terrain_calib', False)      # rescale widths so the near ground is z = 0 (helps blurred renders / Isaac, hurts Gazebo)
-        self.declare_parameter('terrain_hill', False)       # on a slope, project with the line-width height profile (terrain.py)
+        self.declare_parameter('terrain_hill', False)
+        self.declare_parameter('terrain_down_only', False)
+        self.declare_parameter('terrain_bend_z', 0.0, rng(0.0, 0.1, 'on flat ground too, use the profile when it bends this much within the view [m], 0 = off'))  # use the profile only while going downhill (nose down)       # on a slope, project with the line-width height profile (terrain.py)
         self.declare_parameter('x_far_terrain', 0.50, rng(0.3, 1.5, 'camera range on a slope when terrain_hill is on [m]'))
         self.declare_parameter('far_add_unsteady', False)   # rocking on flat ground: far range add-only (fills unseen line, never erases)
         # Track-specific speed plan: [s_from, s_to, v_max, ...] with s = distance driven [m].
@@ -220,6 +226,17 @@ class FollowerNode(Node):
             x_far = vision.X_FAR
         out = None
         on_hill = abs(self.pitch_f) >= math.radians(gp('steady_pitch_deg').value)
+        if on_hill and gp('terrain_down_only').value and self.pitch_f > 0.0:
+            on_hill = False                                  # climbing: keep the original projection
+        bend_z = gp('terrain_bend_z').value
+        if not on_hill and bend_z > 0.0:
+            # standing level (ramp deck, foot of a ramp) but the ground ahead drops or rises
+            prof_b, _ = terrain.estimate(gray, REST_PITCH, gp('terrain_calib').value)
+            if (prof_b is not None and prof_b.b is not None
+                    and abs(prof_b.ds) * max(0.0, vision.X_FAR - prof_b.b) > bend_z):
+                line, valid = terrain.line_mask_profile(gray, REST_PITCH, prof_b, x_far)
+                out = PerceptionOutput(line=line, valid=valid, obstacle=None)
+                add_only = None
         if on_hill and gp('terrain_hill').value:
             # the ground ahead is not the plane the robot stands on (crest / foot of a ramp):
             # measure its height profile from the line width instead of assuming a plane
@@ -238,7 +255,13 @@ class FollowerNode(Node):
         self.last_obstacle = out.obstacle
         out.pitch = self.pitch_at(ts)
         self.last_observation = out
-        self.map.update(out.line, out.valid, self.pose_at(ts), add_only)
+        pose_ts = self.pose_at(ts)
+        if gp('scan_match').value and not on_hill and pose_ts is not None:
+            if not hasattr(self, 'scanmatch'):
+                self.scanmatch = ScanMatcher(gain=gp('scan_gain').value)
+            if self.scanmatch.correct(self, out.line, out.valid, pose_ts):
+                pose_ts = self.pose_at(ts)
+        self.map.update(out.line, out.valid, pose_ts, add_only)
         self.replan()
         if self.get_parameter('debug_image').value:
             self.publish_debug()
@@ -292,6 +315,11 @@ class FollowerNode(Node):
                 break
         if len(lock) >= 3 and acc >= 0.04:
             anchor = self.map.snap(*lock[-1], 0.03)
+            relink = self.get_parameter('relink_radius').value
+            if anchor is None and relink > 0.03:
+                # the line seen now lies a few cm beside the remembered one (odometry drifted,
+                # e.g. after a ramp): re-attach the path to what the map shows now
+                anchor = self.map.snap(*lock[-1], relink)
             if anchor is None:
                 return                      # map has nothing here (yet): keep the remembered path
             h = math.atan2(lock[-1][1] - lock[-3][1], lock[-1][0] - lock[-3][0])

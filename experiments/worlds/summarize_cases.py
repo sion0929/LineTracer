@@ -27,6 +27,8 @@ def main():
         mp = Path(job["map"])
         if not mp.exists() and str(mp).startswith("/ws/"):          # ran inside the lab container
             mp = ROOT / str(mp)[4:]
+        if not mp.with_suffix(".json").exists():               # official track etc.: not a case
+            continue
         meta = json.loads(mp.with_suffix(".json").read_text())
         case = meta.get("case")
         if not case:
