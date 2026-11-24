@@ -21,6 +21,8 @@ from . import vision
 from .line_map import LineMap, RES, C0
 from .perception import make_perception
 from .control import make_controller
+from . import terrain
+from .perception.base import PerceptionOutput
 
 
 REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
@@ -57,6 +59,9 @@ class FollowerNode(Node):
         self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
+        self.declare_parameter('terrain_calib', False)      # rescale widths so the near ground is z = 0 (helps blurred renders / Isaac, hurts Gazebo)
+        self.declare_parameter('terrain_hill', False)       # on a slope, project with the line-width height profile (terrain.py)
+        self.declare_parameter('x_far_terrain', 0.50, rng(0.3, 1.5, 'camera range on a slope when terrain_hill is on [m]'))
         self.declare_parameter('far_add_unsteady', False)   # rocking on flat ground: far range add-only (fills unseen line, never erases)
         # Track-specific speed plan: [s_from, s_to, v_max, ...] with s = distance driven [m].
         # Outside these windows v_max applies. Tuned for the provided line_track world.
@@ -213,7 +218,23 @@ class FollowerNode(Node):
             add_only = np.zeros((vision.BH, vision.BW), np.uint8)
             add_only[:max(0, int(round((vision.X_FAR - x_far) / vision.RES)))] = 255
             x_far = vision.X_FAR
-        out = self.perception.process(bgr, gray, self.pitch_at(ts), x_far)
+        out = None
+        on_hill = abs(self.pitch_f) >= math.radians(gp('steady_pitch_deg').value)
+        if on_hill and gp('terrain_hill').value:
+            # the ground ahead is not the plane the robot stands on (crest / foot of a ramp):
+            # measure its height profile from the line width instead of assuming a plane
+            prof, _ = terrain.estimate(gray, REST_PITCH, gp('terrain_calib').value)
+            if prof is not None:
+                self.terrain_prof, self.terrain_t = prof, ts
+            elif ts - getattr(self, 'terrain_t', -9.0) < 0.4:
+                prof = self.terrain_prof
+            if prof is not None:
+                xt = min(vision.X_FAR, gp('x_far_terrain').value)
+                line, valid = terrain.line_mask_profile(gray, REST_PITCH, prof, xt)
+                out = PerceptionOutput(line=line, valid=valid, obstacle=None)
+                add_only = None
+        if out is None:
+            out = self.perception.process(bgr, gray, self.pitch_at(ts), x_far)
         self.last_obstacle = out.obstacle
         out.pitch = self.pitch_at(ts)
         self.last_observation = out
