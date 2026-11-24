@@ -1,0 +1,5 @@
+# Raw per-run data; result.json, telemetry.json/png and the summaries are kept. Re-run: random_drive.py N --seed S
+*.npz
+*.npy
+*.log
+telemetry.csv

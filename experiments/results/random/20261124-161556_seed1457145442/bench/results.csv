@@ -1,0 +1,7 @@
+name,map,profile,backend,complete,progress_m,progress_pct,lap_sec,sim_sec,wall_sec,lat_p95,lat_mean,lat_max,collision_count,avoidance_attempts,avoided_count,slip_count,odom_windows,wheel_line_events,wheel_line_sec,max_progress_m,reason,domain,partition
+01_01,/ws/experiments/worlds/suites/general200/maps/normal_1055.sdf,default,run_eval,False,3.739,21.1,,23.572,23.7,0.0839,0.0149,0.176,0,0,0,3,78,1,0.18,3.772,off line >0.12m at 3.77m,50,lf_p_drive_08f64f836f3f_001
+02_01,/ws/experiments/worlds/suites/official_like50/maps/hard_5036_m.sdf,default,run_eval,False,0.971,5.6,,10.908,10.9,0.1316,0.0155,0.1832,0,0,0,0,36,1,0.18,1.053,off line >0.12m at 1.05m,51,lf_p_drive_08f64f836f3f_002
+03_01,/ws/experiments/worlds/suites/stress50/maps/hard_7018.sdf,default,run_eval,False,17.805,96.8,,98.432,100.2,0.025,0.0074,0.0485,0,0,0,4,333,8,4.78,17.805,stalled at 17.81m,52,lf_p_drive_08f64f836f3f_003
+04_01,/ws/experiments/worlds/suites/stress50/maps/hard_7037_m.sdf,default,run_eval,False,1.096,5.7,,14.208,14.3,0.1058,0.0122,0.176,0,0,0,2,47,1,0.06,1.128,off line >0.12m at 1.13m,53,lf_p_drive_08f64f836f3f_004
+05_01,/ws/experiments/worlds/suites/general200/maps/hard_1059.sdf,default,run_eval,False,14.716,92.6,,92.376,94.4,0.026,0.0093,0.0487,0,0,0,3,314,0,0.0,14.717,stalled at 14.72m,54,lf_p_drive_08f64f836f3f_005
+06_01,/ws/experiments/worlds/suites/hills60/maps/easy_9024_m.sdf,default,run_eval,False,3.175,20.3,,26.7,27.9,0.1,0.0154,0.1373,0,0,0,0,91,1,0.96,3.198,off line >0.12m at 3.20m,55,lf_p_drive_08f64f836f3f_006

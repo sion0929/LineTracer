@@ -1,0 +1,7 @@
+order,suite,seed,difficulty,hills,mirror,obstacles,length_m,max_ramp_m,min_corner_r_m,square_corners,loop_corners,detours,small_loops,bars,gaps,path
+1,general200,1055,normal,1,0,0,17.746,0.055,0.158,2,0,1,0,2,2,experiments/worlds/suites/general200/maps/normal_1055.sdf
+2,official_like50,5036,hard,1,1,0,17.352,0.063,0.117,3,2,0,0,2,3,experiments/worlds/suites/official_like50/maps/hard_5036_m.sdf
+3,stress50,7018,hard,1,0,0,18.392,0.07,0.087,3,2,0,1,4,3,experiments/worlds/suites/stress50/maps/hard_7018.sdf
+4,stress50,7037,hard,1,1,0,19.322,0.061,0.081,3,2,0,2,3,3,experiments/worlds/suites/stress50/maps/hard_7037_m.sdf
+5,general200,1059,hard,1,0,0,15.894,0.063,0.102,3,0,0,0,1,2,experiments/worlds/suites/general200/maps/hard_1059.sdf
+6,hills60,9024,easy,3,1,0,15.646,0.036,0.271,1,0,0,0,0,0,experiments/worlds/suites/hills60/maps/easy_9024_m.sdf

@@ -1,0 +1,5 @@
+experiments/worlds/suites/official_like50/maps/normal_5009_m.sdf
+experiments/worlds/suites/hills60/maps/hard_9002_m.sdf
+experiments/worlds/suites/general200/maps/normal_1136_m.sdf
+experiments/worlds/suites/general200/maps/easy_1105.sdf
+experiments/worlds/suites/stress50/maps/hard_7012.sdf

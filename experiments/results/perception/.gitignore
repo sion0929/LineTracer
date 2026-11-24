@@ -1,0 +1,3 @@
+# Recordings are re-creatable from the seeds saved next to the tables (record_perception.py / perception_bench.py --random N --seed S).
+*.npz
+*.log
