@@ -2,7 +2,7 @@
 
 No Gazebo and no ROS graph are needed: the frames and the ground truth are stored in
 test/data/official_track_rec.npz (28 frames, 0.35 MB), recorded with the development tool
-experiments/eval/record_perception.py (set_pose teleports along the official centreline,
+experiments/eval/record_perception.py (simulator teleports along the official centreline,
 lateral +-3 cm, heading +-8 deg):
 
     python3 experiments/eval/record_perception.py \
