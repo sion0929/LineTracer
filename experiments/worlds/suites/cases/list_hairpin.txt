@@ -1,0 +1,14 @@
+experiments/worlds/suites/cases/maps/hairpin__u_r10.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_r10_m.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_r15.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_r15_m.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_r20.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_r20_m.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_r30.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_r30_m.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_sq_leg15.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_sq_leg15_m.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_sq_leg25.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_sq_leg25_m.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_sq_leg40.sdf
+experiments/worlds/suites/cases/maps/hairpin__u_sq_leg40_m.sdf

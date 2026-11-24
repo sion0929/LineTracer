@@ -1,0 +1,2 @@
+experiments/worlds/suites/cases/maps/spiral__tightening.sdf
+experiments/worlds/suites/cases/maps/spiral__tightening_m.sdf

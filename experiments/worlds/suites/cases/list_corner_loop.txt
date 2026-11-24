@@ -1,0 +1,8 @@
+experiments/worlds/suites/cases/maps/corner_loop__r08.sdf
+experiments/worlds/suites/cases/maps/corner_loop__r08_m.sdf
+experiments/worlds/suites/cases/maps/corner_loop__r10.sdf
+experiments/worlds/suites/cases/maps/corner_loop__r10_m.sdf
+experiments/worlds/suites/cases/maps/corner_loop__r12.sdf
+experiments/worlds/suites/cases/maps/corner_loop__r12_m.sdf
+experiments/worlds/suites/cases/maps/corner_loop__r15.sdf
+experiments/worlds/suites/cases/maps/corner_loop__r15_m.sdf

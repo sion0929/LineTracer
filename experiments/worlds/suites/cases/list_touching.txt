@@ -1,0 +1,6 @@
+experiments/worlds/suites/cases/maps/touching__d00.sdf
+experiments/worlds/suites/cases/maps/touching__d00_m.sdf
+experiments/worlds/suites/cases/maps/touching__d02.sdf
+experiments/worlds/suites/cases/maps/touching__d02_m.sdf
+experiments/worlds/suites/cases/maps/touching__d05.sdf
+experiments/worlds/suites/cases/maps/touching__d05_m.sdf

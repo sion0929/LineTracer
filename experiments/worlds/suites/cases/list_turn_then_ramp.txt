@@ -1,0 +1,8 @@
+experiments/worlds/suites/cases/maps/turn_then_ramp__h3_d10.sdf
+experiments/worlds/suites/cases/maps/turn_then_ramp__h3_d10_m.sdf
+experiments/worlds/suites/cases/maps/turn_then_ramp__h3_d30.sdf
+experiments/worlds/suites/cases/maps/turn_then_ramp__h3_d30_m.sdf
+experiments/worlds/suites/cases/maps/turn_then_ramp__h6_d10.sdf
+experiments/worlds/suites/cases/maps/turn_then_ramp__h6_d10_m.sdf
+experiments/worlds/suites/cases/maps/turn_then_ramp__h6_d30.sdf
+experiments/worlds/suites/cases/maps/turn_then_ramp__h6_d30_m.sdf

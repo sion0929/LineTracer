@@ -1,0 +1,16 @@
+experiments/worlds/suites/cases/maps/y_split__a15_l.sdf
+experiments/worlds/suites/cases/maps/y_split__a15_l_m.sdf
+experiments/worlds/suites/cases/maps/y_split__a15_r.sdf
+experiments/worlds/suites/cases/maps/y_split__a15_r_m.sdf
+experiments/worlds/suites/cases/maps/y_split__a25_l.sdf
+experiments/worlds/suites/cases/maps/y_split__a25_l_m.sdf
+experiments/worlds/suites/cases/maps/y_split__a25_r.sdf
+experiments/worlds/suites/cases/maps/y_split__a25_r_m.sdf
+experiments/worlds/suites/cases/maps/y_split__a35_l.sdf
+experiments/worlds/suites/cases/maps/y_split__a35_l_m.sdf
+experiments/worlds/suites/cases/maps/y_split__a35_r.sdf
+experiments/worlds/suites/cases/maps/y_split__a35_r_m.sdf
+experiments/worlds/suites/cases/maps/y_split__a50_l.sdf
+experiments/worlds/suites/cases/maps/y_split__a50_l_m.sdf
+experiments/worlds/suites/cases/maps/y_split__a50_r.sdf
+experiments/worlds/suites/cases/maps/y_split__a50_r_m.sdf

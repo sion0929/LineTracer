@@ -1,0 +1,4 @@
+experiments/worlds/suites/cases/maps/overlap__a20.sdf
+experiments/worlds/suites/cases/maps/overlap__a20_m.sdf
+experiments/worlds/suites/cases/maps/overlap__a35.sdf
+experiments/worlds/suites/cases/maps/overlap__a35_m.sdf

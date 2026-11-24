@@ -1,0 +1,4 @@
+experiments/worlds/suites/cases/maps/double_ramp__h4.sdf
+experiments/worlds/suites/cases/maps/double_ramp__h4_m.sdf
+experiments/worlds/suites/cases/maps/double_ramp__h7.sdf
+experiments/worlds/suites/cases/maps/double_ramp__h7_m.sdf

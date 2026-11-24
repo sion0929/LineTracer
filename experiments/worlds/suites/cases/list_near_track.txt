@@ -1,0 +1,2 @@
+experiments/worlds/suites/cases/maps/near_track__long_crossing.sdf
+experiments/worlds/suites/cases/maps/near_track__long_crossing_m.sdf
