@@ -1,0 +1,8 @@
+# Raw traces/logs stay local; result.json per run, all_results.json and summary.md are kept.
+# Re-run: python3 experiments/eval/safety_faults.py run all --repeat 2 --jobs 2 --domains 84-89
+*.npz
+*.npy
+*.log
+*.csv
+ros/
+runs/**/*.sdf

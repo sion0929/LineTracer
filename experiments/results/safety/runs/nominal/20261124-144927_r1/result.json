@@ -1,0 +1,71 @@
+{
+  "scenario": "nominal",
+  "item": "7",
+  "doc": "full official lap, no fault: commanded vs true v/w",
+  "rep": 1,
+  "domain": 84,
+  "partition": "lf_s_nominal_401f4902",
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "ok": true,
+  "path_length_m": 15.699,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "finished",
+  "fault": {
+    "kind": null
+  },
+  "first": {
+    "clock_wall": 2.247,
+    "odom_wall": 2.918,
+    "image_wall": 2.941,
+    "image_sim": 0.036,
+    "cmd_wall": 4.052,
+    "nonzero_cmd_wall": 4.052,
+    "nonzero_cmd_sim": 1.052
+  },
+  "finish_T_detected_travel": [
+    14.58
+  ],
+  "reached_finish_travel": [
+    15.49
+  ],
+  "first_motion_sim": 1.292,
+  "first_motion_wall": 4.287,
+  "max_progress_m": 15.565,
+  "sim_observed_s": 68.94,
+  "v_at_t0": 0.046,
+  "w_at_t0": 0.005,
+  "disp_1s": 0.252,
+  "disp_2s": 0.502,
+  "disp_5s": 1.172,
+  "path_after_t0_m": 15.227,
+  "disp_end_m": 2.659,
+  "yaw_turned_after_t0_rad": 27.41,
+  "t_stop_after_t0": 64.8,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.092,
+  "progress_at_t0": 0.023,
+  "progress_end": 15.565,
+  "z_min_after_t0": 0.007,
+  "left_mat": false,
+  "moving_time_after_t0_s": 64.4,
+  "observed_after_t0_s": 67.66,
+  "cmd_msgs_after_t0": 3395,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 67.97,
+  "cmd_v_max": 0.595,
+  "cmd_w_absmax": 3.0,
+  "cmd_frac_v_over_hw": 0.173,
+  "cmd_frac_w_over_hw": 0.011,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.064,
+  "gt_v_max": 0.555,
+  "gt_w_absmax": 1.766,
+  "gt_frac_v_over_hw": 0.178,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0
+}

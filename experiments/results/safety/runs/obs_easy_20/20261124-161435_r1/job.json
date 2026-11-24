@@ -1,0 +1,6 @@
+{
+  "scenario": "obs_easy_20",
+  "rep": 1,
+  "world": "/ws/experiments/results/safety/maps/g2/easy_20_obs1.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/g2/easy_20_obs1.json"
+}

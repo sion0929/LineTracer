@@ -1,0 +1,37 @@
+{
+  "name": "10_01",
+  "map": "/ws/experiments/results/safety/maps/g2/normal_28_obs3.sdf",
+  "profile": "rule",
+  "args": [],
+  "complete": false,
+  "domain": 79,
+  "partition": "lf_s_g2_98cd94578234_010",
+  "backend": "obstacle",
+  "reason": "off line at 3.31 m",
+  "progress_m": 3.277,
+  "progress_pct": 22.09,
+  "lap_sec": null,
+  "sim_sec": 20.88,
+  "wall_sec": 20.975,
+  "lat_p95": 0.0689,
+  "lat_mean": 0.012,
+  "lat_max": 0.1042,
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 1,
+  "slip_events": [
+    {
+      "start_sim_sec": 8.176,
+      "windows": 1,
+      "peak_linear_mps": 0.185,
+      "peak_angular_radps": 0.006,
+      "end_sim_sec": 8.476
+    }
+  ],
+  "odom_windows": 69,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.12,
+  "max_progress_m": 3.313
+}

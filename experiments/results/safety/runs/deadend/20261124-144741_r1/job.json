@@ -1,0 +1,6 @@
+{
+  "scenario": "deadend",
+  "rep": 1,
+  "world": "/ws/experiments/results/safety/maps/deadend.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/deadend.json"
+}

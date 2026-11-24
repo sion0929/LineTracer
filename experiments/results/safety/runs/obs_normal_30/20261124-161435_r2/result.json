@@ -1,0 +1,113 @@
+{
+  "scenario": "obs_normal_30",
+  "item": "6",
+  "doc": "G2 normal_30_obs2: on-line boxes at 10.94/14.98 m",
+  "rep": 2,
+  "domain": 84,
+  "partition": "lf_s_obs_normal_30_d31cea6d",
+  "world": "/ws/experiments/results/safety/maps/g2/normal_30_obs2.sdf",
+  "ok": true,
+  "path_length_m": 15.636,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "finished",
+  "fault": {
+    "kind": null
+  },
+  "first": {
+    "clock_wall": 2.286,
+    "odom_wall": 2.977,
+    "image_wall": 2.999,
+    "image_sim": 0.036,
+    "cmd_wall": 4.097,
+    "nonzero_cmd_wall": 4.097,
+    "nonzero_cmd_sim": 1.136
+  },
+  "finish_T_detected_travel": [
+    14.4
+  ],
+  "reached_finish_travel": [
+    14.92
+  ],
+  "first_motion_sim": 1.396,
+  "first_motion_wall": 4.356,
+  "max_progress_m": 10.788,
+  "sim_observed_s": 66.18,
+  "v_at_t0": 0.044,
+  "w_at_t0": 0.004,
+  "disp_1s": 0.245,
+  "disp_2s": 0.495,
+  "disp_5s": 1.176,
+  "path_after_t0_m": 10.965,
+  "disp_end_m": 2.818,
+  "yaw_turned_after_t0_rad": 11.94,
+  "t_stop_after_t0": 61.81,
+  "v_end": 0.0,
+  "w_end": -0.0,
+  "max_lateral_after_t0_m": 0.034,
+  "progress_at_t0": 0.024,
+  "progress_end": 10.788,
+  "z_min_after_t0": 0.009,
+  "left_mat": false,
+  "moving_time_after_t0_s": 53.98,
+  "observed_after_t0_s": 64.8,
+  "cmd_msgs_after_t0": 3253,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 65.13,
+  "cmd_v_max": 0.632,
+  "cmd_w_absmax": 3.0,
+  "cmd_frac_v_over_hw": 0.151,
+  "cmd_frac_w_over_hw": 0.003,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.096,
+  "gt_v_max": 0.607,
+  "gt_w_absmax": 1.095,
+  "gt_frac_v_over_hw": 0.071,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0,
+  "boxes": [
+    {
+      "name": "obstacle_01",
+      "on_line": true,
+      "s_m": 14.98,
+      "offset_m": 0.0,
+      "size": [
+        0.165,
+        0.168,
+        0.171
+      ],
+      "contact": false,
+      "first_contact_sim": null,
+      "contact_msgs": 0,
+      "closest_center_m": 0.723,
+      "closest_at_sim": 58.15,
+      "reached": false,
+      "passed": false,
+      "max_lateral_last_1m_before": null
+    },
+    {
+      "name": "obstacle_02",
+      "on_line": true,
+      "s_m": 10.94,
+      "offset_m": 0.0,
+      "size": [
+        0.169,
+        0.153,
+        0.171
+      ],
+      "contact": true,
+      "first_contact_sim": 49.96,
+      "contact_msgs": 4191,
+      "closest_center_m": 0.153,
+      "closest_at_sim": 62.58,
+      "reached": true,
+      "passed": false,
+      "max_lateral_last_1m_before": 0.025
+    }
+  ],
+  "collision_count": 1,
+  "passed_without_contact": 0
+}

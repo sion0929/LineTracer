@@ -1,0 +1,14 @@
+{
+  "name": "02_01",
+  "map": "/ws/experiments/results/safety/maps/g2/easy_22_obs3.sdf",
+  "profile": "rule",
+  "args": [],
+  "limit": 300,
+  "stall": 20,
+  "off": 0.08,
+  "startup": 90,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "obstacle",
+  "domain": 71,
+  "partition": "lf_s_g2_98cd94578234_002"
+}

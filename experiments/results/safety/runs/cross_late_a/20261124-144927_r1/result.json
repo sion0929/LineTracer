@@ -1,0 +1,71 @@
+{
+  "scenario": "cross_late_a",
+  "item": "5",
+  "doc": "gen normal_26 --crosses 4: + crossing at 15.13 m of 16.04 m",
+  "rep": 1,
+  "domain": 85,
+  "partition": "lf_s_cross_late_a_ed7b3238",
+  "world": "/ws/experiments/results/safety/maps/normal_26_x4.sdf",
+  "ok": true,
+  "path_length_m": 16.043,
+  "t_start_sim": 0.016,
+  "follower_returncode": null,
+  "end_reason": "finished",
+  "fault": {
+    "kind": null
+  },
+  "first": {
+    "clock_wall": 2.261,
+    "odom_wall": 2.857,
+    "image_wall": 2.88,
+    "image_sim": 0.036,
+    "cmd_wall": 4.057,
+    "nonzero_cmd_wall": 4.057,
+    "nonzero_cmd_sim": 1.216
+  },
+  "finish_T_detected_travel": [
+    19.33
+  ],
+  "reached_finish_travel": [
+    20.07
+  ],
+  "first_motion_sim": 1.436,
+  "first_motion_wall": 4.276,
+  "max_progress_m": 13.777,
+  "sim_observed_s": 97.75,
+  "v_at_t0": 0.039,
+  "w_at_t0": 0.004,
+  "disp_1s": 0.246,
+  "disp_2s": 0.499,
+  "disp_5s": 1.183,
+  "path_after_t0_m": 19.914,
+  "disp_end_m": 1.798,
+  "yaw_turned_after_t0_rad": 24.1,
+  "t_stop_after_t0": 92.49,
+  "v_end": 0.0,
+  "w_end": 0.0,
+  "max_lateral_after_t0_m": 0.165,
+  "progress_at_t0": 0.021,
+  "progress_end": 13.777,
+  "z_min_after_t0": 0.008,
+  "left_mat": false,
+  "moving_time_after_t0_s": 92.19,
+  "observed_after_t0_s": 96.33,
+  "cmd_msgs_after_t0": 4828,
+  "cmd_last": [
+    0.0,
+    0.0
+  ],
+  "cmd_zero_after_t0": true,
+  "cmd_last_wall_after_t0": 96.63,
+  "cmd_v_max": 0.589,
+  "cmd_w_absmax": 1.627,
+  "cmd_frac_v_over_hw": 0.19,
+  "cmd_frac_w_over_hw": 0.0,
+  "cmd_frac_curvature_changed_by_hw_clamp_gt25pct": 0.041,
+  "gt_v_max": 0.567,
+  "gt_w_absmax": 1.354,
+  "gt_frac_v_over_hw": 0.193,
+  "gt_frac_w_over_hw": 0.0,
+  "moved_before_first_image_m": 0.0
+}

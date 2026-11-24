@@ -1,0 +1,6 @@
+{
+  "scenario": "short_t",
+  "rep": 1,
+  "world": "/ws/experiments/results/safety/maps/short_t.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/short_t.json"
+}

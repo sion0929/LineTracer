@@ -1,0 +1,6 @@
+{
+  "scenario": "nobox_normal_28",
+  "rep": 1,
+  "world": "/ws/experiments/results/safety/maps/normal_28_x0.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/normal_28_x0.json"
+}

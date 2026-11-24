@@ -1,0 +1,6 @@
+{
+  "scenario": "blank_start",
+  "rep": 1,
+  "world": "/ws/experiments/results/safety/maps/blank.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/blank.json"
+}

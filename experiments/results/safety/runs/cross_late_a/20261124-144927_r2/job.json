@@ -1,0 +1,6 @@
+{
+  "scenario": "cross_late_a",
+  "rep": 2,
+  "world": "/ws/experiments/results/safety/maps/normal_26_x4.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/normal_26_x4.json"
+}

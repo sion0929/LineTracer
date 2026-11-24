@@ -1,0 +1,6 @@
+{
+  "scenario": "far",
+  "rep": 2,
+  "world": "/ws/experiments/results/safety/maps/far.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/far.json"
+}

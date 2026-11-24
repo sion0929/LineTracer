@@ -1,0 +1,6 @@
+{
+  "scenario": "launch_nodelay",
+  "rep": 1,
+  "world": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "map_json": null
+}

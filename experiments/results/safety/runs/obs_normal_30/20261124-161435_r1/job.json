@@ -1,0 +1,6 @@
+{
+  "scenario": "obs_normal_30",
+  "rep": 1,
+  "world": "/ws/experiments/results/safety/maps/g2/normal_30_obs2.sdf",
+  "map_json": "/ws/experiments/results/safety/maps/g2/normal_30_obs2.json"
+}
