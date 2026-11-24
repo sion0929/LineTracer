@@ -28,10 +28,17 @@ class RulePlanePerception(Perception):
         node.declare_parameter('plane.slope_grid_deg', 0.0)  # >0: also try ground ahead tilted by +-this (hurt offline)
         node.declare_parameter('plane.slope_step_deg', 2.5)
         node.declare_parameter('plane.margin', 0.03)         # keep the default unless clearly better
+        node.declare_parameter('plane.cutoff', True)          # stop trusting rows where width disagrees
+        node.declare_parameter('plane.cutoff_log', 0.30)      # |log(width ratio)| that marks a ground change
+        node.declare_parameter('plane.cutoff_min_x', 0.40)    # never cut nearer than this [m]
         self.steps = int(node.get_parameter('plane.steps').value)
         self.grid = math.radians(node.get_parameter('plane.slope_grid_deg').value)
         self.gstep = math.radians(node.get_parameter('plane.slope_step_deg').value)
         self.margin = node.get_parameter('plane.margin').value
+        self.cutoff = node.get_parameter('plane.cutoff').value
+        self.cut_log = node.get_parameter('plane.cutoff_log').value
+        self.cut_min = node.get_parameter('plane.cutoff_min_x').value
+        self.last_cut = None
         self.f = vision.FX
         self.last_choice = None
 
@@ -89,5 +96,44 @@ class RulePlanePerception(Perception):
                     if base is None or scores[cand] < base - self.margin:
                         best = cand
         self.last_choice = best
+        self.last_cut = None
+        if self.cutoff and len(cands) >= 1:
+            cut = self.ground_change(gray, best, x_max)
+            if cut is not None:
+                self.last_cut = cut
+                x_max = min(x_max, cut)
         line, valid = vision.line_mask(gray, best, x_max)
         return PerceptionOutput(line=line, valid=valid)
+
+    def ground_change(self, gray, theta, x_max):
+        """Nearest distance where measured line widths leave the chosen plane's prediction for
+        two consecutive 5 cm bands (e.g. a ramp rising ahead). None if consistent."""
+        bev, valid = vision.bev_warp(gray, theta, vision.X_FAR)
+        seen = valid > 0
+        if not seen.any():
+            return None
+        img = gray < min(125.0, 0.62 * float(np.median(bev[seen])))
+        bands = {}
+        c, s = math.cos(theta), math.sin(theta)
+        v_near = min(int(round(vision.ground_to_image(vision.X_NEAR, 0.0, theta)[1])), vision.H - 1)
+        v_far = max(int(round(vision.ground_to_image(min(x_max, vision.X_FAR), 0.0, theta)[1])), 0)
+        for v in range(v_near, v_far - 1, -2):
+            dz = -(v - vision.CY) / self.f
+            rz = s + c * dz
+            if rz >= -1e-6:
+                continue
+            t = vision.CAM_H / -rz
+            x = vision.CAM_X + t * (c - s * dz)
+            w_exp = self.f * LINE_W / t
+            row = img[v]
+            idx = np.flatnonzero(np.diff(np.concatenate(([0], row.view(np.uint8), [0]))))
+            for a, b in zip(idx[::2], idx[1::2]):
+                w = int(b - a)
+                if 3 <= w <= 2.6 * w_exp:
+                    bands.setdefault(int(x / 0.05), []).append(math.log(w / w_exp))
+        keys = sorted(k for k, vals in bands.items() if len(vals) >= 3)
+        off = [k for k in keys if abs(float(np.median(bands[k]))) > self.cut_log]
+        for k in off:
+            if k + 1 in off and k * 0.05 >= self.cut_min - 1e-9:
+                return k * 0.05
+        return None
