@@ -1,0 +1,511 @@
+{
+ "frames": 540,
+ "results": {
+  "fixed_gray80": {
+   "ms_mean": 0.14,
+   "ms_p95": 0.16,
+   "easy_301": {
+    "iou": 0.3288,
+    "precision": 0.3405,
+    "recall": 0.9053,
+    "obstacle_as_line": 0.8273
+   },
+   "ALL": {
+    "iou": 0.4125,
+    "precision": 0.4334,
+    "recall": 0.8953,
+    "obstacle_as_line": 0.7041
+   },
+   "flat": {
+    "iou": 0.4059,
+    "precision": 0.4257,
+    "recall": 0.897,
+    "obstacle_as_line": 0.7041
+   },
+   "hill": {
+    "iou": 0.8279,
+    "precision": 0.9741,
+    "recall": 0.8465,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.3099,
+    "precision": 0.3208,
+    "recall": 0.9012,
+    "obstacle_as_line": 0.7378
+   },
+   "normal_302": {
+    "iou": 0.3625,
+    "precision": 0.377,
+    "recall": 0.9038,
+    "obstacle_as_line": 0.5786
+   },
+   "official": {
+    "iou": 0.8745,
+    "precision": 0.9945,
+    "recall": 0.8787,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "user_median0.62": {
+   "ms_mean": 0.46,
+   "ms_p95": 0.6,
+   "easy_301": {
+    "iou": 0.3587,
+    "precision": 0.3647,
+    "recall": 0.956,
+    "obstacle_as_line": 0.6852
+   },
+   "ALL": {
+    "iou": 0.4309,
+    "precision": 0.4408,
+    "recall": 0.9506,
+    "obstacle_as_line": 0.5614
+   },
+   "flat": {
+    "iou": 0.424,
+    "precision": 0.4331,
+    "recall": 0.9523,
+    "obstacle_as_line": 0.5614
+   },
+   "hill": {
+    "iou": 0.8657,
+    "precision": 0.956,
+    "recall": 0.9016,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.3806,
+    "precision": 0.3874,
+    "recall": 0.9556,
+    "obstacle_as_line": 0.4985
+   },
+   "normal_302": {
+    "iou": 0.3504,
+    "precision": 0.3562,
+    "recall": 0.9556,
+    "obstacle_as_line": 0.5464
+   },
+   "official": {
+    "iou": 0.7105,
+    "precision": 0.7443,
+    "recall": 0.94,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "otsu": {
+   "ms_mean": 0.35,
+   "ms_p95": 0.39,
+   "easy_301": {
+    "iou": 0.151,
+    "precision": 0.1526,
+    "recall": 0.9345,
+    "obstacle_as_line": 0.7721
+   },
+   "ALL": {
+    "iou": 0.1918,
+    "precision": 0.1947,
+    "recall": 0.9267,
+    "obstacle_as_line": 0.6509
+   },
+   "flat": {
+    "iou": 0.1956,
+    "precision": 0.1986,
+    "recall": 0.9284,
+    "obstacle_as_line": 0.6509
+   },
+   "hill": {
+    "iou": 0.1194,
+    "precision": 0.1215,
+    "recall": 0.876,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.2175,
+    "precision": 0.2204,
+    "recall": 0.9433,
+    "obstacle_as_line": 0.5596
+   },
+   "normal_302": {
+    "iou": 0.2009,
+    "precision": 0.204,
+    "recall": 0.9298,
+    "obstacle_as_line": 0.6705
+   },
+   "official": {
+    "iou": 0.1989,
+    "precision": 0.203,
+    "recall": 0.9064,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "adaptive_gauss": {
+   "ms_mean": 2.29,
+   "ms_p95": 2.42,
+   "easy_301": {
+    "iou": 0.3715,
+    "precision": 0.4062,
+    "recall": 0.8132,
+    "obstacle_as_line": 0.1526
+   },
+   "ALL": {
+    "iou": 0.4076,
+    "precision": 0.4478,
+    "recall": 0.8194,
+    "obstacle_as_line": 0.1209
+   },
+   "flat": {
+    "iou": 0.4062,
+    "precision": 0.4459,
+    "recall": 0.8202,
+    "obstacle_as_line": 0.1209
+   },
+   "hill": {
+    "iou": 0.4555,
+    "precision": 0.5157,
+    "recall": 0.796,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.4165,
+    "precision": 0.4571,
+    "recall": 0.8242,
+    "obstacle_as_line": 0.1096
+   },
+   "normal_302": {
+    "iou": 0.3939,
+    "precision": 0.4313,
+    "recall": 0.8197,
+    "obstacle_as_line": 0.1115
+   },
+   "official": {
+    "iou": 0.4358,
+    "precision": 0.4823,
+    "recall": 0.8189,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "robotis_hsv_adapt": {
+   "ms_mean": 2.26,
+   "ms_p95": 10.16,
+   "easy_301": {
+    "iou": 0.4705,
+    "precision": 0.4931,
+    "recall": 0.9113,
+    "obstacle_as_line": 0.1999
+   },
+   "ALL": {
+    "iou": 0.5549,
+    "precision": 0.5902,
+    "recall": 0.9026,
+    "obstacle_as_line": 0.1263
+   },
+   "flat": {
+    "iou": 0.5527,
+    "precision": 0.5871,
+    "recall": 0.9041,
+    "obstacle_as_line": 0.1263
+   },
+   "hill": {
+    "iou": 0.6318,
+    "precision": 0.7051,
+    "recall": 0.8587,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.58,
+    "precision": 0.6181,
+    "recall": 0.9038,
+    "obstacle_as_line": 0.0988
+   },
+   "normal_302": {
+    "iou": 0.5536,
+    "precision": 0.585,
+    "recall": 0.9117,
+    "obstacle_as_line": 0.1062
+   },
+   "official": {
+    "iou": 0.6008,
+    "precision": 0.649,
+    "recall": 0.8899,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "line_seg@1t": {
+   "ms_mean": 9.42,
+   "ms_p95": 9.94,
+   "easy_301": {
+    "iou": 0.8591,
+    "precision": 0.8972,
+    "recall": 0.9528,
+    "obstacle_as_line": 0.0005
+   },
+   "ALL": {
+    "iou": 0.8464,
+    "precision": 0.8881,
+    "recall": 0.9474,
+    "obstacle_as_line": 0.0003
+   },
+   "flat": {
+    "iou": 0.8488,
+    "precision": 0.89,
+    "recall": 0.9483,
+    "obstacle_as_line": 0.0003
+   },
+   "hill": {
+    "iou": 0.78,
+    "precision": 0.8359,
+    "recall": 0.9211,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.8561,
+    "precision": 0.8978,
+    "recall": 0.9485,
+    "obstacle_as_line": 0.0003
+   },
+   "normal_302": {
+    "iou": 0.8571,
+    "precision": 0.8956,
+    "recall": 0.9522,
+    "obstacle_as_line": 0.0002
+   },
+   "official": {
+    "iou": 0.8242,
+    "precision": 0.8701,
+    "recall": 0.9398,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "line_seg@4t": {
+   "ms_mean": 4.11,
+   "ms_p95": 4.94,
+   "easy_301": {
+    "iou": 0.8591,
+    "precision": 0.8972,
+    "recall": 0.9528,
+    "obstacle_as_line": 0.0005
+   },
+   "ALL": {
+    "iou": 0.8464,
+    "precision": 0.8881,
+    "recall": 0.9474,
+    "obstacle_as_line": 0.0003
+   },
+   "flat": {
+    "iou": 0.8488,
+    "precision": 0.89,
+    "recall": 0.9483,
+    "obstacle_as_line": 0.0003
+   },
+   "hill": {
+    "iou": 0.78,
+    "precision": 0.8359,
+    "recall": 0.9211,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.8561,
+    "precision": 0.8978,
+    "recall": 0.9485,
+    "obstacle_as_line": 0.0003
+   },
+   "normal_302": {
+    "iou": 0.8571,
+    "precision": 0.8956,
+    "recall": 0.9522,
+    "obstacle_as_line": 0.0002
+   },
+   "official": {
+    "iou": 0.8242,
+    "precision": 0.8701,
+    "recall": 0.9398,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "line_seg_v2@1t": {
+   "ms_mean": 42.43,
+   "ms_p95": 43.84,
+   "easy_301": {
+    "iou": 0.9578,
+    "precision": 0.9706,
+    "recall": 0.9864,
+    "obstacle_as_line": 0.0001
+   },
+   "ALL": {
+    "iou": 0.9545,
+    "precision": 0.9687,
+    "recall": 0.9848,
+    "obstacle_as_line": 0.0001
+   },
+   "flat": {
+    "iou": 0.958,
+    "precision": 0.9709,
+    "recall": 0.9863,
+    "obstacle_as_line": 0.0001
+   },
+   "hill": {
+    "iou": 0.8602,
+    "precision": 0.9079,
+    "recall": 0.9424,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.961,
+    "precision": 0.9729,
+    "recall": 0.9874,
+    "obstacle_as_line": 0.0001
+   },
+   "normal_302": {
+    "iou": 0.962,
+    "precision": 0.9733,
+    "recall": 0.988,
+    "obstacle_as_line": 0.0001
+   },
+   "official": {
+    "iou": 0.9423,
+    "precision": 0.9611,
+    "recall": 0.9797,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "line_seg_v2@4t": {
+   "ms_mean": 17.94,
+   "ms_p95": 20.37,
+   "easy_301": {
+    "iou": 0.9578,
+    "precision": 0.9706,
+    "recall": 0.9864,
+    "obstacle_as_line": 0.0001
+   },
+   "ALL": {
+    "iou": 0.9545,
+    "precision": 0.9687,
+    "recall": 0.9848,
+    "obstacle_as_line": 0.0001
+   },
+   "flat": {
+    "iou": 0.958,
+    "precision": 0.9709,
+    "recall": 0.9863,
+    "obstacle_as_line": 0.0001
+   },
+   "hill": {
+    "iou": 0.8602,
+    "precision": 0.9079,
+    "recall": 0.9424,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.961,
+    "precision": 0.9729,
+    "recall": 0.9874,
+    "obstacle_as_line": 0.0001
+   },
+   "normal_302": {
+    "iou": 0.962,
+    "precision": 0.9733,
+    "recall": 0.988,
+    "obstacle_as_line": 0.0001
+   },
+   "official": {
+    "iou": 0.9423,
+    "precision": 0.9611,
+    "recall": 0.9797,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "line_seg_v3@1t": {
+   "ms_mean": 43.27,
+   "ms_p95": 47.4,
+   "easy_301": {
+    "iou": 0.9655,
+    "precision": 0.9785,
+    "recall": 0.9864,
+    "obstacle_as_line": 0.0002
+   },
+   "ALL": {
+    "iou": 0.963,
+    "precision": 0.9768,
+    "recall": 0.9855,
+    "obstacle_as_line": 0.0002
+   },
+   "flat": {
+    "iou": 0.9665,
+    "precision": 0.9788,
+    "recall": 0.9871,
+    "obstacle_as_line": 0.0002
+   },
+   "hill": {
+    "iou": 0.8669,
+    "precision": 0.9186,
+    "recall": 0.939,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.97,
+    "precision": 0.9814,
+    "recall": 0.9882,
+    "obstacle_as_line": 0.0001
+   },
+   "normal_302": {
+    "iou": 0.9703,
+    "precision": 0.9812,
+    "recall": 0.9887,
+    "obstacle_as_line": 0.0002
+   },
+   "official": {
+    "iou": 0.9509,
+    "precision": 0.9691,
+    "recall": 0.9806,
+    "obstacle_as_line": 0.0
+   }
+  },
+  "line_seg_v3@4t": {
+   "ms_mean": 17.94,
+   "ms_p95": 20.88,
+   "easy_301": {
+    "iou": 0.9655,
+    "precision": 0.9785,
+    "recall": 0.9864,
+    "obstacle_as_line": 0.0002
+   },
+   "ALL": {
+    "iou": 0.963,
+    "precision": 0.9768,
+    "recall": 0.9855,
+    "obstacle_as_line": 0.0002
+   },
+   "flat": {
+    "iou": 0.9665,
+    "precision": 0.9788,
+    "recall": 0.9871,
+    "obstacle_as_line": 0.0002
+   },
+   "hill": {
+    "iou": 0.8669,
+    "precision": 0.9186,
+    "recall": 0.939,
+    "obstacle_as_line": 0.0
+   },
+   "hard_303": {
+    "iou": 0.97,
+    "precision": 0.9814,
+    "recall": 0.9882,
+    "obstacle_as_line": 0.0001
+   },
+   "normal_302": {
+    "iou": 0.9703,
+    "precision": 0.9812,
+    "recall": 0.9887,
+    "obstacle_as_line": 0.0002
+   },
+   "official": {
+    "iou": 0.9509,
+    "precision": 0.9691,
+    "recall": 0.9806,
+    "obstacle_as_line": 0.0
+   }
+  }
+ }
+}
