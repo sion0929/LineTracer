@@ -493,11 +493,13 @@ def job_contexts(count):
     base = int(os.environ.get("BENCH_DOMAIN_BASE") or LAB_DOMAIN_BASE.get(lab, BENCH_DOMAINS.start))
     stop = min(base + 20, BENCH_DOMAINS.stop) if not os.environ.get("BENCH_DOMAIN_BASE") or lab else BENCH_DOMAINS.stop
     domains = [domain for domain in range(base, stop) if domain != coordinator]
-    if not 1 <= count <= len(domains):
-        raise ValueError(f"matrix must have 1–{len(domains)} runs for distinct ROS domains")
+    if count < 1 or not domains:
+        raise ValueError("matrix needs at least one run and one free ROS domain")
     batch = uuid4().hex[:12]
-    return [(domain, f"{prefix}_{batch}_{index:03d}")
-            for index, domain in enumerate(domains[:count], 1)]
+    # Domains are reused round-robin; run_job holds an exclusive lock per domain, so two
+    # concurrent runs never share one (jobs must not exceed the block size of 20).
+    return [(domains[(index - 1) % len(domains)], f"{prefix}_{batch}_{index:03d}")
+            for index in range(1, count + 1)]
 
 
 def run_matrix(maps, profiles, output, jobs=1, limit=300, stall=20, off=0.08,
