@@ -18,6 +18,8 @@ from geometry_msgs.msg import Twist
 
 from . import vision
 from .line_map import LineMap, RES, C0
+from .perception import make_perception
+from .control import make_controller
 
 
 REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
@@ -55,6 +57,9 @@ class FollowerNode(Node):
         self.declare_parameter('speed_profile', [0.0], ParameterDescriptor(
             description='flat list of (s_from, s_to, v) triples, s = distance driven [m]'))
         self.declare_parameter('debug_image', False)
+        # plugins: who sees the line, who drives (see TEAM_GUIDE.md)
+        self.declare_parameter('perception', 'rule')    # rule | dl
+        self.declare_parameter('controller', 'rule')    # rule | learned
 
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.dbg_pub = self.create_publisher(Image, '/line_follower/debug', 1)
@@ -80,8 +85,13 @@ class FollowerNode(Node):
         self.w_cmd = 0.0
         self.blind = 0.0            # distance driven without any path
         self.last_t = None
+        self.last_obstacle = None   # latest BEV obstacle mask from the perception plugin (or None)
+        self.perception = make_perception(self.get_parameter('perception').value, self)
+        self.controller = make_controller(self.get_parameter('controller').value, self)
         self.create_timer(0.02, self.control)
-        self.get_logger().info('line follower started')
+        self.get_logger().info(
+            f"line follower started (perception={self.get_parameter('perception').value}, "
+            f"controller={self.get_parameter('controller').value})")
 
     # ---- frames --------------------------------------------------------
     def to_odom(self, x, y, pose=None):
@@ -170,18 +180,22 @@ class FollowerNode(Node):
             return
         if msg.encoding in ('rgb8', 'bgr8'):
             img = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width, 3)
-            gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY if msg.encoding == 'rgb8' else cv2.COLOR_BGR2GRAY)
+            bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) if msg.encoding == 'rgb8' else img
+            gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
         elif msg.encoding == 'mono8':
             gray = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width)
+            bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
         else:
             return
         if gray.shape != (vision.H, vision.W):
             gray = cv2.resize(gray, (vision.W, vision.H))
+            bgr = cv2.resize(bgr, (vision.W, vision.H))
         ts = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
         # while the body rocks or the robot is on the hill, only trust the near ground
         steady = self.rock < 0.08 and abs(self.pitch_f) < math.radians(3.0)
-        mask, valid = vision.line_mask(gray, self.pitch_at(ts), vision.X_FAR if steady else 0.50)
-        self.map.update(mask, valid, self.pose_at(ts))
+        out = self.perception.process(bgr, gray, self.pitch_at(ts), vision.X_FAR if steady else 0.50)
+        self.last_obstacle = out.obstacle
+        self.map.update(out.line, out.valid, self.pose_at(ts))
         self.replan()
         if self.get_parameter('debug_image').value:
             self.publish_debug()
@@ -278,10 +292,7 @@ class FollowerNode(Node):
         dt = 0.02 if self.last_t is None else min(0.05, max(0.0, now - self.last_t))
         self.last_t = now
 
-        gp = self.get_parameter
-        v_max, v_min = gp('v_max').value, gp('v_min').value
-        a_lat, a_dec, a_acc = gp('a_lat').value, gp('a_dec').value, gp('a_acc').value
-        w_max = gp('omega_max').value
+        v_min = self.get_parameter('v_min').value
 
         if self.t_point is not None:
             tx, ty = self.to_robot(*self.t_point)
@@ -305,59 +316,8 @@ class FollowerNode(Node):
             return
         self.blind = 0.0
 
-        # top speed here: v_max, or the track-specific plan [s_from, s_to, v, ...]
-        # (s = distance driven), braking early for slower windows ahead
-        v_top, v_brake = v_max, 1e9
-        prof = list(gp('speed_profile').value)
-        for k in range(0, len(prof) - 2, 3):
-            s0, s1, vw = prof[k], prof[k + 1], prof[k + 2]
-            if s0 <= self.travel < s1:
-                v_top = vw
-            elif s0 > self.travel:
-                v_brake = min(v_brake, math.sqrt(vw * vw + 2.0 * a_dec * (s0 - self.travel)))
-        v_max = min(v_top, v_brake) if v_top > v_brake else v_top
-        v_max = max(v_max, v_min)
-
-        # speed limit from the curvature of the path ahead, with braking distance
-        v_lim = v_max
-        s, a, prev_h = math.hypot(*rp[0]), rp[0], None
-        for b in rp[1:]:
-            seg = math.hypot(b[0] - a[0], b[1] - a[1])
-            if seg < 0.05:
-                continue
-            h = math.atan2(b[1] - a[1], b[0] - a[0])
-            if prev_h is not None:
-                kappa = abs(wrap(h - prev_h)) / seg
-                v_c = max(v_min, min(v_max, math.sqrt(a_lat / max(kappa, 1e-3))))
-                v_lim = min(v_lim, math.sqrt(v_c * v_c + 2.0 * a_dec * max(0.0, s - 0.10)))
-            prev_h, a = h, b
-            s += seg
-        if abs(self.pitch_f) > math.radians(3.0):
-            v_lim = min(v_lim, gp('v_hill').value)
-        # do not outrun what has been seen (unless the path ends at the finish T)
-        if self.t_point is not None:
-            d = math.hypot(*self.to_robot(*self.t_point))
-            v_lim = min(v_lim, math.sqrt(2.0 * a_dec * max(0.0, d - 0.01)) + 0.04)
-        elif self.path_end == 'open':
-            v_lim = min(v_lim, math.sqrt(v_min * v_min + 2.0 * a_dec * max(0.0, s - 0.10)))
-        v = max(min(v_min, v_lim), min(v_lim, self.v_cmd + a_acc * dt))
-        v = max(v, self.v_cmd - 1.0 * dt)
-
-        # pure pursuit
-        ld = gp('lookahead_min').value + gp('lookahead_gain').value * v
-        tgt = rp[-1]
-        for p in rp:
-            if math.hypot(p[0], p[1]) >= ld:
-                tgt = p
-                break
-        d2 = max(1e-4, tgt[0] ** 2 + tgt[1] ** 2)
-        alpha = math.atan2(tgt[1], tgt[0])
-        if abs(alpha) > math.radians(60):
-            v = min(v, v_min)               # sharp corner: turn almost on the spot
-            w = 2.5 * alpha
-        else:
-            w = 2.0 * v * tgt[1] / d2
-        w = max(-w_max, min(w_max, w))
+        # drive: the controller plugin turns the path ahead into (v, w)
+        v, w = self.controller.compute(rp, dt)
         self.v_cmd, self.w_cmd = v, w
         cmd.linear.x, cmd.angular.z = v, w
         self.cmd_pub.publish(cmd)

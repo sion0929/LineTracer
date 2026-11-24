@@ -21,7 +21,10 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('gui', default_value='true'),
         DeclareLaunchArgument('start_delay', default_value='20.0'),
-        DeclareLaunchArgument('params', default_value=os.path.join(pkg, 'config', 'follower.yaml')),
+        # mode:=rule (default) or mode:=dl picks config/<mode>.yaml; params:=<file> overrides it
+        DeclareLaunchArgument('mode', default_value='rule'),
+        DeclareLaunchArgument('params', default_value=PythonExpression(
+            ["'", os.path.join(pkg, 'config'), "/' + '", LaunchConfiguration('mode'), "' + '.yaml'"])),
         AppendEnvironmentVariable('GZ_SIM_RESOURCE_PATH', os.path.join(pkg, 'models')),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(ros_gz_sim, 'launch', 'gz_sim.launch.py')),

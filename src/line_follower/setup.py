@@ -1,6 +1,6 @@
 import os
 from glob import glob
-from setuptools import setup
+from setuptools import find_packages, setup
 
 pkg = 'line_follower'
 
@@ -18,7 +18,7 @@ def tree(src, dst):
 setup(
     name=pkg,
     version='0.1.0',
-    packages=[pkg],
+    packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + pkg]),
         ('share/' + pkg, ['package.xml']),

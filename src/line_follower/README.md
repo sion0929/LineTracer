@@ -49,3 +49,12 @@ docker run --rm --device /dev/dri -e DISPLAY=$DISPLAY -e XAUTHORITY=/tmp/.Xautho
 ```
 
 베이스 이미지는 수업 실습 이미지 `rp/ros2:jazzy-lab`.
+
+## 모드 (팀 분업 틀)
+
+인식(`perception/`)과 제어(`control/`)를 플러그인으로 나눴다. `mode:=rule`(기본)은 위의 원본 알고리즘을 그대로 쓰고, `mode:=dl`은 딥러닝 인식을 쓴다(모델 경로 설정 필요). 담당과 실행·채점 방법은 저장소 루트의 `TEAM_GUIDE.md`를 본다.
+
+```bash
+ros2 launch line_follower line_follower.launch.py mode:=rule
+ros2 launch line_follower line_follower.launch.py mode:=dl
+```
