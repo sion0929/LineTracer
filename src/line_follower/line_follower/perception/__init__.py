@@ -5,6 +5,7 @@ distance X_FAR..X_NEAR, cols = left..right, RES metres per cell), so the shared
 line map (`line_map.py`) can use any of them unchanged.
 
     rule  - OpenCV dark-pixel threshold (owner: rule-based teammate)
+    rule_hill - rule + hill correction from the 2 cm line width (lead experiment)
     dl    - learned segmentation (owner: deep-learning teammate)
 """
 from .base import Perception, PerceptionOutput
@@ -14,6 +15,9 @@ def make_perception(name, node):
     if name == 'rule':
         from .rule import RulePerception
         return RulePerception(node)
+    if name == 'rule_hill':
+        from .rule_hill import RuleHillPerception
+        return RuleHillPerception(node)
     if name == 'dl':
         from .dl import DlPerception
         return DlPerception(node)
