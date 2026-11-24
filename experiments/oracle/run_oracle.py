@@ -104,7 +104,22 @@ class OracleNode(Base):
             self.t_point = odom[-1]
 
 
+def exit_with_parent():
+    """A follower outliving its bench keeps publishing /cmd_vel on that ROS domain and drives
+    the robot of the NEXT run there. Exit as soon as the parent (bench) is gone."""
+    import threading
+    import time
+    parent = os.getppid()
+
+    def watch():
+        while os.getppid() == parent:
+            time.sleep(0.5)
+        os._exit(0)
+    threading.Thread(target=watch, daemon=True).start()
+
+
 def main(node_class=OracleNode):
+    exit_with_parent()
     sys.argv = [sys.argv[0], "--ros-args", "--params-file",
                 os.environ.get("LF_PARAMS", str(PKG / "config" / "follower.yaml")),
                 "-p", "use_sim_time:=true", *sys.argv[1:]]
