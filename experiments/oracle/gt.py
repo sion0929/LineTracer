@@ -47,8 +47,11 @@ def _truth_proc(model, shared):
             if p.name == model:
                 q = p.orientation
                 yaw = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
+                pitch = math.asin(max(-1.0, min(1.0, 2.0 * (q.w * q.y - q.z * q.x))))
+                stamp = msg.header.stamp.sec + msg.header.stamp.nsec * 1e-9
                 with shared.get_lock():
                     shared[0], shared[1], shared[2], shared[3] = p.position.x, p.position.y, yaw, 1.0
+                    shared[4], shared[5], shared[6] = pitch, p.position.z, stamp
                 return
 
     node = Node()
@@ -62,14 +65,20 @@ class Truth:
     def __init__(self, model="turtlebot3_waffle_pi"):
         import multiprocessing as mp
         ctx = mp.get_context("spawn")
-        self.shared = ctx.Array("d", 4)
+        self.shared = ctx.Array("d", 7)
         self.proc = ctx.Process(target=_truth_proc, args=(model, self.shared), daemon=True)
         self.proc.start()
 
     def get(self):
         with self.shared.get_lock():
-            x, y, yaw, ok = self.shared[:]
+            x, y, yaw, ok = self.shared[:4]
         return (x, y, yaw) if ok else None
+
+    def get_full(self):
+        """(x, y, yaw, pitch, z, sim stamp) or None."""
+        with self.shared.get_lock():
+            v = self.shared[:]
+        return (v[0], v[1], v[2], v[4], v[5], v[6]) if v[3] else None
 
 
 class Progress:

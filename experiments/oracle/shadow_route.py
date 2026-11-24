@@ -131,6 +131,44 @@ class ShadowNode(Base):
                             valid=np.asarray(obs.valid) if obs is not None else np.zeros(1),
                             route=self.route[:, :2], t=t, plen=plen, robot_off=robot_off)
 
+    def on_image(self, msg):
+        super().on_image(msg)
+        # SHADOW_RAW=1: keep every Nth raw frame with the IMU history and the true pose
+        # (incl. pitch) for offline projection studies (experiments/eval/pitch_offline.py)
+        if os.environ.get("SHADOW_RAW") != "1" or self.pose is None:
+            return
+        self.n_img = getattr(self, "n_img", 0) + 1
+        if self.n_img % int(os.environ.get("SHADOW_RAW_EVERY", "2")) or len(getattr(self, "raw", [])) >= 900:
+            return
+        full = self.truth.get_full()
+        if full is None or msg.encoding not in ("rgb8", "bgr8", "mono8"):
+            return
+        ch = 1 if msg.encoding == "mono8" else 3
+        img = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width, ch)
+        gray = img[..., 0] if ch == 1 else (0.299 * img[..., 0] + 0.587 * img[..., 1] + 0.114 * img[..., 2]).astype(np.uint8)
+        if msg.encoding == "bgr8":
+            gray = (0.114 * img[..., 0] + 0.587 * img[..., 1] + 0.299 * img[..., 2]).astype(np.uint8)
+        ts = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        self.raw = getattr(self, "raw", [])
+        self.raw.append((gray, ts, np.array(self.imu[-120:], float), np.array(full), float(self.rock),
+                         float(self.pitch_f), np.array(self.pose)))
+        if len(self.raw) % 100 == 0:
+            self.save_raw()
+
+    def save_raw(self):
+        raw = getattr(self, "raw", [])
+        if not raw:
+            return
+        imu = np.full((len(raw), 120, 2), np.nan)
+        for i, r in enumerate(raw):
+            imu[i, :len(r[2])] = r[2]
+        tmp = gt.job_dir() / "raw.tmp.npz"
+        np.savez_compressed(tmp, gray=np.stack([r[0] for r in raw]), ts=np.array([r[1] for r in raw]), imu=imu,
+                            truth=np.stack([r[3] for r in raw]), rock=np.array([r[4] for r in raw]),
+                            pitch_f=np.array([r[5] for r in raw]), pose=np.stack([r[6] for r in raw]),
+                            route=self.route)
+        os.replace(tmp, gt.job_dir() / "raw.npz")
+
     def save(self):
         if not self.rows:
             return
@@ -143,6 +181,7 @@ class ShadowNode(Base):
     def destroy_node(self):
         try:
             self.save()
+            self.save_raw()
         finally:
             return super().destroy_node()
 
