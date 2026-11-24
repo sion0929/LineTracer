@@ -27,6 +27,7 @@ setup(
         ('share/' + pkg + '/worlds', glob('worlds/*.sdf')),
     ] + tree('models', 'models'),
     install_requires=['setuptools'],
+    tests_require=['pytest'],
     zip_safe=True,
     entry_points={'console_scripts': ['follower_node = line_follower.follower_node:main']},
 )
