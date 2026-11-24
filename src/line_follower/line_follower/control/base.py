@@ -19,3 +19,12 @@ class Controller:
 
     def compute(self, rp, dt):
         raise NotImplementedError
+
+    def confirm_finish(self, path, observation):
+        """Optional finish judge, called when the traced path ends in a T bar.
+
+        path: the new path (odom frame) whose last point is the candidate finish.
+        observation: latest PerceptionOutput (line / valid BEV masks, .pitch) or None.
+        Return True (accept), False (reject) or None (use the node's legacy rule:
+        driven distance > finish_min_dist)."""
+        return None

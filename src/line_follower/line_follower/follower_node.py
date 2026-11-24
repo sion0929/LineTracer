@@ -9,6 +9,7 @@ import math
 import numpy as np
 import cv2
 import rclpy
+import rclpy.executors
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.msg import ParameterDescriptor, FloatingPointRange
@@ -86,6 +87,7 @@ class FollowerNode(Node):
         self.blind = 0.0            # distance driven without any path
         self.last_t = None
         self.last_obstacle = None   # latest BEV obstacle mask from the perception plugin (or None)
+        self.last_observation = None  # latest PerceptionOutput (line, valid, obstacle) + .pitch
         self.perception = make_perception(self.get_parameter('perception').value, self)
         self.controller = make_controller(self.get_parameter('controller').value, self)
         self.create_timer(0.02, self.control)
@@ -195,6 +197,8 @@ class FollowerNode(Node):
         steady = self.rock < 0.08 and abs(self.pitch_f) < math.radians(3.0)
         out = self.perception.process(bgr, gray, self.pitch_at(ts), vision.X_FAR if steady else 0.50)
         self.last_obstacle = out.obstacle
+        out.pitch = self.pitch_at(ts)
+        self.last_observation = out
         self.map.update(out.line, out.valid, self.pose_at(ts))
         self.replan()
         if self.get_parameter('debug_image').value:
@@ -272,10 +276,15 @@ class FollowerNode(Node):
                     new, pts, end = link + pts2, pts2, end2
         self.path = new
         self.path_end = end
-        if end == 't' and self.travel > self.get_parameter('finish_min_dist').value:
-            # finish T seen: from now on drive this path to the T and stop there
-            self.get_logger().info(f'finish T detected (driven {self.travel:.2f} m)')
-            self.t_point = pts[-1]
+        if end == 't':
+            # the controller plugin may judge the finish itself (None = use the legacy rule)
+            verdict = self.controller.confirm_finish(new, self.last_observation)
+            if verdict is None:
+                verdict = self.travel > self.get_parameter('finish_min_dist').value
+            if verdict:
+                # finish T seen: from now on drive this path to the T and stop there
+                self.get_logger().info(f'finish T detected (driven {self.travel:.2f} m)')
+                self.t_point = pts[-1]
 
     # ---- control --------------------------------------------------------
     def stop(self):
@@ -359,8 +368,21 @@ class FollowerNode(Node):
 def main():
     rclpy.init()
     node = FollowerNode()
+    # rclpy occasionally fails to deserialise one incoming message under heavy load
+    # ("Unable to convert call argument '0' to Python object"). Losing that single message
+    # is harmless; letting it kill the node ends the run. Drop it and keep spinning.
+    executor = rclpy.executors.SingleThreadedExecutor()
+    executor.add_node(node)
+    dropped = 0
     try:
-        rclpy.spin(node)
+        while rclpy.ok():
+            try:
+                executor.spin_once(timeout_sec=0.1)
+            except RuntimeError as error:
+                if 'Unable to convert' not in str(error) or dropped > 1000:
+                    raise
+                dropped += 1
+                node.get_logger().warning(f'dropped one undecodable message ({dropped})')
     except KeyboardInterrupt:
         pass
     finally:
