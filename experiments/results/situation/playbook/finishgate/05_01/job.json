@@ -1,0 +1,14 @@
+{
+  "name": "05_01",
+  "map": "/ws/experiments/results/safety/maps/normal_13_x4.sdf",
+  "profile": "default",
+  "args": [],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 54,
+  "partition": "lf_l_playbook_c6a2a8d8a22a_005"
+}

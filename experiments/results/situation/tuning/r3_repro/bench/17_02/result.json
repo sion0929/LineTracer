@@ -1,0 +1,40 @@
+{
+  "name": "17_02",
+  "map": "/ws/experiments/worlds/suites/general200/maps/normal_1016_m.sdf",
+  "profile": "c01",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r3_repro/configs/c01.yaml"
+  ],
+  "complete": true,
+  "domain": 63,
+  "partition": "lf_l_tune_r3_repro_324d64122723_034",
+  "backend": "run_eval",
+  "progress_m": 16.924,
+  "progress_pct": 99.3,
+  "lap_sec": 81.06,
+  "wall_sec": 84.3,
+  "lat_mean": 0.0094,
+  "lat_p95": 0.0325,
+  "lat_max": 0.0591,
+  "reason": "finished",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 1,
+  "slip_events": [
+    {
+      "start_sim_sec": 46.88,
+      "windows": 1,
+      "peak_linear_mps": 0.029,
+      "peak_angular_radps": 0.691,
+      "end_sim_sec": 47.18
+    }
+  ],
+  "odom_windows": 280,
+  "sim_sec": 84.192,
+  "wheel_line_events": 4,
+  "wheel_line_sec": 2.7,
+  "max_progress_m": 16.911
+}

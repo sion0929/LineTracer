@@ -1,0 +1,14 @@
+{
+  "name": "09_01",
+  "map": "/ws/experiments/situation/data/maps/eval/normal_8.sdf",
+  "profile": "default",
+  "args": [],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 58,
+  "partition": "lf_l_rule_1bb51f6ee3a0_009"
+}

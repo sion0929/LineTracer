@@ -1,0 +1,54 @@
+{
+  "name": "12_02",
+  "map": "/ws/experiments/worlds/suites/official_like50/maps/normal_5011.sdf",
+  "profile": "c01",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r2_arc/configs/c01.yaml"
+  ],
+  "complete": false,
+  "domain": 64,
+  "partition": "lf_l_tune_r2_arc_6440665ed5ef_035",
+  "backend": "run_eval",
+  "progress_m": 6.768,
+  "progress_pct": 38.2,
+  "lap_sec": null,
+  "wall_sec": 43.5,
+  "lat_mean": 0.0166,
+  "lat_p95": 0.0613,
+  "lat_max": 0.2353,
+  "reason": "off line >0.12m at 6.43m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 3,
+  "slip_events": [
+    {
+      "start_sim_sec": 40.864,
+      "windows": 4,
+      "peak_linear_mps": 0.166,
+      "peak_angular_radps": 2.933,
+      "end_sim_sec": 42.064
+    },
+    {
+      "start_sim_sec": 42.364,
+      "windows": 1,
+      "peak_linear_mps": 0.165,
+      "peak_angular_radps": 0.508,
+      "end_sim_sec": 42.664
+    },
+    {
+      "start_sim_sec": 43.264,
+      "windows": 2,
+      "peak_linear_mps": 0.073,
+      "peak_angular_radps": 2.615,
+      "end_sim_sec": 43.864
+    }
+  ],
+  "odom_windows": 142,
+  "sim_sec": 43.476,
+  "wheel_line_events": 7,
+  "wheel_line_sec": 1.68,
+  "max_progress_m": 6.769
+}

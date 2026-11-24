@@ -1,0 +1,92 @@
+{
+ "created": "2026-11-24 22:21:44",
+ "wall_min": 1.9693333546320597,
+ "seed": 1457145442,
+ "suites": [
+  "general200",
+  "official_like50",
+  "hills60",
+  "stress50"
+ ],
+ "mode": "balanced",
+ "follower": "experiments/user_base/run_user.py",
+ "params": "/ws/src/line_follower/config/playbook_rule.yaml",
+ "backend": "run_eval",
+ "off": 0.12,
+ "limit": 300,
+ "stall": 20,
+ "jobs": 3,
+ "domain_base": 50,
+ "partition": "lf_l_rand_playbook_v0_r2",
+ "bench_exit": 0,
+ "completed": 1,
+ "runs": 6,
+ "infra_errors": 0,
+ "mean_progress_pct": 41.57,
+ "mean_lap_sec": 72.39,
+ "failures": {
+  "선 이탈": [
+   "normal_1055",
+   "hard_5036_m",
+   "hard_7018",
+   "hard_7037_m",
+   "easy_9024_m"
+  ]
+ },
+ "maps": [
+  {
+   "order": 1,
+   "suite": "general200",
+   "map": "experiments/worlds/suites/general200/maps/normal_1055.sdf",
+   "complete": false,
+   "progress_pct": 57.5,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 10.23m"
+  },
+  {
+   "order": 2,
+   "suite": "official_like50",
+   "map": "experiments/worlds/suites/official_like50/maps/hard_5036_m.sdf",
+   "complete": false,
+   "progress_pct": 13.3,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 2.06m"
+  },
+  {
+   "order": 3,
+   "suite": "stress50",
+   "map": "experiments/worlds/suites/stress50/maps/hard_7018.sdf",
+   "complete": false,
+   "progress_pct": 18.5,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 3.45m"
+  },
+  {
+   "order": 4,
+   "suite": "stress50",
+   "map": "experiments/worlds/suites/stress50/maps/hard_7037_m.sdf",
+   "complete": false,
+   "progress_pct": 14.4,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 2.81m"
+  },
+  {
+   "order": 5,
+   "suite": "general200",
+   "map": "experiments/worlds/suites/general200/maps/hard_1059.sdf",
+   "complete": true,
+   "progress_pct": 99.3,
+   "lap_sec": 72.39,
+   "reason": "finished"
+  },
+  {
+   "order": 6,
+   "suite": "hills60",
+   "map": "experiments/worlds/suites/hills60/maps/easy_9024_m.sdf",
+   "complete": false,
+   "progress_pct": 46.4,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 7.30m"
+  }
+ ]
+}

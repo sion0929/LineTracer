@@ -1,0 +1,16 @@
+{
+ "name": "legacy",
+ "args": [
+  "-p",
+  "playbook.config:=/ws/experiments/results/situation/tuning/r3_repro/configs/c01.yaml"
+ ],
+ "complete": false,
+ "progress_m": 2.948,
+ "progress_pct": 18.9,
+ "lap_sec": null,
+ "wall_sec": 20.8,
+ "lat_mean": 0.0181,
+ "lat_p95": 0.1069,
+ "lat_max": 0.1405,
+ "reason": "off line >0.12m at 2.98m"
+}

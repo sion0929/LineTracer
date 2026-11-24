@@ -1,0 +1,44 @@
+{
+  "name": "02_01",
+  "map": "/ws/experiments/worlds/suites/official_like50/maps/hard_5036_m.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 51,
+  "partition": "lf_l_rand_playbook_v0_974df4b05995_002",
+  "backend": "run_eval",
+  "progress_m": 2.266,
+  "progress_pct": 13.1,
+  "lap_sec": null,
+  "wall_sec": 21.5,
+  "lat_mean": 0.0132,
+  "lat_p95": 0.0914,
+  "lat_max": 0.1755,
+  "reason": "off line >0.12m at 2.36m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 2,
+  "slip_events": [
+    {
+      "start_sim_sec": 21.976,
+      "windows": 7,
+      "peak_linear_mps": 0.172,
+      "peak_angular_radps": 2.485,
+      "end_sim_sec": 24.076
+    },
+    {
+      "start_sim_sec": 25.3,
+      "windows": 1,
+      "peak_linear_mps": 0.07,
+      "peak_angular_radps": 2.049,
+      "end_sim_sec": 25.6
+    }
+  ],
+  "odom_windows": 71,
+  "sim_sec": 21.388,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.3,
+  "max_progress_m": 2.355
+}

@@ -1,0 +1,44 @@
+{
+  "name": "17_01",
+  "map": "/ws/experiments/situation/data/maps/eval/hard_16.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 66,
+  "partition": "lf_l_playbook_v0_r2_e3069e1cd3b3_017",
+  "backend": "run_eval",
+  "progress_m": 2.675,
+  "progress_pct": 16.5,
+  "lap_sec": null,
+  "wall_sec": 16.4,
+  "lat_mean": 0.0119,
+  "lat_p95": 0.1054,
+  "lat_max": 0.146,
+  "reason": "off line >0.12m at 2.73m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 2,
+  "slip_events": [
+    {
+      "start_sim_sec": 10.356,
+      "windows": 1,
+      "peak_linear_mps": 0.115,
+      "peak_angular_radps": 0.008,
+      "end_sim_sec": 10.656
+    },
+    {
+      "start_sim_sec": 14.556,
+      "windows": 2,
+      "peak_linear_mps": 0.249,
+      "peak_angular_radps": 0.02,
+      "end_sim_sec": 15.156
+    }
+  ],
+  "odom_windows": 52,
+  "sim_sec": 16.392,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.832,
+  "max_progress_m": 2.728
+}

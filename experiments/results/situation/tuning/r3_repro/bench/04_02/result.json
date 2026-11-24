@@ -1,0 +1,32 @@
+{
+  "name": "04_02",
+  "map": "/ws/experiments/worlds/suites/general200/maps/easy_1015.sdf",
+  "profile": "c01",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r3_repro/configs/c01.yaml"
+  ],
+  "complete": false,
+  "domain": 57,
+  "partition": "lf_l_tune_r3_repro_324d64122723_008",
+  "backend": "run_eval",
+  "progress_m": 3.129,
+  "progress_pct": 20.0,
+  "lap_sec": null,
+  "wall_sec": 23.0,
+  "lat_mean": 0.0185,
+  "lat_p95": 0.1018,
+  "lat_max": 0.1322,
+  "reason": "off line >0.12m at 3.14m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 0,
+  "slip_events": [],
+  "odom_windows": 74,
+  "sim_sec": 22.852,
+  "wheel_line_events": 2,
+  "wheel_line_sec": 0.78,
+  "max_progress_m": 3.142
+}

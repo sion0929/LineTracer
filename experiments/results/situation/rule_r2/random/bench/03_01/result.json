@@ -1,0 +1,86 @@
+{
+  "name": "03_01",
+  "map": "/ws/experiments/worlds/suites/stress50/maps/hard_7018.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 52,
+  "partition": "lf_l_rand_rule_r2_74662be131db_003",
+  "backend": "run_eval",
+  "progress_m": 17.79,
+  "progress_pct": 96.7,
+  "lap_sec": null,
+  "wall_sec": 100.8,
+  "lat_mean": 0.0154,
+  "lat_p95": 0.1008,
+  "lat_max": 0.1257,
+  "reason": "stalled at 17.79m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 8,
+  "slip_events": [
+    {
+      "start_sim_sec": 10.036,
+      "windows": 1,
+      "peak_linear_mps": 0.172,
+      "peak_angular_radps": 0.027,
+      "end_sim_sec": 10.336
+    },
+    {
+      "start_sim_sec": 11.536,
+      "windows": 1,
+      "peak_linear_mps": 0.11,
+      "peak_angular_radps": 0.004,
+      "end_sim_sec": 11.836
+    },
+    {
+      "start_sim_sec": 13.936,
+      "windows": 3,
+      "peak_linear_mps": 0.246,
+      "peak_angular_radps": 0.035,
+      "end_sim_sec": 14.836
+    },
+    {
+      "start_sim_sec": 15.436,
+      "windows": 1,
+      "peak_linear_mps": 0.128,
+      "peak_angular_radps": 0.009,
+      "end_sim_sec": 15.736
+    },
+    {
+      "start_sim_sec": 20.528,
+      "windows": 2,
+      "peak_linear_mps": 0.019,
+      "peak_angular_radps": 1.602,
+      "end_sim_sec": 21.128
+    },
+    {
+      "start_sim_sec": 26.228,
+      "windows": 1,
+      "peak_linear_mps": 0.064,
+      "peak_angular_radps": 0.699,
+      "end_sim_sec": 26.528
+    },
+    {
+      "start_sim_sec": 26.828,
+      "windows": 3,
+      "peak_linear_mps": 0.081,
+      "peak_angular_radps": 1.118,
+      "end_sim_sec": 27.728
+    },
+    {
+      "start_sim_sec": 28.328,
+      "windows": 2,
+      "peak_linear_mps": 0.065,
+      "peak_angular_radps": 1.14,
+      "end_sim_sec": 28.928
+    }
+  ],
+  "odom_windows": 334,
+  "sim_sec": 100.508,
+  "wheel_line_events": 10,
+  "wheel_line_sec": 4.496,
+  "max_progress_m": 17.792
+}

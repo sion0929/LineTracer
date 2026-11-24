@@ -1,0 +1,58 @@
+{
+  "name": "03_01",
+  "map": "/ws/experiments/worlds/suites/stress50/maps/hard_7018.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 52,
+  "partition": "lf_l_rand_playbook_v0_974df4b05995_003",
+  "backend": "run_eval",
+  "progress_m": 2.913,
+  "progress_pct": 15.8,
+  "lap_sec": null,
+  "wall_sec": 17.9,
+  "lat_mean": 0.013,
+  "lat_p95": 0.1093,
+  "lat_max": 0.1447,
+  "reason": "off line >0.12m at 2.92m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 4,
+  "slip_events": [
+    {
+      "start_sim_sec": 10.076,
+      "windows": 1,
+      "peak_linear_mps": 0.18,
+      "peak_angular_radps": 0.002,
+      "end_sim_sec": 10.376
+    },
+    {
+      "start_sim_sec": 11.576,
+      "windows": 1,
+      "peak_linear_mps": 0.104,
+      "peak_angular_radps": 0.025,
+      "end_sim_sec": 11.876
+    },
+    {
+      "start_sim_sec": 14.276,
+      "windows": 2,
+      "peak_linear_mps": 0.241,
+      "peak_angular_radps": 0.054,
+      "end_sim_sec": 14.876
+    },
+    {
+      "start_sim_sec": 15.476,
+      "windows": 1,
+      "peak_linear_mps": 0.109,
+      "peak_angular_radps": 0.033,
+      "end_sim_sec": 15.776
+    }
+  ],
+  "odom_windows": 59,
+  "sim_sec": 17.92,
+  "wheel_line_events": 2,
+  "wheel_line_sec": 0.54,
+  "max_progress_m": 2.92
+}

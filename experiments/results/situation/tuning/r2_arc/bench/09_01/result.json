@@ -1,0 +1,32 @@
+{
+  "name": "09_01",
+  "map": "/ws/experiments/worlds/suites/official_like50/maps/hard_5008.sdf",
+  "profile": "c00",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r2_arc/configs/c00.yaml"
+  ],
+  "complete": false,
+  "domain": 54,
+  "partition": "lf_l_tune_r2_arc_6440665ed5ef_025",
+  "backend": "run_eval",
+  "progress_m": 10.632,
+  "progress_pct": 64.7,
+  "lap_sec": null,
+  "wall_sec": 57.4,
+  "lat_mean": 0.0106,
+  "lat_p95": 0.0397,
+  "lat_max": 0.1349,
+  "reason": "off line >0.12m at 10.78m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 0,
+  "slip_events": [],
+  "odom_windows": 188,
+  "sim_sec": 57.064,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.66,
+  "max_progress_m": 10.771
+}

@@ -1,0 +1,24 @@
+{
+ "name": "r2_arc",
+ "base": "experiments/results/situation/tuning/r1_caps/configs/c02.yaml",
+ "started": "2026-11-24 21:25:11",
+ "configs": {
+  "c00": "ARC.v_cap=0.18",
+  "c01": "ARC.v_cap=0.15",
+  "c02": "base"
+ },
+ "maps": [
+  "experiments/worlds/suites/general200/maps/easy_1012_m.sdf",
+  "experiments/worlds/suites/general200/maps/normal_1013.sdf",
+  "experiments/worlds/suites/general200/maps/hard_1014_m.sdf",
+  "experiments/worlds/suites/general200/maps/easy_1015.sdf",
+  "experiments/worlds/suites/general200/maps/normal_1016_m.sdf",
+  "experiments/worlds/suites/general200/maps/hard_1017_m.sdf",
+  "experiments/worlds/suites/general200/maps/easy_1018.sdf",
+  "experiments/worlds/suites/general200/maps/normal_1019_m.sdf",
+  "experiments/worlds/suites/official_like50/maps/hard_5008.sdf",
+  "experiments/worlds/suites/official_like50/maps/normal_5009_m.sdf",
+  "experiments/worlds/suites/official_like50/maps/hard_5010.sdf",
+  "experiments/worlds/suites/official_like50/maps/normal_5011.sdf"
+ ]
+}

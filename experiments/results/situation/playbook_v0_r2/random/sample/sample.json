@@ -1,0 +1,22 @@
+{
+  "seed": 1457145442,
+  "n": 6,
+  "suites": [
+    "general200",
+    "official_like50",
+    "hills60",
+    "stress50"
+  ],
+  "mode": "balanced",
+  "generated_now": 0,
+  "maps": [
+    "experiments/worlds/suites/general200/maps/normal_1055.sdf",
+    "experiments/worlds/suites/official_like50/maps/hard_5036_m.sdf",
+    "experiments/worlds/suites/stress50/maps/hard_7018.sdf",
+    "experiments/worlds/suites/stress50/maps/hard_7037_m.sdf",
+    "experiments/worlds/suites/general200/maps/hard_1059.sdf",
+    "experiments/worlds/suites/hills60/maps/easy_9024_m.sdf"
+  ],
+  "reproduce": "python3 experiments/worlds/sample_maps.py 6 --seed 1457145442 --suites general200,official_like50,hills60,stress50 --mode balanced",
+  "created": "2026-11-24 22:19:45"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "01_01",
+  "map": "/ws/src/line_follower_bringup/worlds/line_track.sdf",
+  "profile": "default",
+  "args": [],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 50,
+  "partition": "lf_l_rule_r2_eff97f6a046b_001"
+}

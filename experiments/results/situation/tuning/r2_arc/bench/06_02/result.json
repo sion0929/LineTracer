@@ -1,0 +1,32 @@
+{
+  "name": "06_02",
+  "map": "/ws/experiments/worlds/suites/general200/maps/hard_1017_m.sdf",
+  "profile": "c01",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r2_arc/configs/c01.yaml"
+  ],
+  "complete": false,
+  "domain": 66,
+  "partition": "lf_l_tune_r2_arc_6440665ed5ef_017",
+  "backend": "run_eval",
+  "progress_m": 2.772,
+  "progress_pct": 14.7,
+  "lap_sec": null,
+  "wall_sec": 24.7,
+  "lat_mean": 0.0114,
+  "lat_p95": 0.0968,
+  "lat_max": 0.1426,
+  "reason": "off line >0.12m at 2.80m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 0,
+  "slip_events": [],
+  "odom_windows": 82,
+  "sim_sec": 24.548,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 1.02,
+  "max_progress_m": 2.801
+}

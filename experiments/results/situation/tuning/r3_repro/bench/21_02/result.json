@@ -1,0 +1,40 @@
+{
+  "name": "21_02",
+  "map": "/ws/experiments/worlds/suites/official_like50/maps/hard_5008.sdf",
+  "profile": "c01",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r3_repro/configs/c01.yaml"
+  ],
+  "complete": false,
+  "domain": 51,
+  "partition": "lf_l_tune_r3_repro_324d64122723_042",
+  "backend": "run_eval",
+  "progress_m": 2.823,
+  "progress_pct": 17.2,
+  "lap_sec": null,
+  "wall_sec": 17.8,
+  "lat_mean": 0.0156,
+  "lat_p95": 0.1108,
+  "lat_max": 0.1351,
+  "reason": "off line >0.12m at 2.86m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 1,
+  "slip_events": [
+    {
+      "start_sim_sec": 14.264,
+      "windows": 2,
+      "peak_linear_mps": 0.235,
+      "peak_angular_radps": 0.029,
+      "end_sim_sec": 14.864
+    }
+  ],
+  "odom_windows": 56,
+  "sim_sec": 17.732,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.84,
+  "max_progress_m": 2.86
+}

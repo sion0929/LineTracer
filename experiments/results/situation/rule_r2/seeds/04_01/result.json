@@ -1,0 +1,37 @@
+{
+  "name": "04_01",
+  "map": "/ws/experiments/situation/data/maps/eval/easy_3.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": true,
+  "domain": 53,
+  "partition": "lf_l_rule_r2_65e0e15990b2_004",
+  "backend": "run_eval",
+  "progress_m": 16.161,
+  "progress_pct": 99.3,
+  "lap_sec": 71.11,
+  "wall_sec": 74.3,
+  "lat_mean": 0.0066,
+  "lat_p95": 0.0235,
+  "lat_max": 0.0375,
+  "reason": "finished",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 1,
+  "slip_events": [
+    {
+      "start_sim_sec": 68.104,
+      "windows": 1,
+      "peak_linear_mps": 0.01,
+      "peak_angular_radps": 0.766,
+      "end_sim_sec": 68.404
+    }
+  ],
+  "odom_windows": 246,
+  "sim_sec": 73.896,
+  "wheel_line_events": 0,
+  "wheel_line_sec": 0.0,
+  "max_progress_m": 16.161
+}

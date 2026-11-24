@@ -1,0 +1,403 @@
+{
+ "model": "mlp_wide",
+ "p_min": 0.6,
+ "selection": {
+  "mlp": {
+   "macro_f1": 0.744,
+   "macro_f1_gz": 0.6311,
+   "bytes": 90209,
+   "p_min": null,
+   "finish": {
+    "runs_with_t": 263,
+    "runs_with_finish_candidates": 143,
+    "false_accepts": 1,
+    "correct_accepts": 142,
+    "tcand_precision": 0.998,
+    "tcand_recall": 0.813
+   }
+  },
+  "mlp_wide": {
+   "macro_f1": 0.7478,
+   "macro_f1_gz": 0.626,
+   "bytes": 162154,
+   "p_min": 0.6,
+   "finish": {
+    "runs_with_t": 263,
+    "runs_with_finish_candidates": 143,
+    "false_accepts": 0,
+    "correct_accepts": 142,
+    "tcand_precision": 0.999,
+    "tcand_recall": 0.813
+   }
+  },
+  "rtrees": {
+   "macro_f1": 0.6941,
+   "macro_f1_gz": 0.5536,
+   "bytes": 1685352,
+   "p_min": 0.6,
+   "finish": {
+    "runs_with_t": 263,
+    "runs_with_finish_candidates": 143,
+    "false_accepts": 0,
+    "correct_accepts": 141,
+    "tcand_precision": 0.999,
+    "tcand_recall": 0.804
+   }
+  }
+ },
+ "created": "2026-11-24 17:54",
+ "data": {
+  "synth": 175219,
+  "gz_train": 18246,
+  "gz_val": 6310
+ },
+ "maps": {
+  "gz_train": 30,
+  "gz_val": 12,
+  "synth": 342
+ },
+ "class_counts": {
+  "train": {
+   "STRAIGHT": 12788,
+   "ARC": 24579,
+   "RIGHT_ANGLE": 12053,
+   "CROSSING": 48953,
+   "LOOP_CORNER": 17483,
+   "STUB": 3456,
+   "GAP": 8112,
+   "HILL": 18828,
+   "FINISH_T": 23493,
+   "START_T": 10152,
+   "OFF": 13568
+  },
+  "gz_val": {
+   "STRAIGHT": 326,
+   "ARC": 829,
+   "RIGHT_ANGLE": 462,
+   "CROSSING": 1402,
+   "LOOP_CORNER": 680,
+   "STUB": 95,
+   "GAP": 307,
+   "HILL": 981,
+   "FINISH_T": 465,
+   "START_T": 0,
+   "OFF": 763
+  }
+ },
+ "gz_val_per_class": {
+  "STRAIGHT": {
+   "n": 326,
+   "precision": 0.51,
+   "recall": 0.531
+  },
+  "ARC": {
+   "n": 829,
+   "precision": 0.71,
+   "recall": 0.752
+  },
+  "RIGHT_ANGLE": {
+   "n": 462,
+   "precision": 0.597,
+   "recall": 0.554
+  },
+  "CROSSING": {
+   "n": 1402,
+   "precision": 0.802,
+   "recall": 0.703
+  },
+  "LOOP_CORNER": {
+   "n": 680,
+   "precision": 0.653,
+   "recall": 0.726
+  },
+  "STUB": {
+   "n": 95,
+   "precision": 0.416,
+   "recall": 0.547
+  },
+  "GAP": {
+   "n": 307,
+   "precision": 0.199,
+   "recall": 0.3
+  },
+  "HILL": {
+   "n": 981,
+   "precision": 0.834,
+   "recall": 0.815
+  },
+  "FINISH_T": {
+   "n": 465,
+   "precision": 0.977,
+   "recall": 0.918
+  },
+  "START_T": {
+   "n": 0,
+   "precision": 0.0,
+   "recall": null
+  },
+  "OFF": {
+   "n": 763,
+   "precision": 0.603,
+   "recall": 0.547
+  }
+ },
+ "gz_val_macro_f1": 0.6319,
+ "gz_val_accuracy": 0.6845,
+ "gz_val_tcand_per_class": {
+  "STRAIGHT": {
+   "n": 7,
+   "precision": null,
+   "recall": 0.0
+  },
+  "ARC": {
+   "n": 0,
+   "precision": null,
+   "recall": null
+  },
+  "RIGHT_ANGLE": {
+   "n": 2,
+   "precision": null,
+   "recall": 0.0
+  },
+  "CROSSING": {
+   "n": 207,
+   "precision": 0.71,
+   "recall": 0.874
+  },
+  "LOOP_CORNER": {
+   "n": 167,
+   "precision": 0.856,
+   "recall": 0.784
+  },
+  "STUB": {
+   "n": 1,
+   "precision": 0.0,
+   "recall": 0.0
+  },
+  "GAP": {
+   "n": 12,
+   "precision": 0.889,
+   "recall": 0.667
+  },
+  "HILL": {
+   "n": 19,
+   "precision": 1.0,
+   "recall": 0.842
+  },
+  "FINISH_T": {
+   "n": 317,
+   "precision": 0.984,
+   "recall": 1.0
+  },
+  "START_T": {
+   "n": 0,
+   "precision": null,
+   "recall": null
+  },
+  "OFF": {
+   "n": 105,
+   "precision": 0.74,
+   "recall": 0.514
+  }
+ },
+ "gz_val_confusion": [
+  [
+   173,
+   17,
+   0,
+   8,
+   8,
+   1,
+   37,
+   49,
+   2,
+   0,
+   31
+  ],
+  [
+   10,
+   623,
+   28,
+   8,
+   12,
+   2,
+   112,
+   13,
+   1,
+   0,
+   20
+  ],
+  [
+   13,
+   42,
+   256,
+   21,
+   29,
+   9,
+   44,
+   5,
+   1,
+   0,
+   42
+  ],
+  [
+   47,
+   76,
+   39,
+   985,
+   104,
+   26,
+   69,
+   7,
+   0,
+   0,
+   49
+  ],
+  [
+   7,
+   12,
+   23,
+   76,
+   494,
+   4,
+   14,
+   7,
+   2,
+   2,
+   39
+  ],
+  [
+   9,
+   2,
+   0,
+   11,
+   1,
+   52,
+   20,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   7,
+   50,
+   51,
+   27,
+   10,
+   3,
+   92,
+   29,
+   1,
+   0,
+   37
+  ],
+  [
+   45,
+   29,
+   10,
+   8,
+   9,
+   7,
+   13,
+   800,
+   2,
+   2,
+   56
+  ],
+  [
+   3,
+   8,
+   0,
+   0,
+   0,
+   7,
+   0,
+   20,
+   427,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   25,
+   19,
+   22,
+   84,
+   89,
+   14,
+   62,
+   29,
+   1,
+   1,
+   417
+  ]
+ ],
+ "gz_val_finish_replay": {
+  "0.4": {
+   "runs_with_t": 26,
+   "runs_with_finish_candidates": 11,
+   "false_accepts": 0,
+   "correct_accepts": 9,
+   "tcand_precision": 1.0,
+   "tcand_recall": 0.713
+  },
+  "0.5": {
+   "runs_with_t": 26,
+   "runs_with_finish_candidates": 11,
+   "false_accepts": 0,
+   "correct_accepts": 9,
+   "tcand_precision": 1.0,
+   "tcand_recall": 0.713
+  },
+  "0.6": {
+   "runs_with_t": 26,
+   "runs_with_finish_candidates": 11,
+   "false_accepts": 0,
+   "correct_accepts": 9,
+   "tcand_precision": 1.0,
+   "tcand_recall": 0.713
+  },
+  "0.7": {
+   "runs_with_t": 26,
+   "runs_with_finish_candidates": 11,
+   "false_accepts": 0,
+   "correct_accepts": 9,
+   "tcand_precision": 1.0,
+   "tcand_recall": 0.713
+  },
+  "0.8": {
+   "runs_with_t": 26,
+   "runs_with_finish_candidates": 11,
+   "false_accepts": 0,
+   "correct_accepts": 9,
+   "tcand_precision": 1.0,
+   "tcand_recall": 0.713
+  },
+  "0.9": {
+   "runs_with_t": 26,
+   "runs_with_finish_candidates": 11,
+   "false_accepts": 0,
+   "correct_accepts": 9,
+   "tcand_precision": 1.0,
+   "tcand_recall": 0.713
+  }
+ },
+ "model_bytes": 162316,
+ "latency_ms": {
+  "predict": 0.0187,
+  "features": 1.234
+ }
+}

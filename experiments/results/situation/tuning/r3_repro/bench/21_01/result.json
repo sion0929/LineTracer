@@ -1,0 +1,54 @@
+{
+  "name": "21_01",
+  "map": "/ws/experiments/worlds/suites/official_like50/maps/hard_5008.sdf",
+  "profile": "c00",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r3_repro/configs/c00.yaml"
+  ],
+  "complete": true,
+  "domain": 50,
+  "partition": "lf_l_tune_r3_repro_324d64122723_041",
+  "backend": "run_eval",
+  "progress_m": 16.318,
+  "progress_pct": 99.3,
+  "lap_sec": 81.71,
+  "wall_sec": 85.1,
+  "lat_mean": 0.0092,
+  "lat_p95": 0.0296,
+  "lat_max": 0.0547,
+  "reason": "finished",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 3,
+  "slip_events": [
+    {
+      "start_sim_sec": 81.248,
+      "windows": 1,
+      "peak_linear_mps": 0.115,
+      "peak_angular_radps": 0.001,
+      "end_sim_sec": 81.548
+    },
+    {
+      "start_sim_sec": 83.048,
+      "windows": 1,
+      "peak_linear_mps": 0.114,
+      "peak_angular_radps": 0.003,
+      "end_sim_sec": 83.348
+    },
+    {
+      "start_sim_sec": 85.144,
+      "windows": 2,
+      "peak_linear_mps": 0.174,
+      "peak_angular_radps": 0.03,
+      "end_sim_sec": 85.744
+    }
+  ],
+  "odom_windows": 280,
+  "sim_sec": 84.592,
+  "wheel_line_events": 2,
+  "wheel_line_sec": 0.42,
+  "max_progress_m": 16.318
+}

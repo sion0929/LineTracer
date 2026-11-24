@@ -1,0 +1,117 @@
+{
+  "name": "12_01",
+  "map": "/ws/experiments/worlds/suites/official_like50/maps/normal_5011.sdf",
+  "profile": "c00",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r1_caps/configs/c00.yaml"
+  ],
+  "complete": false,
+  "domain": 54,
+  "partition": "lf_l_tune_r1_caps_89cfa385b567_045",
+  "backend": "run_eval",
+  "progress_m": 7.693,
+  "progress_pct": 43.4,
+  "lap_sec": null,
+  "wall_sec": 46.6,
+  "lat_mean": 0.0206,
+  "lat_p95": 0.0893,
+  "lat_max": 0.1545,
+  "reason": "off line >0.12m at 7.71m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 12,
+  "slip_events": [
+    {
+      "start_sim_sec": 10.052,
+      "windows": 1,
+      "peak_linear_mps": 0.132,
+      "peak_angular_radps": 0.005,
+      "end_sim_sec": 10.352
+    },
+    {
+      "start_sim_sec": 14.256,
+      "windows": 1,
+      "peak_linear_mps": 0.214,
+      "peak_angular_radps": 0.002,
+      "end_sim_sec": 14.556
+    },
+    {
+      "start_sim_sec": 38.4,
+      "windows": 4,
+      "peak_linear_mps": 0.112,
+      "peak_angular_radps": 2.606,
+      "end_sim_sec": 39.6
+    },
+    {
+      "start_sim_sec": 40.2,
+      "windows": 4,
+      "peak_linear_mps": 0.256,
+      "peak_angular_radps": 2.962,
+      "end_sim_sec": 41.36
+    },
+    {
+      "start_sim_sec": 43.16,
+      "windows": 5,
+      "peak_linear_mps": 0.184,
+      "peak_angular_radps": 1.881,
+      "end_sim_sec": 44.66
+    },
+    {
+      "start_sim_sec": 44.96,
+      "windows": 1,
+      "peak_linear_mps": 0.087,
+      "peak_angular_radps": 1.974,
+      "end_sim_sec": 45.26
+    },
+    {
+      "start_sim_sec": 45.86,
+      "windows": 1,
+      "peak_linear_mps": 0.005,
+      "peak_angular_radps": 0.837,
+      "end_sim_sec": 46.16
+    },
+    {
+      "start_sim_sec": 46.76,
+      "windows": 1,
+      "peak_linear_mps": 0.0,
+      "peak_angular_radps": 0.916,
+      "end_sim_sec": 47.06
+    },
+    {
+      "start_sim_sec": 47.36,
+      "windows": 3,
+      "peak_linear_mps": 0.078,
+      "peak_angular_radps": 1.342,
+      "end_sim_sec": 48.26
+    },
+    {
+      "start_sim_sec": 48.56,
+      "windows": 1,
+      "peak_linear_mps": 0.037,
+      "peak_angular_radps": 0.835,
+      "end_sim_sec": 48.86
+    },
+    {
+      "start_sim_sec": 49.46,
+      "windows": 1,
+      "peak_linear_mps": 0.092,
+      "peak_angular_radps": 0.909,
+      "end_sim_sec": 49.76
+    },
+    {
+      "start_sim_sec": 50.06,
+      "windows": 1,
+      "peak_linear_mps": 0.111,
+      "peak_angular_radps": 1.678,
+      "end_sim_sec": 50.36
+    }
+  ],
+  "odom_windows": 152,
+  "sim_sec": 46.388,
+  "wheel_line_events": 18,
+  "wheel_line_sec": 2.78,
+  "max_progress_m": 7.712
+}

@@ -1,0 +1,16 @@
+{
+ "name": "legacy",
+ "args": [
+  "-p",
+  "playbook.config:=/ws/experiments/results/situation/tuning/r1_caps/configs/c00.yaml"
+ ],
+ "complete": false,
+ "progress_m": 3.378,
+ "progress_pct": 20.3,
+ "lap_sec": null,
+ "wall_sec": 28.3,
+ "lat_mean": 0.0135,
+ "lat_p95": 0.0926,
+ "lat_max": 0.1407,
+ "reason": "off line >0.12m at 3.41m"
+}

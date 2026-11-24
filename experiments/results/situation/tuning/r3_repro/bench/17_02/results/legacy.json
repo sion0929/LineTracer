@@ -1,0 +1,16 @@
+{
+ "name": "legacy",
+ "args": [
+  "-p",
+  "playbook.config:=/ws/experiments/results/situation/tuning/r3_repro/configs/c01.yaml"
+ ],
+ "complete": true,
+ "progress_m": 16.924,
+ "progress_pct": 99.3,
+ "lap_sec": 81.06,
+ "wall_sec": 84.3,
+ "lat_mean": 0.0094,
+ "lat_p95": 0.0325,
+ "lat_max": 0.0591,
+ "reason": "finished"
+}

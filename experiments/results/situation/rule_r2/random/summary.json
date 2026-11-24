@@ -1,0 +1,95 @@
+{
+ "created": "2026-11-24 22:10:58",
+ "wall_min": 2.698799280325572,
+ "seed": 1457145442,
+ "suites": [
+  "general200",
+  "official_like50",
+  "hills60",
+  "stress50"
+ ],
+ "mode": "balanced",
+ "follower": "experiments/user_base/run_user.py",
+ "params": "/ws/src/line_follower/config/rule.yaml",
+ "backend": "run_eval",
+ "off": 0.12,
+ "limit": 300,
+ "stall": 20,
+ "jobs": 3,
+ "domain_base": 50,
+ "partition": "lf_l_rand_rule_r2",
+ "bench_exit": 0,
+ "completed": 0,
+ "runs": 6,
+ "infra_errors": 0,
+ "mean_progress_pct": 58.27,
+ "mean_lap_sec": null,
+ "failures": {
+  "선 이탈": [
+   "normal_1055",
+   "hard_5036_m",
+   "hard_7037_m",
+   "easy_9024_m"
+  ],
+  "정지(진행 없음)": [
+   "hard_7018",
+   "hard_1059"
+  ]
+ },
+ "maps": [
+  {
+   "order": 1,
+   "suite": "general200",
+   "map": "experiments/worlds/suites/general200/maps/normal_1055.sdf",
+   "complete": false,
+   "progress_pct": 55.9,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 9.91m"
+  },
+  {
+   "order": 2,
+   "suite": "official_like50",
+   "map": "experiments/worlds/suites/official_like50/maps/hard_5036_m.sdf",
+   "complete": false,
+   "progress_pct": 12.6,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 2.08m"
+  },
+  {
+   "order": 3,
+   "suite": "stress50",
+   "map": "experiments/worlds/suites/stress50/maps/hard_7018.sdf",
+   "complete": false,
+   "progress_pct": 96.7,
+   "lap_sec": null,
+   "reason": "stalled at 17.79m"
+  },
+  {
+   "order": 4,
+   "suite": "stress50",
+   "map": "experiments/worlds/suites/stress50/maps/hard_7037_m.sdf",
+   "complete": false,
+   "progress_pct": 44.5,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 8.57m"
+  },
+  {
+   "order": 5,
+   "suite": "general200",
+   "map": "experiments/worlds/suites/general200/maps/hard_1059.sdf",
+   "complete": false,
+   "progress_pct": 92.6,
+   "lap_sec": null,
+   "reason": "stalled at 14.72m"
+  },
+  {
+   "order": 6,
+   "suite": "hills60",
+   "map": "experiments/worlds/suites/hills60/maps/easy_9024_m.sdf",
+   "complete": false,
+   "progress_pct": 47.3,
+   "lap_sec": null,
+   "reason": "off line >0.12m at 7.44m"
+  }
+ ]
+}

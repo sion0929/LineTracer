@@ -1,0 +1,17 @@
+{
+  "name": "07_01",
+  "map": "/ws/experiments/worlds/suites/general200/maps/easy_1018.sdf",
+  "profile": "c00",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r1_caps/configs/c00.yaml"
+  ],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 54,
+  "partition": "lf_l_tune_r1_caps_89cfa385b567_025"
+}

@@ -1,0 +1,3 @@
+# Datasets, generated maps and Gazebo collection runs are regenerable and large.
+data/
+__pycache__/

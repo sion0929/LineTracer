@@ -1,0 +1,548 @@
+{
+ "name": "r1_caps",
+ "base": "/ws/src/line_follower/config/playbook.yaml",
+ "started": "2026-11-24 21:12:15",
+ "configs": {
+  "c00": "RIGHT_ANGLE.v_cap=0.15",
+  "c01": "ARC.v_cap=0.18",
+  "c02": "HILL.v_cap=0.18",
+  "c03": "base"
+ },
+ "maps": [
+  "experiments/worlds/suites/general200/maps/easy_1012_m.sdf",
+  "experiments/worlds/suites/general200/maps/normal_1013.sdf",
+  "experiments/worlds/suites/general200/maps/hard_1014_m.sdf",
+  "experiments/worlds/suites/general200/maps/easy_1015.sdf",
+  "experiments/worlds/suites/general200/maps/normal_1016_m.sdf",
+  "experiments/worlds/suites/general200/maps/hard_1017_m.sdf",
+  "experiments/worlds/suites/general200/maps/easy_1018.sdf",
+  "experiments/worlds/suites/general200/maps/normal_1019_m.sdf",
+  "experiments/worlds/suites/official_like50/maps/hard_5008.sdf",
+  "experiments/worlds/suites/official_like50/maps/normal_5009_m.sdf",
+  "experiments/worlds/suites/official_like50/maps/hard_5010.sdf",
+  "experiments/worlds/suites/official_like50/maps/normal_5011.sdf"
+ ],
+ "results": {
+  "c00": {
+   "tag": "RIGHT_ANGLE.v_cap=0.15",
+   "runs": 12,
+   "complete": 0,
+   "mean_progress": 26.6,
+   "J": 4772.2,
+   "infra": 0,
+   "per_map": [
+    {
+     "map": "easy_1012_m",
+     "complete": false,
+     "progress_pct": 18.9,
+     "lap_sec": null,
+     "lat_p95": 0.0983,
+     "reason": "off line >0.12m at 2.91m",
+     "J": 407.72,
+     "infra": false
+    },
+    {
+     "map": "normal_1013",
+     "complete": false,
+     "progress_pct": 17.0,
+     "lap_sec": null,
+     "lat_p95": 0.1003,
+     "reason": "off line >0.12m at 2.90m",
+     "J": 406.39,
+     "infra": false
+    },
+    {
+     "map": "hard_1014_m",
+     "complete": false,
+     "progress_pct": 11.4,
+     "lap_sec": null,
+     "lat_p95": 0.0934,
+     "reason": "off line >0.12m at 1.53m",
+     "J": 418.78,
+     "infra": false
+    },
+    {
+     "map": "easy_1015",
+     "complete": false,
+     "progress_pct": 19.4,
+     "lap_sec": null,
+     "lat_p95": 0.1072,
+     "reason": "off line >0.12m at 3.05m",
+     "J": 406.28,
+     "infra": false
+    },
+    {
+     "map": "normal_1016_m",
+     "complete": false,
+     "progress_pct": 37.7,
+     "lap_sec": null,
+     "lat_p95": 0.0969,
+     "reason": "off line >0.12m at 6.33m",
+     "J": 394.71,
+     "infra": false
+    },
+    {
+     "map": "hard_1017_m",
+     "complete": false,
+     "progress_pct": 10.5,
+     "lap_sec": null,
+     "lat_p95": 0.0937,
+     "reason": "off line >0.12m at 1.96m",
+     "J": 417.76,
+     "infra": false
+    },
+    {
+     "map": "easy_1018",
+     "complete": false,
+     "progress_pct": 21.9,
+     "lap_sec": null,
+     "lat_p95": 0.098,
+     "reason": "off line >0.12m at 3.47m",
+     "J": 399.26,
+     "infra": false
+    },
+    {
+     "map": "normal_1019_m",
+     "complete": false,
+     "progress_pct": 20.3,
+     "lap_sec": null,
+     "lat_p95": 0.0926,
+     "reason": "off line >0.12m at 3.41m",
+     "J": 403.81,
+     "infra": false
+    },
+    {
+     "map": "hard_5008",
+     "complete": false,
+     "progress_pct": 22.0,
+     "lap_sec": null,
+     "lat_p95": 0.032,
+     "reason": "off line >0.12m at 3.63m",
+     "J": 382.36,
+     "infra": false
+    },
+    {
+     "map": "normal_5009_m",
+     "complete": false,
+     "progress_pct": 16.1,
+     "lap_sec": null,
+     "lat_p95": 0.1188,
+     "reason": "off line >0.12m at 2.85m",
+     "J": 429.31,
+     "infra": false
+    },
+    {
+     "map": "hard_5010",
+     "complete": false,
+     "progress_pct": 80.3,
+     "lap_sec": null,
+     "lat_p95": 0.0898,
+     "reason": "off line >0.12m at 13.21m",
+     "J": 331.63,
+     "infra": false
+    },
+    {
+     "map": "normal_5011",
+     "complete": false,
+     "progress_pct": 43.4,
+     "lap_sec": null,
+     "lat_p95": 0.0893,
+     "reason": "off line >0.12m at 7.71m",
+     "J": 374.19,
+     "infra": false
+    }
+   ]
+  },
+  "c01": {
+   "tag": "ARC.v_cap=0.18",
+   "runs": 12,
+   "complete": 2,
+   "mean_progress": 34.8,
+   "J": 4121.5,
+   "infra": 0,
+   "per_map": [
+    {
+     "map": "easy_1012_m",
+     "complete": false,
+     "progress_pct": 19.4,
+     "lap_sec": null,
+     "lat_p95": 0.0947,
+     "reason": "off line >0.12m at 2.99m",
+     "J": 405.97,
+     "infra": false
+    },
+    {
+     "map": "normal_1013",
+     "complete": true,
+     "progress_pct": 99.3,
+     "lap_sec": 75.01,
+     "lat_p95": 0.0231,
+     "reason": "finished",
+     "J": 75.01,
+     "infra": false
+    },
+    {
+     "map": "hard_1014_m",
+     "complete": false,
+     "progress_pct": 12.4,
+     "lap_sec": null,
+     "lat_p95": 0.0659,
+     "reason": "off line >0.12m at 2.01m",
+     "J": 397.37,
+     "infra": false
+    },
+    {
+     "map": "easy_1015",
+     "complete": false,
+     "progress_pct": 22.3,
+     "lap_sec": null,
+     "lat_p95": 0.0938,
+     "reason": "off line >0.12m at 3.50m",
+     "J": 398.33,
+     "infra": false
+    },
+    {
+     "map": "normal_1016_m",
+     "complete": false,
+     "progress_pct": 22.8,
+     "lap_sec": null,
+     "lat_p95": 0.0216,
+     "reason": "off line >0.12m at 3.92m",
+     "J": 389.97,
+     "infra": false
+    },
+    {
+     "map": "hard_1017_m",
+     "complete": false,
+     "progress_pct": 14.7,
+     "lap_sec": null,
+     "lat_p95": 0.0972,
+     "reason": "off line >0.12m at 2.79m",
+     "J": 413.35,
+     "infra": false
+    },
+    {
+     "map": "easy_1018",
+     "complete": false,
+     "progress_pct": 22.5,
+     "lap_sec": null,
+     "lat_p95": 0.1004,
+     "reason": "off line >0.12m at 3.57m",
+     "J": 401.19,
+     "infra": false
+    },
+    {
+     "map": "normal_1019_m",
+     "complete": false,
+     "progress_pct": 20.2,
+     "lap_sec": null,
+     "lat_p95": 0.091,
+     "reason": "off line >0.12m at 3.39m",
+     "J": 404.06,
+     "infra": false
+    },
+    {
+     "map": "hard_5008",
+     "complete": true,
+     "progress_pct": 99.3,
+     "lap_sec": 72.68,
+     "lat_p95": 0.0347,
+     "reason": "finished",
+     "J": 72.68,
+     "infra": false
+    },
+    {
+     "map": "normal_5009_m",
+     "complete": false,
+     "progress_pct": 27.8,
+     "lap_sec": null,
+     "lat_p95": 0.045,
+     "reason": "off line >0.12m at 4.95m",
+     "J": 380.26,
+     "infra": false
+    },
+    {
+     "map": "hard_5010",
+     "complete": false,
+     "progress_pct": 16.9,
+     "lap_sec": null,
+     "lat_p95": 0.1118,
+     "reason": "off line >0.12m at 2.81m",
+     "J": 409.67,
+     "infra": false
+    },
+    {
+     "map": "normal_5011",
+     "complete": false,
+     "progress_pct": 40.5,
+     "lap_sec": null,
+     "lat_p95": 0.0884,
+     "reason": "off line >0.12m at 7.46m",
+     "J": 373.67,
+     "infra": false
+    }
+   ]
+  },
+  "c02": {
+   "tag": "HILL.v_cap=0.18",
+   "runs": 12,
+   "complete": 2,
+   "mean_progress": 37.3,
+   "J": 4109.8,
+   "infra": 0,
+   "per_map": [
+    {
+     "map": "easy_1012_m",
+     "complete": false,
+     "progress_pct": 18.9,
+     "lap_sec": null,
+     "lat_p95": 0.0948,
+     "reason": "off line >0.12m at 2.91m",
+     "J": 407.41,
+     "infra": false
+    },
+    {
+     "map": "normal_1013",
+     "complete": true,
+     "progress_pct": 99.4,
+     "lap_sec": 71.85,
+     "lat_p95": 0.0231,
+     "reason": "finished",
+     "J": 71.85,
+     "infra": false
+    },
+    {
+     "map": "hard_1014_m",
+     "complete": false,
+     "progress_pct": 16.9,
+     "lap_sec": null,
+     "lat_p95": 0.0995,
+     "reason": "off line >0.12m at 2.80m",
+     "J": 410.31,
+     "infra": false
+    },
+    {
+     "map": "easy_1015",
+     "complete": false,
+     "progress_pct": 22.4,
+     "lap_sec": null,
+     "lat_p95": 0.0904,
+     "reason": "off line >0.12m at 3.53m",
+     "J": 397.96,
+     "infra": false
+    },
+    {
+     "map": "normal_1016_m",
+     "complete": true,
+     "progress_pct": 99.3,
+     "lap_sec": 80.07,
+     "lat_p95": 0.0299,
+     "reason": "finished",
+     "J": 80.07,
+     "infra": false
+    },
+    {
+     "map": "hard_1017_m",
+     "complete": false,
+     "progress_pct": 14.5,
+     "lap_sec": null,
+     "lat_p95": 0.0913,
+     "reason": "off line >0.12m at 2.77m",
+     "J": 410.12,
+     "infra": false
+    },
+    {
+     "map": "easy_1018",
+     "complete": false,
+     "progress_pct": 21.8,
+     "lap_sec": null,
+     "lat_p95": 0.0939,
+     "reason": "off line >0.12m at 3.46m",
+     "J": 399.6,
+     "infra": false
+    },
+    {
+     "map": "normal_1019_m",
+     "complete": false,
+     "progress_pct": 20.0,
+     "lap_sec": null,
+     "lat_p95": 0.0871,
+     "reason": "off line >0.12m at 3.36m",
+     "J": 402.79,
+     "infra": false
+    },
+    {
+     "map": "hard_5008",
+     "complete": false,
+     "progress_pct": 64.8,
+     "lap_sec": null,
+     "lat_p95": 0.0366,
+     "reason": "off line >0.12m at 10.79m",
+     "J": 328.04,
+     "infra": false
+    },
+    {
+     "map": "normal_5009_m",
+     "complete": false,
+     "progress_pct": 15.2,
+     "lap_sec": null,
+     "lat_p95": 0.0928,
+     "reason": "off line >0.12m at 2.68m",
+     "J": 436.55,
+     "infra": false
+    },
+    {
+     "map": "hard_5010",
+     "complete": false,
+     "progress_pct": 16.7,
+     "lap_sec": null,
+     "lat_p95": 0.0932,
+     "reason": "off line >0.12m at 2.77m",
+     "J": 402.53,
+     "infra": false
+    },
+    {
+     "map": "normal_5011",
+     "complete": false,
+     "progress_pct": 37.2,
+     "lap_sec": null,
+     "lat_p95": 0.0593,
+     "reason": "off line >0.12m at 6.53m",
+     "J": 362.52,
+     "infra": false
+    }
+   ]
+  },
+  "c03": {
+   "tag": "base",
+   "runs": 12,
+   "complete": 0,
+   "mean_progress": 24.2,
+   "J": 4758.8,
+   "infra": 0,
+   "per_map": [
+    {
+     "map": "easy_1012_m",
+     "complete": false,
+     "progress_pct": 18.9,
+     "lap_sec": null,
+     "lat_p95": 0.0976,
+     "reason": "off line >0.12m at 2.91m",
+     "J": 407.16,
+     "infra": false
+    },
+    {
+     "map": "normal_1013",
+     "complete": false,
+     "progress_pct": 19.7,
+     "lap_sec": null,
+     "lat_p95": 0.1032,
+     "reason": "off line >0.12m at 3.46m",
+     "J": 402.4,
+     "infra": false
+    },
+    {
+     "map": "hard_1014_m",
+     "complete": false,
+     "progress_pct": 16.7,
+     "lap_sec": null,
+     "lat_p95": 0.064,
+     "reason": "off line >0.12m at 2.77m",
+     "J": 390.93,
+     "infra": false
+    },
+    {
+     "map": "easy_1015",
+     "complete": false,
+     "progress_pct": 18.0,
+     "lap_sec": null,
+     "lat_p95": 0.1129,
+     "reason": "off line >0.12m at 2.84m",
+     "J": 407.86,
+     "infra": false
+    },
+    {
+     "map": "normal_1016_m",
+     "complete": false,
+     "progress_pct": 16.1,
+     "lap_sec": null,
+     "lat_p95": 0.0976,
+     "reason": "off line >0.12m at 2.78m",
+     "J": 409.29,
+     "infra": false
+    },
+    {
+     "map": "hard_1017_m",
+     "complete": false,
+     "progress_pct": 10.2,
+     "lap_sec": null,
+     "lat_p95": 0.0081,
+     "reason": "stalled at 1.91m",
+     "J": 415.64,
+     "infra": false
+    },
+    {
+     "map": "easy_1018",
+     "complete": false,
+     "progress_pct": 22.1,
+     "lap_sec": null,
+     "lat_p95": 0.1007,
+     "reason": "off line >0.12m at 3.50m",
+     "J": 400.51,
+     "infra": false
+    },
+    {
+     "map": "normal_1019_m",
+     "complete": false,
+     "progress_pct": 15.8,
+     "lap_sec": null,
+     "lat_p95": 0.0993,
+     "reason": "off line >0.12m at 2.66m",
+     "J": 410.93,
+     "infra": false
+    },
+    {
+     "map": "hard_5008",
+     "complete": false,
+     "progress_pct": 66.9,
+     "lap_sec": null,
+     "lat_p95": 0.0492,
+     "reason": "off line >0.12m at 11.03m",
+     "J": 323.85,
+     "infra": false
+    },
+    {
+     "map": "normal_5009_m",
+     "complete": false,
+     "progress_pct": 31.5,
+     "lap_sec": null,
+     "lat_p95": 0.0795,
+     "reason": "off line >0.12m at 5.53m",
+     "J": 394.39,
+     "infra": false
+    },
+    {
+     "map": "hard_5010",
+     "complete": false,
+     "progress_pct": 17.1,
+     "lap_sec": null,
+     "lat_p95": 0.1136,
+     "reason": "off line >0.12m at 2.85m",
+     "J": 410.44,
+     "infra": false
+    },
+    {
+     "map": "normal_5011",
+     "complete": false,
+     "progress_pct": 37.2,
+     "lap_sec": null,
+     "lat_p95": 0.1048,
+     "reason": "off line >0.12m at 6.43m",
+     "J": 385.37,
+     "infra": false
+    }
+   ]
+  }
+ },
+ "best": "c02"
+}

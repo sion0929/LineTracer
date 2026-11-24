@@ -1,0 +1,14 @@
+{
+  "name": "01_01",
+  "map": "/ws/experiments/worlds/suites/general200/maps/normal_1055.sdf",
+  "profile": "default",
+  "args": [],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 50,
+  "partition": "lf_l_rand_playbook_v0_974df4b05995_001"
+}

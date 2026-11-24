@@ -1,0 +1,58 @@
+{
+  "name": "17_01",
+  "map": "/ws/experiments/situation/data/maps/eval/hard_16.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 66,
+  "partition": "lf_l_rule_r2_65e0e15990b2_017",
+  "backend": "run_eval",
+  "progress_m": 2.814,
+  "progress_pct": 17.3,
+  "lap_sec": null,
+  "wall_sec": 21.9,
+  "lat_mean": 0.0232,
+  "lat_p95": 0.0803,
+  "lat_max": 0.2563,
+  "reason": "off line >0.12m at 2.48m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 4,
+  "slip_events": [
+    {
+      "start_sim_sec": 10.1,
+      "windows": 1,
+      "peak_linear_mps": 0.133,
+      "peak_angular_radps": 0.006,
+      "end_sim_sec": 10.4
+    },
+    {
+      "start_sim_sec": 14.216,
+      "windows": 2,
+      "peak_linear_mps": 0.244,
+      "peak_angular_radps": 0.031,
+      "end_sim_sec": 14.816
+    },
+    {
+      "start_sim_sec": 21.108,
+      "windows": 1,
+      "peak_linear_mps": 0.001,
+      "peak_angular_radps": 1.748,
+      "end_sim_sec": 21.408
+    },
+    {
+      "start_sim_sec": 22.608,
+      "windows": 7,
+      "peak_linear_mps": 0.197,
+      "peak_angular_radps": 2.684,
+      "end_sim_sec": 24.708
+    }
+  ],
+  "odom_windows": 71,
+  "sim_sec": 21.904,
+  "wheel_line_events": 4,
+  "wheel_line_sec": 0.66,
+  "max_progress_m": 2.814
+}

@@ -1,0 +1,17 @@
+{
+  "name": "06_01",
+  "map": "/ws/experiments/worlds/suites/general200/maps/hard_1017_m.sdf",
+  "profile": "c00",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r3_repro/configs/c00.yaml"
+  ],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 60,
+  "partition": "lf_l_tune_r3_repro_324d64122723_011"
+}

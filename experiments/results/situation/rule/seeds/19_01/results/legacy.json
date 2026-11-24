@@ -1,0 +1,13 @@
+{
+ "name": "legacy",
+ "args": [],
+ "complete": false,
+ "progress_m": 2.835,
+ "progress_pct": 17.3,
+ "lap_sec": null,
+ "wall_sec": 17.1,
+ "lat_mean": 0.0127,
+ "lat_p95": 0.1146,
+ "lat_max": 0.139,
+ "reason": "off line >0.12m at 2.87m"
+}

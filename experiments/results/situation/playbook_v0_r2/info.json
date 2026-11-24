@@ -1,0 +1,6 @@
+{
+ "tag": "playbook_v0_r2",
+ "params": "src/line_follower/config/playbook_rule.yaml",
+ "started": "2026-11-24 22:12:56",
+ "groups": "official,seeds,random,finishgate"
+}

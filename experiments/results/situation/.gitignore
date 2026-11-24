@@ -1,0 +1,9 @@
+# Raw per-run data stays local: result.json, telemetry.json, job.json, summaries, configs and
+# model metrics are kept; traces, logs and the per-run telemetry.png (~200 KB each, >300 runs) are not.
+# Re-run: experiments/situation/evaluate.py / tune.py (see docs/playbook_learning.md 9).
+*.npz
+*.npy
+*.log
+*.csv
+ros/
+telemetry.png

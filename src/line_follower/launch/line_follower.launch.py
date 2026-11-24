@@ -22,8 +22,9 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('gui', default_value='true'),
         DeclareLaunchArgument('start_delay', default_value='20.0'),
-        # mode:=rule (default) or mode:=dl picks config/<mode>.yaml; params:=<file> overrides it
-        DeclareLaunchArgument('mode', default_value='rule'),
+        # mode:=playbook_rule (default: rule + learned finish judge), mode:=rule or mode:=dl picks
+        # config/<mode>.yaml; params:=<file> overrides it
+        DeclareLaunchArgument('mode', default_value='playbook_rule'),
         DeclareLaunchArgument('params', default_value=PythonExpression(
             ["'", config, "/' + '", LaunchConfiguration('mode'), "' + '.yaml'"])),
         # safety:=sim (default, generous limits) or safety:=real (Waffle Pi limits) picks

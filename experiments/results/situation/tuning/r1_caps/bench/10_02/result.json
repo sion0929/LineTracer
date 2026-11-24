@@ -1,0 +1,32 @@
+{
+  "name": "10_02",
+  "map": "/ws/experiments/worlds/suites/official_like50/maps/normal_5009_m.sdf",
+  "profile": "c01",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r1_caps/configs/c01.yaml"
+  ],
+  "complete": false,
+  "domain": 67,
+  "partition": "lf_l_tune_r1_caps_89cfa385b567_038",
+  "backend": "run_eval",
+  "progress_m": 4.884,
+  "progress_pct": 27.8,
+  "lap_sec": null,
+  "wall_sec": 36.1,
+  "lat_mean": 0.0141,
+  "lat_p95": 0.045,
+  "lat_max": 0.1382,
+  "reason": "off line >0.12m at 4.95m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 0,
+  "slip_events": [],
+  "odom_windows": 117,
+  "sim_sec": 35.9,
+  "wheel_line_events": 3,
+  "wheel_line_sec": 1.02,
+  "max_progress_m": 4.946
+}

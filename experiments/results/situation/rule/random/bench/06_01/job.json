@@ -1,0 +1,14 @@
+{
+  "name": "06_01",
+  "map": "/ws/experiments/worlds/suites/hills60/maps/easy_9024_m.sdf",
+  "profile": "default",
+  "args": [],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 55,
+  "partition": "lf_l_rand_rule_7ad745fb6f45_006"
+}

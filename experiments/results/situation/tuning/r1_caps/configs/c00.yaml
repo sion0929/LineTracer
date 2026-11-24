@@ -1,0 +1,24 @@
+# RIGHT_ANGLE.v_cap=0.15
+update_period: 0.1
+smoothing: 0.5
+min_confidence: 0.45
+finish:
+  p_min: 0.6
+  frames: 3
+  beyond_seen_min: 0.1
+  beyond_hit_max: 0.1
+  same_place: 0.15
+  approach_decel: 0.6
+situations:
+  STRAIGHT: {}
+  ARC: {}
+  RIGHT_ANGLE:
+    v_cap: 0.15
+  CROSSING: {}
+  LOOP_CORNER: {}
+  STUB: {}
+  GAP: {}
+  HILL: {}
+  FINISH_T: {}
+  START_T: {}
+  'OFF': {}

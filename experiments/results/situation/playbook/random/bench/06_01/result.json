@@ -1,0 +1,58 @@
+{
+  "name": "06_01",
+  "map": "/ws/experiments/worlds/suites/hills60/maps/easy_9024_m.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 55,
+  "partition": "lf_l_rand_playbook_234439002663_006",
+  "backend": "run_eval",
+  "progress_m": 8.051,
+  "progress_pct": 51.5,
+  "lap_sec": null,
+  "wall_sec": 61.3,
+  "lat_mean": 0.016,
+  "lat_p95": 0.0899,
+  "lat_max": 0.1661,
+  "reason": "off line >0.12m at 8.16m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 4,
+  "slip_events": [
+    {
+      "start_sim_sec": 51.772,
+      "windows": 1,
+      "peak_linear_mps": 0.052,
+      "peak_angular_radps": 0.702,
+      "end_sim_sec": 52.072
+    },
+    {
+      "start_sim_sec": 54.472,
+      "windows": 2,
+      "peak_linear_mps": 0.034,
+      "peak_angular_radps": 0.816,
+      "end_sim_sec": 55.072
+    },
+    {
+      "start_sim_sec": 61.072,
+      "windows": 1,
+      "peak_linear_mps": 0.032,
+      "peak_angular_radps": 0.665,
+      "end_sim_sec": 61.372
+    },
+    {
+      "start_sim_sec": 62.572,
+      "windows": 3,
+      "peak_linear_mps": 0.033,
+      "peak_angular_radps": 1.626,
+      "end_sim_sec": 63.472
+    }
+  ],
+  "odom_windows": 201,
+  "sim_sec": 61.236,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.3,
+  "max_progress_m": 8.151
+}

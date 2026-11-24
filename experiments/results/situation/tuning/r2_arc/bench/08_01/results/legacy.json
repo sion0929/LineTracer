@@ -1,0 +1,16 @@
+{
+ "name": "legacy",
+ "args": [
+  "-p",
+  "playbook.config:=/ws/experiments/results/situation/tuning/r2_arc/configs/c00.yaml"
+ ],
+ "complete": false,
+ "progress_m": 7.652,
+ "progress_pct": 46.0,
+ "lap_sec": null,
+ "wall_sec": 52.6,
+ "lat_mean": 0.0087,
+ "lat_p95": 0.0282,
+ "lat_max": 0.1748,
+ "reason": "off line >0.12m at 7.75m"
+}

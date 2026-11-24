@@ -1,0 +1,14 @@
+{
+  "name": "20_01",
+  "map": "/ws/experiments/situation/data/maps/eval/hard_19.sdf",
+  "profile": "default",
+  "args": [],
+  "limit": 300.0,
+  "stall": 20.0,
+  "off": 0.12,
+  "startup": 60,
+  "follower": "/ws/experiments/user_base/run_user.py",
+  "backend": "run_eval",
+  "domain": 69,
+  "partition": "lf_l_playbook_v0_r2_e3069e1cd3b3_020"
+}

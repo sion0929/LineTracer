@@ -1,0 +1,47 @@
+{
+  "name": "05_03",
+  "map": "/ws/experiments/worlds/suites/general200/maps/normal_1016_m.sdf",
+  "profile": "c02",
+  "args": [
+    "-p",
+    "playbook.config:=/ws/experiments/results/situation/tuning/r2_arc/configs/c02.yaml"
+  ],
+  "complete": true,
+  "domain": 64,
+  "partition": "lf_l_tune_r2_arc_6440665ed5ef_015",
+  "backend": "run_eval",
+  "progress_m": 16.936,
+  "progress_pct": 99.4,
+  "lap_sec": 79.76,
+  "wall_sec": 83.3,
+  "lat_mean": 0.0081,
+  "lat_p95": 0.0307,
+  "lat_max": 0.0462,
+  "reason": "finished",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 2,
+  "slip_events": [
+    {
+      "start_sim_sec": 32.984,
+      "windows": 2,
+      "peak_linear_mps": 0.098,
+      "peak_angular_radps": 1.998,
+      "end_sim_sec": 33.584
+    },
+    {
+      "start_sim_sec": 49.184,
+      "windows": 2,
+      "peak_linear_mps": 0.049,
+      "peak_angular_radps": 0.864,
+      "end_sim_sec": 49.784
+    }
+  ],
+  "odom_windows": 275,
+  "sim_sec": 83.208,
+  "wheel_line_events": 4,
+  "wheel_line_sec": 3.84,
+  "max_progress_m": 16.931
+}

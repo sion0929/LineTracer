@@ -1,0 +1,44 @@
+{
+  "name": "03_01",
+  "map": "/ws/experiments/results/safety/maps/normal_26_x4.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 52,
+  "partition": "lf_l_rule_r2_9424c0599ccb_003",
+  "backend": "run_eval",
+  "progress_m": 2.933,
+  "progress_pct": 18.3,
+  "lap_sec": null,
+  "wall_sec": 18.5,
+  "lat_mean": 0.0196,
+  "lat_p95": 0.1131,
+  "lat_max": 0.1344,
+  "reason": "off line >0.12m at 2.97m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 2,
+  "slip_events": [
+    {
+      "start_sim_sec": 9.676,
+      "windows": 1,
+      "peak_linear_mps": 0.134,
+      "peak_angular_radps": 0.005,
+      "end_sim_sec": 9.976
+    },
+    {
+      "start_sim_sec": 13.876,
+      "windows": 2,
+      "peak_linear_mps": 0.185,
+      "peak_angular_radps": 0.022,
+      "end_sim_sec": 14.476
+    }
+  ],
+  "odom_windows": 61,
+  "sim_sec": 18.48,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.9,
+  "max_progress_m": 2.968
+}

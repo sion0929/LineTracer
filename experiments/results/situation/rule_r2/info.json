@@ -1,0 +1,6 @@
+{
+ "tag": "rule_r2",
+ "params": "src/line_follower/config/rule.yaml",
+ "started": "2026-11-24 22:01:02",
+ "groups": "official,seeds,random,finishgate"
+}

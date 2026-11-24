@@ -1,0 +1,25 @@
+# Per-situation playbook for controller: playbook (control/playbook.py).
+# Not a ROS parameter file: loaded by the controller (parameter playbook.config, default this file).
+# Situations: line_follower.situation.SITUATIONS. Tuning record: docs/playbook_learning.md.
+update_period: 0.1        # [s] situation re-classification period
+smoothing: 0.5            # EMA weight of the newest class probabilities
+min_confidence: 0.45      # below this no situation row applies (plain rule behaviour)
+finish:                   # confirm_finish (replaces finish_min_dist)
+  p_min: 0.6              # P(FINISH_T) needed on each confirming frame
+  frames: 3               # consecutive confirming candidates at the same place
+  beyond_seen_min: 0.10   # [m] camera view must already reach this far past the bar
+  beyond_hit_max: 0.10    # max share of line cells just past the bar
+  same_place: 0.15        # [m] candidates closer than this count as the same T
+  approach_decel: 0.6     # [m/s^2] unconfirmed T ahead: keep v <= sqrt(2 a d) + v_min
+situations:               # keys: v_cap, v_max, a_lat, a_dec, omega_max, lookahead_min, lookahead_gain
+  STRAIGHT: {}
+  ARC: {}                  # tuned v_cap 0.18 not adopted (held-out worse), see playbook_tuned.yaml
+  RIGHT_ANGLE: {}
+  CROSSING: {}
+  LOOP_CORNER: {}
+  STUB: {}
+  GAP: {}
+  HILL: {}                 # tuned v_cap 0.18 not adopted (held-out worse), see playbook_tuned.yaml
+  FINISH_T: {}
+  START_T: {}
+  "OFF": {}              # quoted: YAML 1.1 reads a bare OFF as false

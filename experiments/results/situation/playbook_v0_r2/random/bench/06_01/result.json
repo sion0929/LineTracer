@@ -1,0 +1,37 @@
+{
+  "name": "06_01",
+  "map": "/ws/experiments/worlds/suites/hills60/maps/easy_9024_m.sdf",
+  "profile": "default",
+  "args": [],
+  "complete": false,
+  "domain": 55,
+  "partition": "lf_l_rand_playbook_v0_r2_401fec6ec703_006",
+  "backend": "run_eval",
+  "progress_m": 7.266,
+  "progress_pct": 46.4,
+  "lap_sec": null,
+  "wall_sec": 48.6,
+  "lat_mean": 0.0124,
+  "lat_p95": 0.075,
+  "lat_max": 0.1361,
+  "reason": "off line >0.12m at 7.30m",
+  "collision_count": 0,
+  "collided": [],
+  "avoidance_attempts": 0,
+  "avoided_count": 0,
+  "slip_count": 1,
+  "slip_events": [
+    {
+      "start_sim_sec": 45.276,
+      "windows": 1,
+      "peak_linear_mps": 0.021,
+      "peak_angular_radps": 0.683,
+      "end_sim_sec": 45.576
+    }
+  ],
+  "odom_windows": 160,
+  "sim_sec": 48.616,
+  "wheel_line_events": 1,
+  "wheel_line_sec": 0.96,
+  "max_progress_m": 7.302
+}
