@@ -60,6 +60,11 @@ class FollowerNode(Node):
         self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
+        self.declare_parameter('imu_slip', False)             # fuse encoder and IMU speed; use the IMU while the wheels slip
+        self.declare_parameter('imu_slip_thresh', 0.04, rng(0.0, 0.5, 'encoder speed above the IMU speed that counts as wheel slip [m/s]'))
+        self.declare_parameter('imu_slip_k', 1.5, rng(0.0, 20.0, 'pull of the IMU speed toward the encoder speed [1/s]'))
+        self.declare_parameter('imu_floor', False)            # on/near ramps project onto the floor tracked with the IMU
+        self.declare_parameter('imu_floor_min_h', 0.008, rng(0.0, 0.1, 'elevation above which the floor model is used [m]'))
         self.declare_parameter('map_skip_pitch_deg', 0.0, rng(0.0, 30.0, 'do not write the map while |pitch| exceeds this (tipping over a ramp edge) [deg], 0 = off'))
         self.declare_parameter('deck_xfar', 0.0, rng(0.0, 1.0, 'camera range while standing on a raised deck (climbed, not yet descended) [m], 0 = off'))
         self.declare_parameter('climb_slip', 0.0, rng(0.0, 0.3, 'fraction of /odom distance lost to wheel slip while climbing'))
@@ -160,6 +165,17 @@ class FollowerNode(Node):
             ds = math.hypot(dx, dy)
             if dx * math.cos(oyaw) + dy * math.sin(oyaw) < 0.0:
                 ds = -ds
+            t_od = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+            dt_od = t_od - getattr(self, 't_odom', t_od)
+            self.t_odom = t_od
+            if self.get_parameter('imu_slip').value and 0.0 < dt_od < 0.2:
+                self.v_enc = ds / dt_od
+                v_imu = getattr(self, 'v_imu', self.v_enc)
+                self.slipping = self.v_enc - v_imu > self.get_parameter('imu_slip_thresh').value
+                if self.slipping and ds > 0.0:
+                    # wheels turn faster than the body moves: trust the IMU speed
+                    ds = max(0.0, min(ds, v_imu * dt_od))
+                    self.slip_events = getattr(self, 'slip_events', 0) + 1
             slip = self.get_parameter('climb_slip').value
             if slip > 0.0 and self.pitch_f > math.radians(2.0) and ds > 0.0:
                 # climbing: the wheels spin a little, /odom overstates the distance (~6-7 %
@@ -175,6 +191,9 @@ class FollowerNode(Node):
             ym = self.pose[2] + 0.5 * wrap(yaw - self.pose[2])
             self.pose = (self.pose[0] + ds * math.cos(ym), self.pose[1] + ds * math.sin(ym), yaw)
             self.travel += abs(ds)
+            # height of the wheels above the floor, from the IMU pitch along the way
+            pitch_now = self.imu[-1][1] if self.imu else 0.0
+            self.elev = max(0.0, getattr(self, 'elev', 0.0) + ds * math.sin(pitch_now - REST_PITCH))
         self.odom_xy, self.odom_yaw = (p.position.x, p.position.y), oyaw
         self.hist.append((msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9, self.pose))
         if len(self.hist) > 100:
@@ -186,9 +205,29 @@ class FollowerNode(Node):
         pitch = -math.asin(max(-1.0, min(1.0, 2.0 * (q.w * q.y - q.z * q.x))))
         self.pitch_f += 0.1 * (pitch - self.pitch_f)                # ~50 ms at 200 Hz
         self.rock += 0.05 * (abs(msg.angular_velocity.y) - self.rock)
-        self.imu.append((msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9, pitch))
+        t_imu = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        if self.get_parameter('imu_slip').value:
+            # forward speed from the IMU: specific force minus the gravity share along the body
+            # x axis (nose up -> +g sin(pitch)), pulled slowly toward the encoder speed
+            last = getattr(self, 't_imu', None)
+            self.t_imu = t_imu
+            if last is not None and 0.0 < t_imu - last < 0.05:
+                dt = t_imu - last
+                a = msg.linear_acceleration.x - 9.81 * math.sin(pitch)
+                v = getattr(self, 'v_imu', 0.0) + a * dt
+                if not getattr(self, 'slipping', False):
+                    v += self.get_parameter('imu_slip_k').value * (getattr(self, 'v_enc', 0.0) - v) * dt
+                self.v_imu = v
+        self.imu.append((t_imu, pitch))
         if len(self.imu) > 400:
             del self.imu[:200]
+
+    def imu_pitch_at(self, ts):
+        """Raw IMU body pitch nearest to time ts (nose up > 0)."""
+        if not self.imu:
+            return REST_PITCH
+        k = min(range(len(self.imu) - 1, max(-1, len(self.imu) - 80), -1), key=lambda i: abs(self.imu[i][0] - ts))
+        return self.imu[k][1]
 
     def pitch_at(self, ts):
         """Camera pitch relative to the ground at time ts.
@@ -233,7 +272,7 @@ class FollowerNode(Node):
         elif self.pitch_f < -math.radians(3.0):
             self.on_deck = False
         deck = gp('deck_xfar').value
-        if deck > 0.0 and getattr(self, 'on_deck', False):
+        if deck > 0.0 and (getattr(self, 'on_deck', False) or getattr(self, 'elev', 0.0) > 0.01):
             x_far = min(x_far, deck)
         add_only = None
         if (not steady and gp('far_add_unsteady').value and x_far < vision.X_FAR
@@ -269,6 +308,18 @@ class FollowerNode(Node):
                 line, valid = terrain.line_mask_profile(gray, REST_PITCH, prof, xt)
                 out = PerceptionOutput(line=line, valid=valid, obstacle=None)
                 add_only = None
+        elev = getattr(self, 'elev', 0.0)
+        if out is None and gp('imu_floor').value and (on_hill or elev > gp('imu_floor_min_h').value):
+            # the floor ahead is level in the world: in the body frame it lies at
+            # z = -(h + x sin b) / cos b (h: wheel height above the floor, b: IMU body pitch).
+            # The ground ahead is the higher of the plane under the wheels and that floor.
+            b = self.imu_pitch_at(ts) - REST_PITCH
+            cb, sb = math.cos(b), math.sin(b)
+
+            def ground(xs, h=elev, cb=cb, sb=sb):
+                return np.maximum(0.0, (-h - xs * sb) / cb)
+            line, valid = terrain.line_mask_profile(gray, REST_PITCH, ground, min(x_far, vision.X_FAR))
+            out = PerceptionOutput(line=line, valid=valid, obstacle=None)
         if out is None:
             out = self.perception.process(bgr, gray, self.pitch_at(ts), x_far)
         self.last_obstacle = out.obstacle

@@ -56,6 +56,17 @@ class OracleNode(Base):
 
     def replan(self):
         tp = self.truth.get()
+        win = os.environ.get("ORACLE_WINDOW")              # "s0,s1": oracle only inside this arc window
+        if win:
+            s0, s1 = (float(v) for v in win.split(","))
+            if tp is not None:
+                d = np.linalg.norm(self.route - np.asarray(tp[:2]), axis=1)
+                lo = max(0, np.searchsorted(self.route_arc, self.progress_s - 0.4) - 1)
+                hi = min(len(d), np.searchsorted(self.route_arc, self.progress_s + 0.6) + 1)
+                k = lo + int(np.argmin(d[lo:hi]))
+                self.progress_s = max(self.progress_s, float(self.route_arc[k]))
+            if not (s0 <= self.progress_s <= s1):
+                return Base.replan(self)                   # camera route outside the window
         if tp is None or self.pose is None:
             return
         c, arc = self.route, self.route_arc
