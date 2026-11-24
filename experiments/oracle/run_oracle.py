@@ -17,62 +17,25 @@ replaced each camera frame. Used by bench.py like any follower:
   python3 experiments/bench.py MAPS --follower experiments/oracle/run_oracle.py --off 0.12 ...
   (set ORACLE_LEVEL / LF_PARAMS in the environment)
 """
-import json
 import math
 import os
 import sys
-import threading
 from collections import deque
 from pathlib import Path
 
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 PKG = Path(os.environ.get("LF_PKG", HERE.parents[1] / "src" / "line_follower"))
 sys.path.insert(0, str(PKG))
 LEVEL = int(os.environ.get("ORACLE_LEVEL", "0"))
 AHEAD = float(os.environ.get("ORACLE_AHEAD", "0.85"))
-sys.argv = [sys.argv[0], "--ros-args", "--params-file",
-            os.environ.get("LF_PARAMS", str(PKG / "config" / "follower.yaml")),
-            "-p", "use_sim_time:=true", *sys.argv[1:]]
 
 import rclpy  # noqa: E402
 from line_follower import follower_node as fn  # noqa: E402
 
-
-def load_route():
-    """Centre line (world, ordered) of the map this bench job runs, via the job folder."""
-    job_dir = Path(os.environ.get("ROS_LOG_DIR", ".")).parent
-    job = json.loads((job_dir / "job.json").read_text())
-    sdf = Path(job["map"])
-    side = sdf.with_suffix(".json")
-    if side.is_file():
-        c = np.asarray(json.loads(side.read_text())["centerline"], float)[:, :2]
-    elif (job_dir / "gt.npy").is_file():                    # official track (bench saves it)
-        c = np.load(job_dir / "gt.npy")[:, :2]
-    else:
-        c = np.load(Path(__file__).resolve().parents[1] / "gt.npy")[:, :2]
-    arc = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(c, axis=0), axis=1))]
-    return c, arc
-
-
-class Truth:
-    def __init__(self):
-        from gz.transport13 import Node
-        from gz.msgs10.pose_v_pb2 import Pose_V
-        self.pose = None
-        self.lock = threading.Lock()
-        self.node = Node()
-        self.node.subscribe(Pose_V, "/world/line_track/dynamic_pose/info", self.cb)
-
-    def cb(self, msg):
-        for p in msg.pose:
-            if p.name == "turtlebot3_waffle_pi":
-                q = p.orientation
-                yaw = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
-                with self.lock:
-                    self.pose = (p.position.x, p.position.y, yaw)
-                return
+import gt  # noqa: E402
 
 
 Base = fn.FollowerNode
@@ -81,8 +44,9 @@ Base = fn.FollowerNode
 class OracleNode(Base):
     def __init__(self):
         super().__init__()
-        self.route, self.route_arc = load_route()
-        self.truth = Truth()
+        route, self.route_arc = gt.load_route()
+        self.route = route[:, :2]
+        self.truth = gt.Truth()
         self.progress_s = 0.0
         self.rng = np.random.default_rng(int(os.environ.get("ORACLE_SEED", "0")))
         self.along_offset = 0.0
@@ -91,8 +55,7 @@ class OracleNode(Base):
         self.get_logger().info(f"ORACLE route level {LEVEL} (dev only, uses ground truth)")
 
     def replan(self):
-        with self.truth.lock:
-            tp = self.truth.pose
+        tp = self.truth.get()
         if tp is None or self.pose is None:
             return
         c, arc = self.route, self.route_arc
@@ -141,7 +104,15 @@ class OracleNode(Base):
             self.t_point = odom[-1]
 
 
-fn.FollowerNode = OracleNode
-_init = rclpy.init
-rclpy.init = lambda *a, **k: _init(args=sys.argv)
-fn.main()
+def main(node_class=OracleNode):
+    sys.argv = [sys.argv[0], "--ros-args", "--params-file",
+                os.environ.get("LF_PARAMS", str(PKG / "config" / "follower.yaml")),
+                "-p", "use_sim_time:=true", *sys.argv[1:]]
+    fn.FollowerNode = node_class
+    init = rclpy.init
+    rclpy.init = lambda *a, **k: init(args=sys.argv)
+    fn.main()
+
+
+if __name__ == "__main__":
+    main()
