@@ -78,3 +78,9 @@
 - 영상 입력이 아니라 선 지도 위 제어만 학습한다. 관측은 지도의 앞쪽 경로 점, 행동은 v와 w다.
 - 학습은 빠른 2D 시뮬레이터(gen_world 중심선, 지연, 슬립, 사각지대 무작위화)에서 하고, 검증은 Gazebo bench로 한다.
 - 담당은 Codex-2(experiments/rl/)다. 장애물 회피는 보류한다.
+
+## 2026-11-24 오후 — 대량 평가 기준선 A (사용자 룰 기반, rule 모드)
+- `hills60` + `official_like50` 110맵(인프라 오류 2건 제외 108): **완주 3/108 (2.8%)**, 평균 진행 29.0%, 완주 랩 73.2초.
+- 실패가 가장 이른 곳은 hard 반전 맵 0.9–2.0 m(첫 언덕의 오르막/내리막)이다. 완주 3건은 모두 normal이고 코너 원과 연결 교차로가 없었다.
+- 자료: experiments/results/lead/A_baseline_summary.txt, A_baseline_runs.csv, A_baseline.png
+- 진행 중: `rule_plane`(선 폭으로 지면 고르기) hills60 비교, 2D 제어 비교(user_pp, profile 끈 user_pp, Nav2 RPP 이식).

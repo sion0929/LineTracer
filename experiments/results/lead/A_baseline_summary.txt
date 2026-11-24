@@ -1,0 +1,38 @@
+runs 110  (infrastructure errors 2 excluded)
+ALL                      3/108   2.8%  mean  29.0%  lap   73.2 s  hits 0
+  difficulty=easy        0/18    0.0%  mean  27.8%  lap      -    hits 0
+  difficulty=hard        0/45    0.0%  mean  25.9%  lap      -    hits 0
+  difficulty=normal      3/45    6.7%  mean  32.6%  lap   73.2 s  hits 0
+  hills=1                1/27    3.7%  mean  30.7%  lap   70.5 s  hits 0
+  hills=2                2/57    3.5%  mean  29.1%  lap   74.6 s  hits 0
+  hills=3                0/20    0.0%  mean  24.5%  lap      -    hits 0
+  hills=4                0/4     0.0%  mean  39.6%  lap      -    hits 0
+  mirror=0               1/53    1.9%  mean  31.6%  lap   69.0 s  hits 0
+  mirror=1               2/55    3.6%  mean  26.6%  lap   75.3 s  hits 0
+  loop_corners=0         3/35    8.6%  mean  31.1%  lap   73.2 s  hits 0
+  loop_corners=1         0/49    0.0%  mean  26.9%  lap      -    hits 0
+  loop_corners=2         0/24    0.0%  mean  30.2%  lap      -    hits 0
+  detours=0              3/84    3.6%  mean  30.8%  lap   73.2 s  hits 0
+  detours=1              0/24    0.0%  mean  22.7%  lap      -    hits 0
+  bars=0                 3/64    4.7%  mean  30.7%  lap   73.2 s  hits 0
+  bars=1                 0/16    0.0%  mean  29.7%  lap      -    hits 0
+  bars=2                 0/14    0.0%  mean  27.8%  lap      -    hits 0
+  bars=3                 0/11    0.0%  mean  16.4%  lap      -    hits 0
+  bars=4                 0/3     0.0%  mean  41.9%  lap      -    hits 0
+  gaps=0                 3/58    5.2%  mean  31.3%  lap   73.2 s  hits 0
+  gaps=1                 0/13    0.0%  mean  36.1%  lap      -    hits 0
+  gaps=2                 0/12    0.0%  mean  28.6%  lap      -    hits 0
+  gaps=3                 0/25    0.0%  mean  20.3%  lap      -    hits 0
+  small_loops=0          3/108   2.8%  mean  29.0%  lap   73.2 s  hits 0
+  obstacles=0            3/108   2.8%  mean  29.0%  lap   73.2 s  hits 0
+worst maps:
+  hard_5012_m.sdf                          5.1%  off line >0.12m at 0.96m
+  hard_5018_m.sdf                          5.1%  off line >0.12m at 0.98m
+  hard_9038_m.sdf                          5.4%  off line >0.12m at 0.97m
+  normal_5029_m.sdf                        6.3%  off line >0.12m at 1.04m
+  hard_5006_m.sdf                          7.1%  off line >0.12m at 0.88m
+  hard_5048_m.sdf                          7.2%  off line >0.12m at 1.26m
+  hard_5014_m.sdf                          7.7%  off line >0.12m at 1.38m
+  hard_5002_m.sdf                          10.9%  off line >0.12m at 1.98m
+  hard_9005_m.sdf                          11.4%  off line >0.12m at 1.70m
+  hard_9017_m.sdf                          11.6%  off line >0.12m at 1.86m

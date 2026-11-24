@@ -1,0 +1,111 @@
+map,complete,progress_m,progress_pct,lap_sec,reason,wheel_line_events,max_progress_m
+/ws/tmp_lead/suites/hills60/easy_9000.sdf,False,2.573,16.8,,off line >0.12m at 2.63m,1,2.614
+/ws/tmp_lead/suites/hills60/normal_9001_m.sdf,False,3.607,22.4,,off line >0.12m at 3.64m,1,3.639
+/ws/tmp_lead/suites/hills60/hard_9002_m.sdf,False,3.466,21.5,,off line >0.12m at 3.50m,1,3.499
+/ws/tmp_lead/suites/hills60/easy_9003_m.sdf,False,3.483,22.2,,off line >0.12m at 3.52m,1,3.517
+/ws/tmp_lead/suites/hills60/normal_9004_m.sdf,False,2.7,17.6,,off line >0.12m at 2.72m,1,2.722
+/ws/tmp_lead/suites/hills60/hard_9005_m.sdf,False,1.905,11.4,,off line >0.12m at 1.70m,3,1.903
+/ws/tmp_lead/suites/hills60/easy_9006_m.sdf,False,,,,error: follower exited with status 1; see results/legacy.log,,
+/ws/tmp_lead/suites/hills60/normal_9007_m.sdf,False,2.813,17.6,,off line >0.12m at 2.83m,1,2.833
+/ws/tmp_lead/suites/hills60/hard_9008.sdf,False,2.885,17.1,,off line >0.12m at 2.92m,1,2.924
+/ws/tmp_lead/suites/official_like50/normal_5039_m.sdf,False,2.728,17.2,,off line >0.12m at 2.76m,1,2.761
+/ws/tmp_lead/suites/official_like50/hard_5040_m.sdf,False,4.486,26.7,,off line >0.12m at 4.48m,2,4.522
+/ws/tmp_lead/suites/official_like50/normal_5041_m.sdf,False,3.525,19.2,,off line >0.12m at 3.63m,1,3.622
+/ws/tmp_lead/suites/official_like50/hard_5042.sdf,False,6.939,36.2,,off line >0.12m at 6.92m,8,6.941
+/ws/tmp_lead/suites/official_like50/normal_5043_m.sdf,False,4.374,26.7,,off line >0.12m at 4.32m,5,4.376
+/ws/tmp_lead/suites/official_like50/hard_5044.sdf,False,2.834,14.3,,off line >0.12m at 2.87m,1,2.872
+/ws/tmp_lead/suites/official_like50/normal_5045_m.sdf,False,3.572,18.4,,off line >0.12m at 3.67m,3,3.667
+/ws/tmp_lead/suites/official_like50/hard_5046_m.sdf,False,2.793,16.6,,off line >0.12m at 2.81m,2,2.813
+/ws/tmp_lead/suites/official_like50/normal_5047.sdf,False,7.643,47.0,,off line >0.12m at 7.80m,3,7.803
+/ws/tmp_lead/suites/official_like50/hard_5048_m.sdf,False,1.266,7.2,,off line >0.12m at 1.26m,3,1.266
+/ws/tmp_lead/suites/hills60/easy_9009.sdf,False,2.905,18.7,,off line >0.12m at 2.93m,1,2.928
+/ws/tmp_lead/suites/official_like50/normal_5049.sdf,False,6.61,35.4,,off line >0.12m at 6.33m,7,6.611
+/ws/tmp_lead/suites/hills60/normal_9010.sdf,False,5.55,35.3,,off line >0.12m at 5.59m,1,5.586
+/ws/tmp_lead/suites/hills60/hard_9011_m.sdf,False,1.88,11.7,,off line >0.12m at 1.54m,7,1.881
+/ws/tmp_lead/suites/hills60/easy_9012_m.sdf,False,15.85,99.1,,stalled at 15.85m,0,15.851
+/ws/tmp_lead/suites/hills60/normal_9013_m.sdf,False,2.756,17.3,,off line >0.12m at 2.77m,1,2.774
+/ws/tmp_lead/suites/hills60/hard_9014_m.sdf,False,2.08,13.0,,off line >0.12m at 1.75m,3,2.083
+/ws/tmp_lead/suites/hills60/easy_9015.sdf,False,2.778,18.8,,off line >0.12m at 2.80m,1,2.804
+/ws/tmp_lead/suites/hills60/normal_9016_m.sdf,True,15.683,99.3,70.46,finished,0,15.677
+/ws/tmp_lead/suites/hills60/hard_9017_m.sdf,False,1.919,11.6,,off line >0.12m at 1.86m,4,1.922
+/ws/tmp_lead/suites/hills60/easy_9018_m.sdf,False,3.277,21.2,,off line >0.12m at 3.31m,1,3.309
+/ws/tmp_lead/suites/hills60/normal_9019.sdf,False,10.035,62.2,,off line >0.12m at 10.16m,1,10.154
+/ws/tmp_lead/suites/hills60/hard_9020_m.sdf,False,14.924,88.7,,stalled at 14.92m,2,14.925
+/ws/tmp_lead/suites/hills60/easy_9021.sdf,False,3.593,22.6,,off line >0.12m at 3.63m,1,3.63
+/ws/tmp_lead/suites/hills60/normal_9022_m.sdf,False,5.986,37.4,,off line >0.12m at 5.64m,1,5.987
+/ws/tmp_lead/suites/hills60/hard_9023_m.sdf,False,1.99,12.8,,off line >0.12m at 2.03m,1,2.035
+/ws/tmp_lead/suites/hills60/easy_9024_m.sdf,False,7.329,46.8,,off line >0.12m at 7.36m,1,7.365
+/ws/tmp_lead/suites/hills60/normal_9025.sdf,False,3.338,20.6,,off line >0.12m at 3.37m,1,3.373
+/ws/tmp_lead/suites/hills60/hard_9026.sdf,False,3.19,19.8,,off line >0.12m at 3.23m,4,3.229
+/ws/tmp_lead/suites/hills60/easy_9027.sdf,False,2.788,18.3,,off line >0.12m at 2.82m,1,2.816
+/ws/tmp_lead/suites/hills60/normal_9028.sdf,False,3.48,22.3,,off line >0.12m at 3.51m,1,3.506
+/ws/tmp_lead/suites/hills60/hard_9029.sdf,False,2.614,16.3,,off line >0.12m at 2.65m,1,2.65
+/ws/tmp_lead/suites/hills60/easy_9030.sdf,False,2.787,17.9,,off line >0.12m at 2.81m,1,2.81
+/ws/tmp_lead/suites/hills60/normal_9031.sdf,False,6.116,37.0,,stalled at 6.12m,34,6.114
+/ws/tmp_lead/suites/hills60/hard_9032_m.sdf,False,2.601,16.3,,off line >0.12m at 2.63m,1,2.632
+/ws/tmp_lead/suites/hills60/easy_9033_m.sdf,False,9.593,61.6,,off line >0.12m at 9.63m,3,9.629
+/ws/tmp_lead/suites/hills60/normal_9034_m.sdf,True,15.713,99.3,80.12,finished,0,15.707
+/ws/tmp_lead/suites/hills60/hard_9035.sdf,False,10.583,68.0,,off line >0.12m at 10.52m,2,10.583
+/ws/tmp_lead/suites/hills60/easy_9036.sdf,False,2.882,19.6,,off line >0.12m at 2.91m,1,2.91
+/ws/tmp_lead/suites/hills60/normal_9037_m.sdf,False,2.661,17.1,,off line >0.12m at 2.69m,1,2.689
+/ws/tmp_lead/suites/hills60/hard_9038_m.sdf,False,0.905,5.4,,off line >0.12m at 0.97m,1,0.97
+/ws/tmp_lead/suites/hills60/easy_9039_m.sdf,False,3.261,21.3,,off line >0.12m at 3.29m,1,3.291
+/ws/tmp_lead/suites/hills60/normal_9040.sdf,True,15.389,99.2,69.0,finished,0,15.384
+/ws/tmp_lead/suites/hills60/hard_9041_m.sdf,False,2.695,17.5,,off line >0.12m at 2.73m,1,2.727
+/ws/tmp_lead/suites/hills60/easy_9042.sdf,False,2.874,19.3,,off line >0.12m at 2.91m,11,2.918
+/ws/tmp_lead/suites/hills60/normal_9043.sdf,False,2.78,17.9,,off line >0.12m at 2.78m,1,2.781
+/ws/tmp_lead/suites/hills60/hard_9044.sdf,False,2.815,17.6,,off line >0.12m at 2.79m,14,2.816
+/ws/tmp_lead/suites/hills60/easy_9045.sdf,False,3.006,19.0,,off line >0.12m at 3.02m,1,3.022
+/ws/tmp_lead/suites/hills60/normal_9046.sdf,False,10.291,63.7,,off line >0.12m at 10.43m,1,10.421
+/ws/tmp_lead/suites/hills60/hard_9047.sdf,False,2.91,17.1,,off line >0.12m at 2.66m,2,2.911
+/ws/tmp_lead/suites/hills60/easy_9048.sdf,False,2.916,19.3,,off line >0.12m at 2.95m,1,2.951
+/ws/tmp_lead/suites/hills60/normal_9049.sdf,False,10.523,62.8,,off line >0.12m at 10.53m,2,10.526
+/ws/tmp_lead/suites/hills60/hard_9050_m.sdf,False,2.134,13.3,,off line >0.12m at 2.04m,8,2.134
+/ws/tmp_lead/suites/hills60/easy_9051.sdf,False,3.373,21.6,,off line >0.12m at 3.40m,1,3.397
+/ws/tmp_lead/suites/hills60/normal_9052_m.sdf,False,2.715,17.2,,off line >0.12m at 2.74m,1,2.735
+/ws/tmp_lead/suites/hills60/hard_9053.sdf,False,11.411,68.4,,off line >0.12m at 11.39m,4,11.411
+/ws/tmp_lead/suites/hills60/easy_9054_m.sdf,False,,,,error: follower exited with status 1; see results/legacy.log,,
+/ws/tmp_lead/suites/hills60/normal_9055.sdf,False,3.519,22.3,,off line >0.12m at 3.55m,1,3.548
+/ws/tmp_lead/suites/hills60/hard_9056.sdf,False,2.915,17.9,,off line >0.12m at 2.95m,1,2.952
+/ws/tmp_lead/suites/hills60/easy_9057_m.sdf,False,2.758,17.1,,off line >0.12m at 2.79m,1,2.784
+/ws/tmp_lead/suites/hills60/normal_9058.sdf,False,7.144,43.1,,off line >0.12m at 7.17m,3,7.171
+/ws/tmp_lead/suites/hills60/hard_9059_m.sdf,False,2.702,16.3,,off line >0.12m at 2.73m,1,2.733
+/ws/tmp_lead/suites/official_like50/hard_5000.sdf,False,3.589,21.3,,off line >0.12m at 3.62m,1,3.618
+/ws/tmp_lead/suites/official_like50/normal_5001_m.sdf,False,3.443,18.5,,off line >0.12m at 3.48m,1,3.474
+/ws/tmp_lead/suites/official_like50/hard_5002_m.sdf,False,1.964,10.9,,off line >0.12m at 1.98m,3,1.987
+/ws/tmp_lead/suites/official_like50/normal_5003.sdf,False,8.307,47.3,,off line >0.12m at 8.27m,6,8.336
+/ws/tmp_lead/suites/official_like50/hard_5004.sdf,False,15.311,90.6,,off line >0.12m at 15.45m,10,15.452
+/ws/tmp_lead/suites/official_like50/normal_5005.sdf,False,13.735,73.4,,off line >0.12m at 13.76m,17,13.765
+/ws/tmp_lead/suites/official_like50/hard_5006_m.sdf,False,1.219,7.1,,off line >0.12m at 0.88m,6,1.221
+/ws/tmp_lead/suites/official_like50/normal_5007.sdf,False,6.527,34.5,,off line >0.12m at 6.57m,4,6.563
+/ws/tmp_lead/suites/official_like50/hard_5008.sdf,False,2.859,17.4,,off line >0.12m at 2.89m,1,2.894
+/ws/tmp_lead/suites/official_like50/normal_5009_m.sdf,False,5.075,28.9,,off line >0.12m at 5.08m,3,5.082
+/ws/tmp_lead/suites/official_like50/hard_5010.sdf,False,11.637,70.8,,off line >0.12m at 11.67m,3,11.67
+/ws/tmp_lead/suites/official_like50/normal_5011.sdf,False,3.462,19.5,,off line >0.12m at 3.47m,34,3.476
+/ws/tmp_lead/suites/official_like50/hard_5012_m.sdf,False,0.858,5.1,,off line >0.12m at 0.96m,1,0.961
+/ws/tmp_lead/suites/official_like50/normal_5013_m.sdf,False,2.754,15.0,,off line >0.12m at 2.78m,1,2.781
+/ws/tmp_lead/suites/official_like50/hard_5014_m.sdf,False,1.285,7.7,,off line >0.12m at 1.38m,2,1.379
+/ws/tmp_lead/suites/official_like50/normal_5015.sdf,False,4.021,21.3,,off line >0.12m at 4.03m,2,4.025
+/ws/tmp_lead/suites/official_like50/hard_5016.sdf,False,3.394,21.1,,off line >0.12m at 3.51m,1,3.506
+/ws/tmp_lead/suites/official_like50/normal_5017_m.sdf,False,2.76,14.3,,off line >0.12m at 2.78m,1,2.776
+/ws/tmp_lead/suites/official_like50/hard_5018_m.sdf,False,0.922,5.1,,off line >0.12m at 0.98m,1,0.983
+/ws/tmp_lead/suites/official_like50/normal_5019.sdf,False,5.69,32.0,,off line >0.12m at 5.77m,5,5.771
+/ws/tmp_lead/suites/official_like50/hard_5020.sdf,False,2.624,16.4,,off line >0.12m at 2.66m,1,2.656
+/ws/tmp_lead/suites/official_like50/normal_5021_m.sdf,False,4.01,21.5,,off line >0.12m at 4.01m,3,4.016
+/ws/tmp_lead/suites/official_like50/hard_5022_m.sdf,False,9.058,53.2,,off line >0.12m at 9.39m,6,9.383
+/ws/tmp_lead/suites/official_like50/normal_5023.sdf,False,5.876,30.8,,off line >0.12m at 5.91m,1,5.909
+/ws/tmp_lead/suites/official_like50/hard_5024_m.sdf,False,15.698,91.9,,stalled at 15.70m,10,15.701
+/ws/tmp_lead/suites/official_like50/normal_5025_m.sdf,False,2.697,14.8,,off line >0.12m at 2.73m,1,2.73
+/ws/tmp_lead/suites/official_like50/hard_5026.sdf,False,2.852,17.1,,off line >0.12m at 2.89m,1,2.887
+/ws/tmp_lead/suites/official_like50/normal_5027.sdf,False,4.054,21.6,,off line >0.12m at 3.71m,20,4.056
+/ws/tmp_lead/suites/official_like50/hard_5028_m.sdf,False,2.854,16.3,,off line >0.12m at 2.88m,1,2.879
+/ws/tmp_lead/suites/official_like50/normal_5029_m.sdf,False,0.994,6.3,,off line >0.12m at 1.04m,1,1.037
+/ws/tmp_lead/suites/official_like50/hard_5030_m.sdf,False,2.676,14.3,,off line >0.12m at 2.73m,1,2.732
+/ws/tmp_lead/suites/official_like50/normal_5031_m.sdf,False,2.809,15.1,,off line >0.12m at 2.84m,1,2.84
+/ws/tmp_lead/suites/official_like50/hard_5032.sdf,False,2.848,16.8,,off line >0.12m at 2.88m,1,2.88
+/ws/tmp_lead/suites/official_like50/normal_5033_m.sdf,False,4.756,25.5,,off line >0.12m at 4.85m,4,4.848
+/ws/tmp_lead/suites/official_like50/hard_5034.sdf,False,2.423,12.5,,off line >0.12m at 2.42m,11,2.423
+/ws/tmp_lead/suites/official_like50/normal_5035.sdf,False,3.38,20.6,,off line >0.12m at 3.36m,9,3.379
+/ws/tmp_lead/suites/official_like50/hard_5036_m.sdf,False,12.419,71.6,,off line >0.12m at 12.38m,2,12.42
+/ws/tmp_lead/suites/official_like50/normal_5037_m.sdf,False,2.215,11.9,,off line >0.12m at 1.87m,12,2.217
+/ws/tmp_lead/suites/official_like50/hard_5038.sdf,False,2.657,13.9,,off line >0.12m at 2.69m,1,2.693
