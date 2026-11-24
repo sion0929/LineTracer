@@ -484,7 +484,10 @@ def job_contexts(count):
     """Assign each run its own domain and a partition namespaced to the matrix."""
     coordinator = int(os.environ.get("ROS_DOMAIN_ID") or "13")
     prefix = os.environ.get("GZ_PARTITION") or os.environ.get("LAB_NAME") or "lf_c"
-    domains = [domain for domain in BENCH_DOMAINS if domain != coordinator]
+    # BENCH_DOMAIN_BASE lets several bench processes share one container without
+    # colliding (e.g. 30, 50, 70 ...). Each run still gets its own domain.
+    base = int(os.environ.get("BENCH_DOMAIN_BASE") or BENCH_DOMAINS.start)
+    domains = [domain for domain in range(base, BENCH_DOMAINS.stop) if domain != coordinator]
     if not 1 <= count <= len(domains):
         raise ValueError(f"matrix must have 1–{len(domains)} runs for distinct ROS domains")
     batch = uuid4().hex[:12]
