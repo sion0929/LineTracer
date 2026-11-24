@@ -18,6 +18,9 @@ def make_perception(name, node):
     if name == 'rule_hill':
         from .rule_hill import RuleHillPerception
         return RuleHillPerception(node)
+    if name == 'rule_plane':
+        from .rule_plane import RulePlanePerception
+        return RulePlanePerception(node)
     if name == 'dl':
         from .dl import DlPerception
         return DlPerception(node)
