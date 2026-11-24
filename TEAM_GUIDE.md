@@ -67,6 +67,49 @@ python3 experiments/user_base/compare_map.py map.npz out/official/01_01 map.png
 - **ROS 도메인 충돌 주의:** 랩 컨테이너끼리 같은 도메인이 서로 보인다. bench는 `LAB_NAME`별로 도메인 블록을 쓴다(lf_a 30–49, lf_b 50–69, lf_c 70–89). 팀원마다 다른 `LAB_NAME`을 쓰고, 노드용 `ROS_DOMAIN_ID`도 서로 다르게 잡는다.
 - 판정 기준: 이탈은 `--off 0.12`(선이 바퀴 사이에 있으면 된다. 바퀴 안쪽 가장자리 ±0.1345 m)를 쓴다. 완주율은 같은 설정 10회 중 몇 회인지로 본다.
 
+## 4-1. 테스트 맵 세트 (대량 평가)
+
+평가 맵은 공식 트랙과 다르고 더 어렵다. 그래서 다양한 요소를 섞은 랜덤 맵을 대량으로 만들어 쓴다. 생성기: `experiments/worlds/gen_world.py`.
+
+| 요소 | 옵션 | 설명 |
+|---|---|---|
+| 난이도 | `--difficulty easy/normal/hard` | 원호 코너 반지름(hard 8–17 cm), 직각 코너 수, 길을 가로지르는 큰 보조 루프 |
+| 언덕 | `--hills N` | 언덕 여러 개(첫 직선 외 다른 직선에도) |
+| 좌우 반전 | `--mirror` | 코너 방향이 반대, 출발 방향 −x |
+| 코너 원 | `--loop-corners N` | 공식 트랙의 작은 원. 직각 코너 대신 반대 방향으로 270° 돌며 지나온 길을 90°로 가로지른다(r 8–12 cm) |
+| 연결 교차로 | `--detours N` | 직선에서 빠져나가 돈 뒤, 이미 지나온 직선을 90°로 가로질러 내려가고 원래 길로 복귀한다 |
+| 교차 막대 | `--crosses N` | 길을 직각으로 가로지르는 +자 선. 직진해서 통과한다 |
+| 곁가지 | `--stubs N` | 한쪽으로만 뻗은 짧은 가지(길 중간 T자). 종점이 아니다 |
+| 끊긴 길 | `--gaps N` | 바닥 선에 5–15 cm 빈 구간. 채점 중심선은 이어져 있다 |
+| 물방울 원 | `--small-loops N` | 직선 위 자기 교차 루프. 진입과 진출이 일직선이라 **직진도 정답일 수 있는 애매한 경우**라 스트레스 세트에만 쓴다 |
+| 상자 | `--obstacles N` | 장애물 |
+
+모든 추가 요소의 기본값은 0이다. 옵션을 안 주면 기존 시드 맵(평가 세트 0–39)이 바이트 단위로 똑같이 나온다.
+
+미리 만든 세트(`experiments/worlds/suites/<이름>/`, 맵 파일은 git에 없으니 아래 명령으로 다시 만든다. 결정적이라 같은 결과가 나온다):
+
+| 세트 | 맵 수 | 시드 | 내용 |
+|---|---|---|---|
+| `general200` | 200 | 1000– | 모든 요소를 무작위로 섞음, 장애물 없음 |
+| `obstacles100` | 100 | 3000– | 위와 같고 상자 1–3개 |
+| `official_like50` | 50 | 5000– | hard/normal, 언덕 2–4, 코너 원 1–2, 연결 교차로 1, 곁가지, 끊긴 길 |
+| `stress50` | 50 | 7000– | 모든 요소 최대, 물방울 원 포함 |
+
+```bash
+python3 experiments/worlds/make_suite.py --name general200 --count 200
+python3 experiments/worlds/make_suite.py --name obstacles100 --count 100 --seed0 3000 --obstacles 1-3
+python3 experiments/worlds/make_suite.py --name official_like50 --count 50 --seed0 5000 --difficulty hard,normal \
+  --hills 2-4 --loop-corners 1-2 --detours 1 --stubs 1-2 --crosses 0-2 --gaps 1-3
+python3 experiments/worlds/make_suite.py --name stress50 --count 50 --seed0 7000 --difficulty hard --hills 3-4 \
+  --loop-corners 2 --detours 1 --stubs 2 --crosses 2 --gaps 3 --small-loops 1-2
+# 세트 전체 주행 (컨테이너 안)
+python3 experiments/bench.py $(cat experiments/worlds/suites/general200/list.txt) \
+  --follower experiments/user_base/run_user.py --jobs 4 --off 0.12 --output out/general200
+# 요소별 완주율 표 + 그림
+python3 experiments/worlds/summarize_suite.py out/general200 experiments/worlds/suites/general200/index.csv --png general200.png
+```
+각 세트 폴더에는 `list.txt`(bench 입력), `index.csv`(맵별 요소), `sheet_XX.png`(미리보기 20장씩)가 있다. 시드 1000 이상은 튜닝용이고, 0–39는 고정 평가 세트라 튜닝에 쓰지 않는다.
+
 ## 5. 과제 규칙 (공통)
 
 - 로봇 런타임은 `/camera/image_raw`, `/imu`, `/odom`, `/cmd_vel`만 쓴다. `/world/...` 토픽, `set_pose`, 지상 진실은 채점 도구에서만 쓴다.
