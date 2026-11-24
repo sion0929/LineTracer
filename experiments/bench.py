@@ -35,6 +35,7 @@ WHEEL_OFFSET = 0.1435
 WHEEL_ON_LINE = 0.010 + 0.009
 MAX_JOBS = 16
 BENCH_DOMAINS = range(30, 102)
+LAB_DOMAIN_BASE = {"lf_a": 30, "lf_b": 50, "lf_c": 70, "line_follower_lab": 90}
 COLUMNS = (
     "name", "map", "profile", "backend", "complete", "progress_m", "progress_pct", "lap_sec",
     "sim_sec", "wall_sec", "lat_p95", "lat_mean", "lat_max", "collision_count",
@@ -486,8 +487,12 @@ def job_contexts(count):
     prefix = os.environ.get("GZ_PARTITION") or os.environ.get("LAB_NAME") or "lf_c"
     # BENCH_DOMAIN_BASE lets several bench processes share one container without
     # colliding (e.g. 30, 50, 70 ...). Each run still gets its own domain.
-    base = int(os.environ.get("BENCH_DOMAIN_BASE") or BENCH_DOMAINS.start)
-    domains = [domain for domain in range(base, BENCH_DOMAINS.stop) if domain != coordinator]
+    # Containers share the Docker bridge, so DDS discovery crosses containers:
+    # every lab gets its own block of 20 domains (lf_a 30-49, lf_b 50-69, lf_c/lead 70-89).
+    lab = os.environ.get("LAB_NAME", "")
+    base = int(os.environ.get("BENCH_DOMAIN_BASE") or LAB_DOMAIN_BASE.get(lab, BENCH_DOMAINS.start))
+    stop = min(base + 20, BENCH_DOMAINS.stop) if not os.environ.get("BENCH_DOMAIN_BASE") or lab else BENCH_DOMAINS.stop
+    domains = [domain for domain in range(base, stop) if domain != coordinator]
     if not 1 <= count <= len(domains):
         raise ValueError(f"matrix must have 1–{len(domains)} runs for distinct ROS domains")
     batch = uuid4().hex[:12]

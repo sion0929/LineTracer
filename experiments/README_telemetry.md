@@ -16,5 +16,5 @@ python3 experiments/telemetry.py compare out.png DIR [DIR ...]   # 여러 주행
 ```
 지상 진실(x, y, yaw)은 채점용 개발 도구에서만 쓰며 로봇 런타임에는 쓰지 않는다.
 
-## 한 컨테이너에서 bench 여러 개 동시 실행
-각 bench는 실행마다 ROS 도메인을 30번부터 차례로 나눠 준다. bench를 동시에 두 개 이상 띄우면 `BENCH_DOMAIN_BASE`로 시작 번호를 겹치지 않게 지정한다(예: 첫 번째 30, 두 번째 50, 세 번째 70). `GZ_PARTITION`도 서로 다르게 준다.
+## ROS 도메인 충돌 주의 (2026-11-24 확인)
+랩 컨테이너들은 같은 Docker 브리지 네트워크를 써서 **다른 컨테이너의 같은 ROS 도메인이 서로 보인다**. lf_a에서 도메인 97로 publish한 메시지가 lf_c에서 그대로 수신됐다. 그래서 bench는 LAB_NAME마다 도메인 20개씩을 따로 쓴다: lf_a 30–49, lf_b 50–69, lf_c(리드) 70–89, line_follower_lab 90–101. 같은 컨테이너에서 bench를 동시에 두 개 이상 띄울 때는 블록 안에서 `BENCH_DOMAIN_BASE`를 나눠라(예: lf_a는 30과 40). `GZ_PARTITION`도 서로 다르게 준다.
