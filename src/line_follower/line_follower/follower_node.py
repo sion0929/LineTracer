@@ -64,7 +64,8 @@ class FollowerNode(Node):
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
         self.declare_parameter('restore_model', '')            # ONNX of the line-restoration net ('' = off)
         self.declare_parameter('restore_trigger', 0.45, rng(0.0, 2.0, 'restore when the open path is shorter than this [m]'))
-        self.declare_parameter('restore_len', 0.6, rng(0.0, 1.5, 'longest restored stretch [m]'))
+        self.declare_parameter('restore_len', 0.4, rng(0.0, 1.5, 'longest restored stretch [m]'))
+        self.declare_parameter('restore_thresh', 0.6, rng(0.0, 1.0, 'follow the predicted route only where its probability exceeds this'))
         self.declare_parameter('trace_wide', False)           # follow acute corners (100-150 deg) when nothing else continues
         self.declare_parameter('imu_slip', False)             # fuse encoder and IMU speed; use the IMU while the wheels slip
         self.declare_parameter('imu_slip_thresh', 0.04, rng(0.0, 0.5, 'encoder speed above the IMU speed that counts as wheel slip [m/s]'))
@@ -393,6 +394,11 @@ class FollowerNode(Node):
         return link, best
 
     def replan(self):
+        # restored points are a fresh guess every frame, never remembered path
+        n = getattr(self, 'n_restored', 0)
+        if n:
+            del self.path[max(0, len(self.path) - n):]      # (all of it if pruning ate into the guess)
+        self.n_restored = 0
         self.replan_map()
         self.restore_path()
 
@@ -450,7 +456,7 @@ class FollowerNode(Node):
 
     def restore_path(self):
         """The map has no more line ahead: continue along the learned route prediction."""
-        if self.restorer is None or self.t_point is not None or self.pose is None:
+        if self.restorer is None or self.t_point is not None or self.pose is None or self.travel < 0.3:
             return
         gp = self.get_parameter
         if len(self.path) >= 2 and (self.path_end != 'open' or path_len(self.path) >= gp('restore_trigger').value):
@@ -462,11 +468,10 @@ class FollowerNode(Node):
         else:
             start, heading = (0.05, 0.0), 0.0
         prob = self.restorer.route(self.map, self.pose)
-        ext = self.restorer.extend(prob, start, heading, gp('restore_len').value)
+        ext = self.restorer.extend(prob, start, heading, gp('restore_len').value, thresh=gp('restore_thresh').value)
         if len(ext) >= 3:
             self.path = list(self.path) + [self.to_odom(x, y) for x, y in ext]
-            if len(self.path) < 2:
-                return
+            self.n_restored = len(ext)
             self.path_end = 'open'
 
     # ---- control --------------------------------------------------------

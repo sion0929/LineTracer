@@ -77,7 +77,7 @@ def metrics(pred, y, unseen):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--train", type=Path, required=True)
+    ap.add_argument("--train", required=True, help="one or more .npz, comma separated")
     ap.add_argument("--val", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--epochs", type=int, default=30)
@@ -88,8 +88,12 @@ def main():
     a = ap.parse_args()
     torch.set_num_threads(2)
     a.out.mkdir(parents=True, exist_ok=True)
-    tr, va = np.load(a.train), np.load(a.val)
-    Xt, Yt, Ut = tr["x"], tr["y"], tr["unseen"]
+    parts = [np.load(f) for f in a.train.split(",")]
+    va = np.load(a.val)
+    Xt = np.concatenate([t["x"] for t in parts])
+    Yt = np.concatenate([t["y"] for t in parts])
+    Ut = np.concatenate([t["unseen"] for t in parts])
+    del parts
     Xv, Yv, Uv = va["x"], va["y"], va["unseen"]
     dev = "cuda"
     w = a.width

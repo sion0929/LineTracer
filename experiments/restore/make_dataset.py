@@ -72,6 +72,84 @@ def load(path):
     return c, arc, painted + marks
 
 
+def synthetic(seed):
+    """Random track in memory: straights, arcs, sharp turns (30-150 deg), U-turns, gaps,
+    dashes, crossing bars, parallel lines and branches. Returns (centre, arc, painted)."""
+    import random
+    import sys
+    sys.path.insert(0, str(ROOT / "experiments/worlds"))
+    import gen_world as G
+    r = random.Random(seed)
+    prog = [("S", 0.6)]
+    for _ in range(r.randint(4, 9)):
+        k = r.random()
+        if k < 0.25:
+            prog.append(("S", r.uniform(0.15, 0.7)))
+        elif k < 0.55:
+            prog.append(("A", r.choice([0.06, 0.1, 0.15, 0.25, 0.4]), r.choice([-1, 1]) * r.uniform(30, 180)))
+        elif k < 0.8:
+            prog.append(("SQ", r.choice([-1, 1]) * r.choice([30, 45, 60, 90, 90, 120, 135, 150])))
+            prog.append(("S", r.uniform(0.12, 0.5)))
+        else:
+            sgn = r.choice([-1, 1])
+            prog += [("A", r.uniform(0.08, 0.2), sgn * 180), ("S", r.uniform(0.2, 0.6))]
+    prog.append(("S", 0.5))
+    x, y, h, pts = 0.0, 0.0, 0.0, [(0.0, 0.0)]
+    for cmd in prog:
+        if cmd[0] == "SQ":
+            h += math.radians(cmd[1])
+            continue
+        new = G.turtle(x, y, h, [cmd])
+        pts += new
+        x, y = pts[-1]
+        if cmd[0] == "A":
+            h += math.radians(cmd[2])
+    c = np.asarray(pts, float)
+    keep = np.r_[True, np.linalg.norm(np.diff(c, axis=0), axis=1) > 1e-6]
+    c = c[keep]
+    arc = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(c, axis=0), axis=1))]
+    # painted: gaps / dashes
+    painted, cur = [], []
+    gaps = []
+    for _ in range(r.randint(0, 3)):
+        g0 = r.uniform(0.8, max(0.9, arc[-1] - 0.5))
+        gaps.append((g0, g0 + r.uniform(0.03, 0.2)))
+    dash = r.random() < 0.15
+    for k, p in enumerate(c):
+        s = arc[k]
+        off = any(a < s < b for a, b in gaps) or (dash and (s % 0.15) > 0.10)
+        if off:
+            if len(cur) > 1:
+                painted.append(np.asarray(cur))
+            cur = []
+        else:
+            cur.append(p)
+    if len(cur) > 1:
+        painted.append(np.asarray(cur))
+    extra = []
+    for _ in range(r.randint(0, 4)):
+        s0 = r.uniform(0.5, arc[-1] - 0.2)
+        k = min(int(np.searchsorted(arc, s0)), len(c) - 2)
+        p0, d = c[k], c[k + 1] - c[k]
+        hh = math.atan2(d[1], d[0])
+        kind = r.random()
+        if kind < 0.45:                                  # crossing bar
+            a = hh + math.radians(r.uniform(30, 150))
+            L = r.uniform(0.2, 0.8)
+            extra.append(np.array([p0 - 0.5 * L * np.array([math.cos(a), math.sin(a)]),
+                                   p0 + 0.5 * L * np.array([math.cos(a), math.sin(a)])]))
+        elif kind < 0.7:                                 # branch / stub
+            a = hh + r.choice([-1, 1]) * math.radians(r.uniform(15, 90))
+            L = r.uniform(0.08, 0.5)
+            extra.append(np.array([p0, p0 + L * np.array([math.cos(a), math.sin(a)])]))
+        else:                                            # parallel line
+            off = r.choice([-1, 1]) * r.uniform(0.03, 0.2)
+            n = np.array([-math.sin(hh), math.cos(hh)])
+            L = r.uniform(0.3, 0.9)
+            extra.append(np.array([p0 + off * n, p0 + off * n + L * np.array([math.cos(hh), math.sin(hh)])]))
+    return c, arc, painted + extra
+
+
 def interp(c, arc, s):
     s = min(max(s, 0.0), arc[-1] - 1e-6)
     k = int(np.searchsorted(arc, s)) - 1
@@ -156,7 +234,7 @@ def sample(track, rng):
 def work(args):
     path, n, seed = args
     rng = np.random.default_rng(seed)
-    track = load(path)
+    track = synthetic(seed) if str(path).startswith("synthetic:") else load(path)
     if track[1][-1] < 1.0:
         return []
     return [sample(track, rng) for _ in range(n)]
@@ -169,11 +247,13 @@ def main():
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--workers", type=int, default=12)
+    ap.add_argument("--synthetic", type=int, default=0, help="also this many random in-memory tracks")
     a = ap.parse_args()
     files = []
-    for s in a.suites.split(","):
+    for s in filter(None, a.suites.split(",")):
         files += sorted((SUITES / s / "maps").glob("*.json"))
-    jobs = [(str(f), a.per_track, a.seed * 100003 + i) for i, f in enumerate(files)]
+    files += [f"synthetic:{a.seed}:{k}" for k in range(a.synthetic)]
+    jobs = [(str(f), a.per_track, a.seed * 100003 + i + 7) for i, f in enumerate(files)]
     with Pool(a.workers) as pool:
         out = [x for r in pool.imap(work, jobs, chunksize=2) for x in r]
     X = np.stack([np.stack([o[0], o[1]]) for o in out])
