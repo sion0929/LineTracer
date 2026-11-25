@@ -21,7 +21,25 @@ X1, Y0 = 1.2, 0.8
 
 class Restorer:
     def __init__(self, onnx_path):
-        self.net = cv2.dnn.readNetFromONNX(str(onnx_path))
+        # onnxruntime first (TensorRT FP16 on the Jetson, CUDA, else CPU); OpenCV DNN fallback
+        self.sess, self.net, self.backend = None, None, "cv2"
+        try:
+            import onnxruntime as ort
+            avail = ort.get_available_providers()
+            provs = []
+            if "TensorrtExecutionProvider" in avail:
+                cache = str(Path(onnx_path).parent / "trt_cache")
+                provs.append(("TensorrtExecutionProvider", {"trt_fp16_enable": True,
+                                                            "trt_engine_cache_enable": True,
+                                                            "trt_engine_cache_path": cache}))
+            provs += [p for p in ("CUDAExecutionProvider", "CPUExecutionProvider") if p in avail]
+            opts = ort.SessionOptions()
+            opts.intra_op_num_threads = 2
+            self.sess = ort.InferenceSession(str(onnx_path), opts, providers=provs)
+            self.inp = self.sess.get_inputs()[0].name
+            self.backend = self.sess.get_providers()[0]
+        except Exception:
+            self.net = cv2.dnn.readNetFromONNX(str(onnx_path))
         self.calls = 0
 
     def patch(self, lm, pose):
@@ -42,9 +60,12 @@ class Restorer:
 
     def route(self, lm, pose):
         line, seen = self.patch(lm, pose)
-        blob = np.stack([line, seen])[None]
-        self.net.setInput(blob)
-        logit = self.net.forward()[0, 0]
+        blob = np.stack([line, seen])[None].astype(np.float32)
+        if self.sess is not None:
+            logit = self.sess.run(None, {self.inp: blob})[0][0, 0]
+        else:
+            self.net.setInput(blob)
+            logit = self.net.forward()[0, 0]
         self.calls += 1
         return 1.0 / (1.0 + np.exp(-logit))
 
