@@ -17,6 +17,9 @@ PATCH = 520                  # window written per frame (covers the whole camera
 
 _ANGLES = np.deg2rad(np.arange(-100, 101, 4))
 _CONE = np.deg2rad(np.arange(-32, 33, 4))
+# sharper than 100 deg (acute corners): searched only when nothing is found within +-100 deg
+_WIDE = np.deg2rad(np.r_[np.arange(-150, -99, 4), np.arange(102, 151, 4)])
+WIDE_TURNS = False                     # set by the node (parameter trace_wide)
 ADD_GAP = 0.06               # add-only observations stay this far from known line [m]
 _ADD_KERNEL = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * round(ADD_GAP / RES) + 1,) * 2)
 
@@ -122,6 +125,11 @@ class LineMap:
         end = 'len'
         for _ in range(int(length / step)):
             cands = self._clusters(X, Y, h, 0.03)
+            if not cands and WIDE_TURNS and self._bridge(X, Y, h) is None:
+                # an acute corner: the line continues back to one side (120-150 deg)
+                wide = self._clusters(X, Y, h, 0.03, _WIDE)
+                if len(wide) == 1:
+                    cands = wide
             if not cands:
                 nxt = self._bridge(X, Y, h)
                 if nxt is None:

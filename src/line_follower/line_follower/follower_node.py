@@ -18,6 +18,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 
 from . import vision
+from . import line_map
 from .line_map import LineMap, RES, C0
 from .perception import make_perception
 from .control import make_controller
@@ -60,6 +61,7 @@ class FollowerNode(Node):
         self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
+        self.declare_parameter('trace_wide', False)           # follow acute corners (100-150 deg) when nothing else continues
         self.declare_parameter('imu_slip', False)             # fuse encoder and IMU speed; use the IMU while the wheels slip
         self.declare_parameter('imu_slip_thresh', 0.04, rng(0.0, 0.5, 'encoder speed above the IMU speed that counts as wheel slip [m/s]'))
         self.declare_parameter('imu_slip_rate', 0.0, rng(0.0, 5.0, 'apply the slip fix only while |pitch rate| exceeds this (tipping over a crest) [rad/s], 0 = always'))
@@ -115,6 +117,7 @@ class FollowerNode(Node):
         self.last_obstacle = None   # latest BEV obstacle mask from the perception plugin (or None)
         self.last_observation = None  # latest PerceptionOutput (line, valid, obstacle) + .pitch
         self.perception = make_perception(self.get_parameter('perception').value, self)
+        line_map.WIDE_TURNS = bool(self.get_parameter('trace_wide').value)
         self.controller = make_controller(self.get_parameter('controller').value, self)
         self.create_timer(0.02, self.control)
         self.get_logger().info(
