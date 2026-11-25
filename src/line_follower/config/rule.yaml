@@ -19,3 +19,10 @@ follower_node:
     # track-specific top speeds by distance driven [m]: (from, to, v_max) triples.
     # Fast only on the long straights; v_max elsewhere. Tuned for line_track.
     speed_profile: [7.2, 10.1, 0.7,  12.8, 14.0, 0.45,  14.0, 30.0, 0.7]
+    # Ramp handling with the IMU (adopted 2026-11-25, docs/OPEN_SOURCE_SURVEY.md 5-9):
+    # never-pass case maps 5.4 % -> 16.7 % per run (Fisher p = 0.003), no regression on the
+    # 251 always-pass maps, official track 8/8, hills60 subset 0/24 -> 2/24 (progress +56 %).
+    imu_slip: true          # encoder vs IMU speed: ignore wheel spin ...
+    imu_slip_rate: 0.3      # ... only while the body tips over a crest (|pitch rate| > 0.3 rad/s)
+    imu_floor: true         # project onto the floor tracked with the IMU while on/near a ramp
+    deck_xfar: 0.45         # on a raised deck only trust the near ground

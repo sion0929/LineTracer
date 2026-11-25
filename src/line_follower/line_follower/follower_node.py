@@ -62,6 +62,7 @@ class FollowerNode(Node):
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
         self.declare_parameter('imu_slip', False)             # fuse encoder and IMU speed; use the IMU while the wheels slip
         self.declare_parameter('imu_slip_thresh', 0.04, rng(0.0, 0.5, 'encoder speed above the IMU speed that counts as wheel slip [m/s]'))
+        self.declare_parameter('imu_slip_rate', 0.0, rng(0.0, 5.0, 'apply the slip fix only while |pitch rate| exceeds this (tipping over a crest) [rad/s], 0 = always'))
         self.declare_parameter('imu_slip_k', 1.5, rng(0.0, 20.0, 'pull of the IMU speed toward the encoder speed [1/s]'))
         self.declare_parameter('imu_floor', False)            # on/near ramps project onto the floor tracked with the IMU
         self.declare_parameter('imu_floor_min_h', 0.008, rng(0.0, 0.1, 'elevation above which the floor model is used [m]'))
@@ -172,6 +173,9 @@ class FollowerNode(Node):
                 self.v_enc = ds / dt_od
                 v_imu = getattr(self, 'v_imu', self.v_enc)
                 self.slipping = self.v_enc - v_imu > self.get_parameter('imu_slip_thresh').value
+                rate = self.get_parameter('imu_slip_rate').value
+                if rate > 0.0 and getattr(self, 'gyro_peak', 0.0) < rate:
+                    self.slipping = False          # steady slope: trust the wheels
                 if self.slipping and ds > 0.0:
                     # wheels turn faster than the body moves: trust the IMU speed
                     ds = max(0.0, min(ds, v_imu * dt_od))
@@ -205,6 +209,8 @@ class FollowerNode(Node):
         pitch = -math.asin(max(-1.0, min(1.0, 2.0 * (q.w * q.y - q.z * q.x))))
         self.pitch_f += 0.1 * (pitch - self.pitch_f)                # ~50 ms at 200 Hz
         self.rock += 0.05 * (abs(msg.angular_velocity.y) - self.rock)
+        self.gyro_y = abs(msg.angular_velocity.y)
+        self.gyro_peak = max(self.gyro_y, 0.97 * getattr(self, 'gyro_peak', 0.0))   # ~0.15 s hold at 200 Hz
         t_imu = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
         if self.get_parameter('imu_slip').value:
             # forward speed from the IMU: specific force minus the gravity share along the body
