@@ -27,6 +27,7 @@ _ADD_KERNEL = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * round(ADD_GAP / 
 class LineMap:
     def __init__(self):
         self.grid = np.zeros((SIZE, SIZE), np.uint8)
+        self.seen = np.zeros((SIZE, SIZE), np.uint8)     # cells the camera has looked at (restore.py)
         self.last = None
 
     def update(self, bev_mask, bev_valid, pose, add_only=None):
@@ -55,6 +56,7 @@ class LineMap:
         val = cv2.warpAffine(bev_valid, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST)
         win = self.grid[oy:oy + PATCH, ox:ox + PATCH]
         seen = val > 0
+        self.seen[oy:oy + PATCH, ox:ox + PATCH][seen] = 255
         if add_only is not None:
             add = cv2.warpAffine(add_only, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST) > 0
             known = cv2.dilate((win > 0).astype(np.uint8), _ADD_KERNEL) > 0
