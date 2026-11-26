@@ -13,6 +13,9 @@ def wrap(a):
 
 
 class RuleController(Controller):
+    def reset(self):
+        self.e_int, self.e_prev = 0.0, None
+
     def compute(self, rp, dt):
         node = self.node
         gp = node.get_parameter
@@ -72,5 +75,15 @@ class RuleController(Controller):
             w = 2.5 * alpha
         else:
             w = 2.0 * v * tgt[1] / d2
+        # PID trim on the cross-track error of the path at the robot (team role 3 tuning;
+        # all gains 0 = plain pure pursuit, the original behaviour)
+        kp, ki, kd = gp('pid_kp').value, gp('pid_ki').value, gp('pid_kd').value
+        if kp or ki or kd:
+            e = min(rp, key=lambda p: p[0] * p[0] + p[1] * p[1])[1]      # + = path left of the axle
+            self.e_int = max(-0.2, min(0.2, getattr(self, 'e_int', 0.0) + e * dt))
+            prev = getattr(self, 'e_prev', None)
+            de = 0.0 if prev is None else (e - prev) / max(dt, 1e-3)
+            self.e_prev = e
+            w += kp * e + ki * self.e_int + kd * de
         w = max(-w_max, min(w_max, w))
         return v, w

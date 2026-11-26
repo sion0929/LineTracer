@@ -6,6 +6,8 @@ line map --(trace)--> path ahead of the robot --(pure pursuit)--> /cmd_vel
 Only robot topics are used: /camera/image_raw, /odom, /cmd_vel.
 """
 import math
+import os
+from pathlib import Path
 import numpy as np
 import cv2
 import rclpy
@@ -26,9 +28,10 @@ from .control import make_controller
 from . import terrain
 from .scanmatch import ScanMatcher
 from .perception.base import PerceptionOutput
+from .perception.stage import PerceptionStage, REST_PITCH  # noqa: F401
+from .planning import make_planner
 
 
-REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
 
 
 def rng(lo, hi, desc=''):
@@ -63,6 +66,8 @@ class FollowerNode(Node):
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
         self.declare_parameter('restore_model', '')            # ONNX of the line-restoration net ('' = off)
+        self.declare_parameter('restore_replace', False)
+        self.declare_parameter('restore_gate', 0.0, rng(0.0, 1.0, 'replace mode: keep the map path while the net agrees with it (mean route prob along it >= gate); 0 = always replace'))       # follow the learned route every frame (not only when the path runs out)
         self.declare_parameter('restore_trigger', 0.45, rng(0.0, 2.0, 'restore when the open path is shorter than this [m]'))
         self.declare_parameter('restore_len', 0.4, rng(0.0, 1.5, 'longest restored stretch [m]'))
         self.declare_parameter('restore_thresh', 0.6, rng(0.0, 1.0, 'follow the predicted route only where its probability exceeds this'))
@@ -84,6 +89,17 @@ class FollowerNode(Node):
         self.declare_parameter('terrain_down_only', False)
         self.declare_parameter('terrain_bend_z', 0.0, rng(0.0, 0.1, 'on flat ground too, use the profile when it bends this much within the view [m], 0 = off'))  # use the profile only while going downhill (nose down)       # on a slope, project with the line-width height profile (terrain.py)
         self.declare_parameter('x_far_terrain', 0.50, rng(0.3, 1.5, 'camera range on a slope when terrain_hill is on [m]'))
+        # dual resolution (2026-11-25): near ground from a low-resolution image, the far band
+        # (far_split..BEV end, set LF_X_FAR) from the full 640x480 rows near the horizon,
+        # written add-only (never erases, overwritten once seen from close by). Off by default.
+        self.declare_parameter('far_band', False)
+        self.declare_parameter('far_split', 0.85)
+        self.declare_parameter('near_scale', 1.0)
+        self.declare_parameter('freeze_passed', False)  # keep the map of the road already driven (no rewrites)
+        self.declare_parameter('freeze_radius', 0.15)    # [m] around the axle, marked as driven
+        self.declare_parameter('far_add_only', True)   # far band only fills unseen line (False: overwrite like near)
+        self.declare_parameter('far_thin', 0.0)       # [m] far band: cut across-runs up to this long to their centre
+        self.declare_parameter('far_model', '')      # far-band U-Net ONNX (far_band.py); '' = threshold
         self.declare_parameter('far_add_unsteady', False)   # rocking on flat ground: far range add-only (fills unseen line, never erases)
         # Track-specific speed plan: [s_from, s_to, v_max, ...] with s = distance driven [m].
         # Outside these windows v_max applies. Tuned for the provided line_track world.
@@ -93,6 +109,15 @@ class FollowerNode(Node):
         # plugins: who sees the line, who drives (see TEAM_GUIDE.md)
         self.declare_parameter('perception', 'rule')    # rule | dl
         self.declare_parameter('controller', 'rule')    # rule | learned
+        self.declare_parameter('planner', 'rule')       # rule
+        # control (role 3): pure pursuit + PID trim on the cross-track error (0 = plain PP)
+        self.declare_parameter('pid_kp', 0.0, rng(0.0, 50.0, 'steering per metre of cross-track error [rad/s/m]'))
+        self.declare_parameter('pid_ki', 0.0, rng(0.0, 50.0, 'integral gain [rad/s/(m s)]'))
+        self.declare_parameter('pid_kd', 0.0, rng(0.0, 10.0, 'derivative gain [rad/s/(m/s)]'))
+        # line restoration: 'path' = extend the planned path when it runs out (legacy),
+        # 'map' = perception writes the restored route into the map it hands to planning
+        self.declare_parameter('restore_mode', 'path')
+        self.declare_parameter('restore_period', 0.2, rng(0.0, 2.0, "map mode: run the restoration net at most this often [s]"))
 
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.dbg_pub = self.create_publisher(Image, '/line_follower/debug', 1)
@@ -127,6 +152,8 @@ class FollowerNode(Node):
         self.restorer = restore.load(rpath) if rpath else None
         if rpath and self.restorer is None:
             self.get_logger().warning(f'restore_model not found: {rpath}')
+        self.perception_stage = PerceptionStage(self)
+        self.planner = make_planner(self.get_parameter('planner').value, self)
         self.controller = make_controller(self.get_parameter('controller').value, self)
         self.create_timer(0.02, self.control)
         self.get_logger().info(
@@ -261,218 +288,20 @@ class FollowerNode(Node):
 
     # ---- perception + path ----------------------------------------------
     def on_image(self, msg):
-        if self.pose is None or self.done:
+        # role 1 perception: frame -> lane map; role 2 planning: lane map -> local path
+        if not self.perception_stage.process(msg):
             return
-        if msg.encoding in ('rgb8', 'bgr8'):
-            img = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width, 3)
-            bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) if msg.encoding == 'rgb8' else img
-            gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-        elif msg.encoding == 'mono8':
-            gray = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width)
-            bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-        else:
-            return
-        if gray.shape != (vision.H, vision.W):
-            gray = cv2.resize(gray, (vision.W, vision.H))
-            bgr = cv2.resize(bgr, (vision.W, vision.H))
-        ts = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
-        # while the body rocks or the robot is on the hill, only trust the near ground
-        gp = self.get_parameter
-        steady = (self.rock < gp('steady_rock').value
-                  and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value))
-        self.rocking = (not steady) and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value)
-        x_far = vision.X_FAR if steady else min(vision.X_FAR, gp('x_far_unsteady').value)
-        # raised deck: after a climb and before the matching descent the ground beyond the
-        # edge lies below the plane the robot stands on, so far lines project too close
-        # (3 cm lower at 0.8 m -> ~18 cm short). Trust only the near ground up there.
-        if self.pitch_f > math.radians(3.0):
-            self.on_deck = True
-        elif self.pitch_f < -math.radians(3.0):
-            self.on_deck = False
-        deck = gp('deck_xfar').value
-        if deck > 0.0 and (getattr(self, 'on_deck', False) or getattr(self, 'elev', 0.0) > 0.01):
-            x_far = min(x_far, deck)
-        add_only = None
-        if (not steady and gp('far_add_unsteady').value and x_far < vision.X_FAR
-                and abs(self.pitch_f) < math.radians(gp('steady_pitch_deg').value)):
-            # rocking on flat ground: the far part is projected well but the pose used to
-            # write it is less certain -> let it only fill line the map has not seen yet
-            add_only = np.zeros((vision.BH, vision.BW), np.uint8)
-            add_only[:max(0, int(round((vision.X_FAR - x_far) / vision.RES)))] = 255
-            x_far = vision.X_FAR
-        out = None
-        on_hill = abs(self.pitch_f) >= math.radians(gp('steady_pitch_deg').value)
-        if on_hill and gp('terrain_down_only').value and self.pitch_f > 0.0:
-            on_hill = False                                  # climbing: keep the original projection
-        bend_z = gp('terrain_bend_z').value
-        if not on_hill and bend_z > 0.0:
-            # standing level (ramp deck, foot of a ramp) but the ground ahead drops or rises
-            prof_b, _ = terrain.estimate(gray, REST_PITCH, gp('terrain_calib').value)
-            if (prof_b is not None and prof_b.b is not None
-                    and abs(prof_b.ds) * max(0.0, vision.X_FAR - prof_b.b) > bend_z):
-                line, valid = terrain.line_mask_profile(gray, REST_PITCH, prof_b, x_far)
-                out = PerceptionOutput(line=line, valid=valid, obstacle=None)
-                add_only = None
-        if on_hill and gp('terrain_hill').value:
-            # the ground ahead is not the plane the robot stands on (crest / foot of a ramp):
-            # measure its height profile from the line width instead of assuming a plane
-            prof, _ = terrain.estimate(gray, REST_PITCH, gp('terrain_calib').value)
-            if prof is not None:
-                self.terrain_prof, self.terrain_t = prof, ts
-            elif ts - getattr(self, 'terrain_t', -9.0) < 0.4:
-                prof = self.terrain_prof
-            if prof is not None:
-                xt = min(vision.X_FAR, gp('x_far_terrain').value)
-                line, valid = terrain.line_mask_profile(gray, REST_PITCH, prof, xt)
-                out = PerceptionOutput(line=line, valid=valid, obstacle=None)
-                add_only = None
-        elev = getattr(self, 'elev', 0.0)
-        if out is None and gp('imu_floor').value and (on_hill or elev > gp('imu_floor_min_h').value):
-            # the floor ahead is level in the world: in the body frame it lies at
-            # z = -(h + x sin b) / cos b (h: wheel height above the floor, b: IMU body pitch).
-            # The ground ahead is the higher of the plane under the wheels and that floor.
-            b = self.imu_pitch_at(ts) - REST_PITCH
-            cb, sb = math.cos(b), math.sin(b)
-
-            def ground(xs, h=elev, cb=cb, sb=sb):
-                return np.maximum(0.0, (-h - xs * sb) / cb)
-            line, valid = terrain.line_mask_profile(gray, REST_PITCH, ground, min(x_far, vision.X_FAR))
-            out = PerceptionOutput(line=line, valid=valid, obstacle=None)
-        if out is None:
-            out = self.perception.process(bgr, gray, self.pitch_at(ts), x_far)
-        self.last_obstacle = out.obstacle
-        out.pitch = self.pitch_at(ts)
-        self.last_observation = out
-        pose_ts = self.pose_at(ts)
-        if gp('scan_match').value and not on_hill and pose_ts is not None:
-            if not hasattr(self, 'scanmatch'):
-                self.scanmatch = ScanMatcher(gain=gp('scan_gain').value)
-            if self.scanmatch.correct(self, out.line, out.valid, pose_ts):
-                pose_ts = self.pose_at(ts)
-        skip = gp('map_skip_pitch_deg').value
-        if not (skip > 0.0 and abs(self.pitch_f) > math.radians(skip)):
-            # (while the body tips over a ramp edge the camera-to-ground angle is unknown:
-            # such frames drew corners 13-19 cm off. Keep the map from the good frames.)
-            self.map.update(out.line, out.valid, pose_ts, add_only)
+        if self.get_parameter('restore_mode').value == 'map':
+            self.perception_stage.complete_map()
         self.replan()
         if self.get_parameter('debug_image').value:
             self.publish_debug()
 
-    def prune(self):
-        """Drop path points the axle has passed, measured along the path itself.
-
-        A point is passed when the robot is nearer to the next point than to this one,
-        seen along the segment between them (works for sharp corners and loops).
-        """
-        px, py = self.pose[0], self.pose[1]
-        n = 0
-        while n + 1 < len(self.path) and n < 30:
-            (ax, ay), (bx, by) = self.path[n], self.path[n + 1]
-            ux, uy = bx - ax, by - ay
-            if (px - ax) * ux + (py - ay) * uy <= 0.5 * (ux * ux + uy * uy):
-                break
-            n += 1
-        if n:
-            del self.path[:n]
-
-    def acquire(self, x0=0.0):
-        """Look for the line in front of the robot, starting x0 metres ahead of the axle."""
-        best = None
-        for dx in np.arange(x0, 0.62, 0.02):
-            for dy in (0.0, 0.03, -0.03, 0.06, -0.06, 0.10, -0.10, 0.15, -0.15, 0.2, -0.2):
-                X, Y = self.to_odom(dx, dy)
-                if self.map.hit(X, Y):
-                    best = self.map.snap(X, Y, 0.03) or (X, Y)
-                    break
-            if best:
-                break
-        if best is None:
-            return None, None
-        bx, by = self.to_robot(*best)
-        n = max(1, int(math.hypot(bx, by) / 0.02))
-        link = [self.to_odom(bx * i / n, by * i / n) for i in range(1, n)]
-        return link, best
-
     def replan(self):
-        # restored points are a fresh guess every frame, never remembered path
-        n = getattr(self, 'n_restored', 0)
-        if n:
-            del self.path[max(0, len(self.path) - n):]      # (all of it if pruning ate into the guess)
-        self.n_restored = 0
-        self.replan_map()
-        self.restore_path()
+        self.planner.replan()           # dev tools (oracle, shadow logger) override this hook
 
-    def replan_map(self):
-        self.prune()
-        if self.t_point is not None:
-            return                          # final approach: the path to the T is fixed
-        lock = []
-        acc = 0.0
-        for i, p in enumerate(self.path):
-            if i:
-                acc += math.hypot(p[0] - self.path[i - 1][0], p[1] - self.path[i - 1][1])
-            lock.append(p)
-            if acc >= 0.08:
-                break
-        if len(lock) >= 3 and acc >= 0.04:
-            anchor = self.map.snap(*lock[-1], 0.03)
-            relink = self.get_parameter('relink_radius').value
-            if anchor is None and relink > 0.03:
-                # the line seen now lies a few cm beside the remembered one (odometry drifted,
-                # e.g. after a ramp): re-attach the path to what the map shows now
-                anchor = self.map.snap(*lock[-1], relink)
-            if anchor is None:
-                return                      # map has nothing here (yet): keep the remembered path
-            h = math.atan2(lock[-1][1] - lock[-3][1], lock[-1][0] - lock[-3][0])
-        else:
-            lock, anchor = self.acquire()
-            if anchor is None:
-                return
-            h = self.pose[2]
-        pts, end = self.map.trace(anchor[0], anchor[1], h)
-        old_rest = max(0.0, path_len(self.path) - path_len(lock))
-        if end == 'open' and path_len(pts) < old_rest - 0.10:
-            return                          # the map lost part of the line: trust the memory
-        new = lock[:-1] + pts if lock else pts
-        if end == 'open' and path_len(pts) < 0.25:
-            # the remembered line stops just ahead: if the camera sees a line right now
-            # (the remembered one may be displaced by odometry error), follow what is seen
-            link, anchor = self.acquire(vision.X_NEAR)
-            if anchor is not None and min(math.hypot(anchor[0] - p[0], anchor[1] - p[1]) for p in new) < 0.10:
-                pts2, end2 = self.map.trace(anchor[0], anchor[1], self.pose[2])
-                if path_len(pts2) > path_len(pts) + 0.15 or end2 == 't':
-                    new, pts, end = link + pts2, pts2, end2
-        self.path = new
-        self.path_end = end
-        if end == 't':
-            # the controller plugin may judge the finish itself (None = use the legacy rule)
-            verdict = self.controller.confirm_finish(new, self.last_observation)
-            if verdict is None:
-                verdict = self.travel > self.get_parameter('finish_min_dist').value
-            if verdict:
-                # finish T seen: from now on drive this path to the T and stop there
-                self.get_logger().info(f'finish T detected (driven {self.travel:.2f} m)')
-                self.t_point = pts[-1]
-
-    def restore_path(self):
-        """The map has no more line ahead: continue along the learned route prediction."""
-        if self.restorer is None or self.t_point is not None or self.pose is None or self.travel < 0.3:
-            return
-        gp = self.get_parameter
-        if len(self.path) >= 2 and (self.path_end != 'open' or path_len(self.path) >= gp('restore_trigger').value):
-            return
-        rp = [self.to_robot(*p) for p in self.path]
-        if len(rp) >= 2:
-            start, prev = rp[-1], rp[-2]
-            heading = math.atan2(start[1] - prev[1], start[0] - prev[0])
-        else:
-            start, heading = (0.05, 0.0), 0.0
-        prob = self.restorer.route(self.map, self.pose)
-        ext = self.restorer.extend(prob, start, heading, gp('restore_len').value, thresh=gp('restore_thresh').value)
-        if len(ext) >= 3:
-            self.path = list(self.path) + [self.to_odom(x, y) for x, y in ext]
-            self.n_restored = len(ext)
-            self.path_end = 'open'
+    def prune(self):
+        self.planner.prune()
 
     # ---- control --------------------------------------------------------
     def stop(self):
@@ -504,6 +333,7 @@ class FollowerNode(Node):
         cmd = Twist()
         if len(rp) < 2:
             # nothing known ahead: creep straight for a while, then turn to search
+            self.controller.reset()
             self.blind += self.v_cmd * dt
             creep = self.blind < 0.35
             self.v_cmd = v_min if creep else 0.0

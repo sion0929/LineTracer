@@ -13,7 +13,8 @@ from . import vision
 RES = vision.RES
 SIZE = 2400                  # 12 m x 12 m
 C0 = SIZE // 2
-PATCH = 520                  # window written per frame (covers the whole camera view)
+# window written per frame (covers the whole camera view; grows when LF_X_FAR extends the BEV)
+PATCH = max(520, 2 * int(math.ceil(math.hypot(vision.X_FAR, vision.Y_HALF) / RES)) + 20)
 
 _ANGLES = np.deg2rad(np.arange(-100, 101, 4))
 _CONE = np.deg2rad(np.arange(-32, 33, 4))
@@ -28,7 +29,73 @@ class LineMap:
     def __init__(self):
         self.grid = np.zeros((SIZE, SIZE), np.uint8)
         self.seen = np.zeros((SIZE, SIZE), np.uint8)     # cells the camera has looked at (restore.py)
+        self.frozen = None          # cells the robot has already driven over: never rewritten (freeze())
+        self.restored = None        # learned route where the camera has not looked (perception restores)
         self.last = None
+
+    def freeze(self, x, y, radius):
+        """Mark the ground within radius [m] of the robot (odom) as final: later frames skip it."""
+        if self.frozen is None:
+            self.frozen = np.zeros((SIZE, SIZE), np.uint8)
+        cv2.circle(self.frozen, (int(round(x / RES)) + C0, int(round(y / RES)) + C0),
+                   int(round(radius / RES)), 255, -1)
+
+    def write_restored(self, restorer, pose, thresh=0.6, length=0.4, radius=1.3):
+        """Line restoration handed to planning: from every place where the seen line runs into
+        never-seen ground ("frontier"), follow the learned route (restore.Restorer) for at most
+        `length` m and draw that thin route into self.restored. Refreshed within radius of the
+        robot on every call; cells the camera has seen are never restored."""
+        from .restore import PRES
+
+        thresh = max(thresh, 0.90)
+        length = min(length, 0.12)
+        if self.restored is None:
+            self.restored = np.zeros((SIZE, SIZE), np.uint8)
+        px, py, th = pose
+        ci, cj = int(round(py / RES)) + C0, int(round(px / RES)) + C0
+        r = int(radius / RES)
+        self.restored[:] = 0          # only the current guess: old guesses would come back as ghost lines on revisits
+        line, seen = restorer.patch(self, pose)
+        unseen_near = cv2.dilate((seen == 0).astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+        front = (line > 0) & unseen_near
+        if not front.any():
+            return
+        prob = restorer.route(self, pose)
+        n, lab = cv2.connectedComponents(front.astype(np.uint8), connectivity=8)
+        ly, lx = np.nonzero(line > 0)
+        lxr, lyr = restorer.to_robot(lx, ly)
+        interior = (line > 0) & (seen > 0) & ~unseen_near
+        interior_rc = np.column_stack(np.nonzero(interior))
+        c, s = math.cos(th), math.sin(th)
+        for k in range(1, n):
+            rows, cols = np.nonzero(lab == k)
+            xs, ys = restorer.to_robot(cols, rows)
+            eligible = xs > 0.2
+            if not eligible.any():
+                continue
+            xs, ys = xs[eligible], ys[eligible]
+            pixels = np.column_stack((rows[eligible], cols[eligible]))
+            center = pixels.mean(axis=0)
+            offsets = center - interior_rc
+            local = offsets[np.sum(offsets ** 2, axis=1) < (0.12 / PRES) ** 2]
+            pick = int(np.argmax(xs))
+            if len(local):
+                outward = local.mean(axis=0)
+                if np.linalg.norm(outward) > 0:
+                    pick = int(np.argmax((pixels - center) @ outward))
+            start = (float(xs[pick]), float(ys[pick]))
+            near = np.hypot(lxr - start[0], lyr - start[1]) < 0.12
+            order = np.argsort(-np.hypot(lxr[near] - start[0], lyr[near] - start[1]))
+            known = list(zip(lxr[near][order], lyr[near][order]))       # farthest first, start last
+            chain = restorer.extend_ridge(prob, start, known, length, thresh, min_mean=0.98)
+            for x, y in chain:
+                X = px + x * c - y * s
+                Y = py + x * s + y * c
+                i, j = int(round(Y / RES)) + C0, int(round(X / RES)) + C0
+                if not (1 <= i < SIZE - 1 and 1 <= j < SIZE - 1):
+                    continue
+                stamp = self.seen[i - 1:i + 2, j - 1:j + 2] == 0          # never over seen ground
+                self.restored[i - 1:i + 2, j - 1:j + 2][stamp] = 255
 
     def update(self, bev_mask, bev_valid, pose, add_only=None):
         """Overwrite the part of the map currently seen by the camera.
@@ -57,6 +124,10 @@ class LineMap:
         win = self.grid[oy:oy + PATCH, ox:ox + PATCH]
         seen = val > 0
         self.seen[oy:oy + PATCH, ox:ox + PATCH][seen] = 255
+        if self.restored is not None:
+            self.restored[oy:oy + PATCH, ox:ox + PATCH][seen] = 0      # seen now: the guess is void
+        if self.frozen is not None:
+            seen &= self.frozen[oy:oy + PATCH, ox:ox + PATCH] == 0     # the road already driven stays as it is
         if add_only is not None:
             add = cv2.warpAffine(add_only, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST) > 0
             known = cv2.dilate((win > 0).astype(np.uint8), _ADD_KERNEL) > 0
@@ -72,7 +143,7 @@ class LineMap:
         i = int(round(Y / RES)) + C0
         j = int(round(X / RES)) + C0
         if 0 <= i < SIZE and 0 <= j < SIZE:
-            return self.grid[i, j] > 0
+            return self.grid[i, j] > 0 or (self.restored is not None and self.restored[i, j] > 0)
         return False
 
     def snap(self, X, Y, radius=0.06):
@@ -83,6 +154,8 @@ class LineMap:
         if i0 - r < 0 or j0 - r < 0 or i0 + r >= SIZE or j0 + r >= SIZE:
             return None
         win = self.grid[i0 - r:i0 + r + 1, j0 - r:j0 + r + 1]
+        if self.restored is not None:
+            win = np.maximum(win, self.restored[i0 - r:i0 + r + 1, j0 - r:j0 + r + 1])
         ii, jj = np.nonzero(win)
         if ii.size == 0:
             return None

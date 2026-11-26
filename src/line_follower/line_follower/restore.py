@@ -73,6 +73,70 @@ class Restorer:
     def to_robot(col, row):
         return X1 - (np.asarray(row) + 0.5) * PRES, Y0 - (np.asarray(col) + 0.5) * PRES
 
+    def extend_ridge(self, prob, start, known, length=0.4, thresh=0.6, *, min_mean=0.0):
+        """Longest walk from `start` through the confident part of the prediction (any angle:
+        acute corners and U-turns too), avoiding the already known path `known` (robot frame).
+        Returns robot-frame points ~2 cm apart, at most `length` long.
+        Rejects the chain if its sampled mean probability is below `min_mean`."""
+        from collections import deque
+        m = prob > thresh
+        if not m.any():
+            return []
+        def px(q):
+            return int(round((Y0 - q[1]) / PRES - 0.5)), int(round((X1 - q[0]) / PRES - 0.5))
+        c0, r0 = px(start)
+        # seed: nearest confident pixel within 4 px of the start
+        best = None
+        for dr in range(-4, 5):
+            for dc in range(-4, 5):
+                r, c = r0 + dr, c0 + dc
+                if 0 <= r < N and 0 <= c < N and m[r, c]:
+                    d = dr * dr + dc * dc
+                    if best is None or d < best[0]:
+                        best = (d, r, c)
+        if best is None:
+            return []
+        block = np.zeros_like(m)
+        for q in known[:-8]:                    # do not walk back along the known line (keep the last ~16 cm open)
+            c, r = px(q)
+            if 0 <= r < N and 0 <= c < N:
+                block[max(0, r - 2):r + 3, max(0, c - 2):c + 3] = True
+        m = m & ~block
+        _, rs, cs = best
+        m[rs, cs] = True
+        dist = np.full(m.shape, -1, np.int32)
+        par = {}
+        dist[rs, cs] = 0
+        dq = deque([(rs, cs)])
+        far = (rs, cs)
+        while dq:
+            r, c = dq.popleft()
+            for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+                rr, cc = r + dr, c + dc
+                if 0 <= rr < N and 0 <= cc < N and m[rr, cc] and dist[rr, cc] < 0:
+                    dist[rr, cc] = dist[r, c] + 1
+                    par[(rr, cc)] = (r, c)
+                    dq.append((rr, cc))
+                    if dist[rr, cc] > dist[far]:
+                        far = (rr, cc)
+        chain = [far]
+        while chain[-1] != (rs, cs):
+            chain.append(par[chain[-1]])
+        chain.reverse()
+        out, acc, last = [], 0.0, start
+        for r, c in chain[1::2]:                 # every 2nd pixel ~ 2.5 cm
+            x, y = X1 - (r + 0.5) * PRES, Y0 - (c + 0.5) * PRES
+            acc += math.hypot(x - last[0], y - last[1])
+            if acc > length:
+                break
+            out.append((x, y))
+            last = (x, y)
+        if out and min_mean > 0:
+            cols, rows = zip(*(px(q) for q in out))
+            if float(prob[rows, cols].mean()) < min_mean:
+                return []
+        return out
+
     def extend(self, prob, start, heading, length=0.6, step=0.02, thresh=0.5):
         """Follow the predicted route from start (robot frame) for up to `length`."""
         x, y, h = start[0], start[1], heading
