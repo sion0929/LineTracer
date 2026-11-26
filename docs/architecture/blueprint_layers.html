@@ -1,0 +1,366 @@
+<title>라인 트레이서 층별 청사진</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a building section. Floors stack from 3F (top) to -1F (bottom); data flows upward. Each floor = label rail + node cards. */
+:root{
+  --bg:#f5f6f4; --panel:#ffffff; --fg:#1b1f1d; --muted:#5f6863; --rule:#d8dcd8; --ink:#111413;
+  --f-1:#6b5b95; --f0:#7a6a3a; --f1:#1f6f5c; --f15:#2f6fa0; --f2:#a04f2f; --f3:#8a2f55;
+  --soft-1:#eeebf5; --soft0:#f4f0e3; --soft1:#e3efeb; --soft15:#e3edf6; --soft2:#f6e9e2; --soft3:#f5e5ec;
+  --warn:#9a5b00; --warn-soft:#f7ecd9;
+  --sans:"IBM Plex Sans KR","Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121514; --panel:#1a1e1c; --fg:#e4e8e5; --muted:#9aa49f; --rule:#2d3431; --ink:#eef1ef;
+  --f-1:#b4a3e6; --f0:#d8c27a; --f1:#5cc0a3; --f15:#7fb6e6; --f2:#e8936f; --f3:#e07aa6;
+  --soft-1:#25213a; --soft0:#2c2719; --soft1:#1c302a; --soft15:#1b2a38; --soft2:#33231b; --soft3:#331d28;
+  --warn:#e2a64f; --warn-soft:#33281a; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#121514; --panel:#1a1e1c; --fg:#e4e8e5; --muted:#9aa49f; --rule:#2d3431; --ink:#eef1ef;
+  --f-1:#b4a3e6; --f0:#d8c27a; --f1:#5cc0a3; --f15:#7fb6e6; --f2:#e8936f; --f3:#e07aa6;
+  --soft-1:#25213a; --soft0:#2c2719; --soft1:#1c302a; --soft15:#1b2a38; --soft2:#33231b; --soft3:#331d28;
+  --warn:#e2a64f; --warn-soft:#33281a; color-scheme:dark }
+body{ background:var(--bg); color:var(--fg); font-family:var(--sans); font-size:14.5px; line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+main{ max-width:1180px; margin:0 auto; padding-block:36px 72px; display:flex; flex-direction:column; gap:30px; }
+header{ display:flex; flex-direction:column; gap:8px; }
+.eyebrow{ font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; }
+h1{ font-size:clamp(26px,4vw,36px); margin:0; line-height:1.2; color:var(--ink); text-wrap:balance; }
+h2{ font-size:20px; margin:0 0 10px; color:var(--ink); }
+h3{ font-size:15.5px; margin:0; color:var(--ink); }
+p{ margin:0 0 8px; max-width:78ch; }
+code{ font-family:var(--mono); font-size:.86em; background:var(--soft1); padding:1px 4px; border-radius:4px; color:var(--ink); }
+.lede{ max-width:80ch; }
+.legend{ display:flex; flex-wrap:wrap; gap:8px 16px; font-size:13px; color:var(--muted); }
+.legend span{ display:inline-flex; align-items:center; gap:6px; }
+.dot{ width:10px; height:10px; border-radius:2px; display:inline-block; }
+
+.building{ display:flex; flex-direction:column; gap:10px; }
+.floor{ display:grid; grid-template-columns:120px minmax(0,1fr); gap:12px; border-radius:10px; padding:12px; border:1px solid var(--rule); }
+.floor .rail{ display:flex; flex-direction:column; gap:4px; }
+.floor .lvl{ font-family:var(--mono); font-size:26px; font-weight:500; line-height:1; }
+.floor .name{ font-weight:700; color:var(--ink); }
+.floor .sub{ font-size:12.5px; color:var(--muted); }
+.cards{ display:grid; grid-template-columns:repeat(auto-fit, minmax(270px,1fr)); gap:10px; min-width:0; }
+.card{ background:var(--panel); border:1px solid var(--rule); border-radius:8px; padding:11px 13px; min-width:0; display:flex; flex-direction:column; gap:6px; }
+.card .tag{ font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+.card dl{ margin:0; display:grid; grid-template-columns:62px minmax(0,1fr); gap:3px 8px; font-size:13.2px; }
+.card dt{ color:var(--muted); font-weight:500; }
+.card dd{ margin:0; min-width:0; overflow-wrap:anywhere; }
+.card ul{ margin:0; padding-left:16px; } .card li{ margin:1px 0; }
+.status{ font-size:12px; font-family:var(--mono); padding:2px 6px; border-radius:4px; align-self:flex-start; }
+.s-ok{ background:var(--soft1); color:var(--f1); } .s-wip{ background:var(--warn-soft); color:var(--warn); } .s-todo{ background:var(--soft2); color:var(--f2); }
+
+.f-1{ background:var(--soft-1); } .f-1 .lvl{ color:var(--f-1); }
+.f0{ background:var(--soft0); } .f0 .lvl{ color:var(--f0); }
+.f1{ background:var(--soft1); } .f1 .lvl{ color:var(--f1); }
+.f15{ background:var(--soft15); } .f15 .lvl{ color:var(--f15); }
+.f2{ background:var(--soft2); } .f2 .lvl{ color:var(--f2); }
+.f3{ background:var(--soft3); } .f3 .lvl{ color:var(--f3); }
+.f-1 .card{ border-left:3px solid var(--f-1); } .f0 .card{ border-left:3px solid var(--f0); } .f1 .card{ border-left:3px solid var(--f1); }
+.f15 .card{ border-left:3px solid var(--f15); } .f2 .card{ border-left:3px solid var(--f2); } .f3 .card{ border-left:3px solid var(--f3); }
+.up{ text-align:center; font-family:var(--mono); font-size:12px; color:var(--muted); }
+
+.tw{ overflow-x:auto; border:1px solid var(--rule); border-radius:8px; background:var(--panel); }
+table{ border-collapse:collapse; width:100%; font-size:13.5px; }
+th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--rule); vertical-align:top; }
+th{ font-weight:500; color:var(--muted); font-size:12.5px; background:var(--bg); white-space:nowrap; }
+tr:last-child td{ border-bottom:0; }
+td.num,.num{ font-variant-numeric:tabular-nums; font-family:var(--mono); white-space:nowrap; }
+.note{ border-left:3px solid var(--warn); background:var(--warn-soft); padding:9px 13px; border-radius:0 6px 6px 0; margin:10px 0 0; }
+.ms{ display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:10px; }
+.ms .card{ border-left:3px solid var(--ink); }
+footer{ color:var(--muted); font-size:12.5px; border-top:1px solid var(--rule); padding-top:12px; }
+@media (max-width:640px){ .floor{ grid-template-columns:1fr; } .floor .rail{ flex-direction:row; align-items:baseline; gap:10px; } }
+</style>
+
+<main>
+<header>
+  <div class="eyebrow">TurtleBot3 Waffle Pi · Jetson Orin Nano 8GB · Ubuntu 24.04 · ROS 2 Jazzy · 카메라만 (라이다 없음) · 2026-11-27</div>
+  <h1>라인 트레이서 층별 청사진</h1>
+  <p class="lede">친구(sion)가 세팅한 베이스(<code>3abe6cb</code>: 노드 5개, 토픽 계약, 안전 불변 조건, CI)를 뼈대로 하고, 그 위에 우리 인지 작업(V0–V2 인지, 선 지도, TensorRT, Isaac 평가)을 넣은 목표 구조다. 아래층부터 읽는다. 데이터는 아래에서 위로 흐른다.</p>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--f-1)"></i>-1층 사전 규칙</span>
+    <span><i class="dot" style="background:var(--f0)"></i>0층 센서</span>
+    <span><i class="dot" style="background:var(--f1)"></i>1층 인지</span>
+    <span><i class="dot" style="background:var(--f15)"></i>1.5층 인지↔판단 경계</span>
+    <span><i class="dot" style="background:var(--f2)"></i>2층 판단</span>
+    <span><i class="dot" style="background:var(--f3)"></i>3층 제어</span>
+    <span><span class="status s-ok">있음</span> <span class="status s-wip">진행 중</span> <span class="status s-todo">할 일</span></span>
+  </div>
+</header>
+
+<section class="building" aria-label="층별 구조">
+
+<!-- 3F -->
+<div class="floor f3">
+  <div class="rail"><div class="lvl">3F</div><div class="name">제어</div><div class="sub">제어 팀</div></div>
+  <div class="cards">
+    <div class="card">
+      <div class="tag">N9 · motion_controller (베이스 노드) · 50 Hz 타이머</div>
+      <h3>경로를 속도 명령 후보로</h3>
+      <span class="status s-ok">Python RuleController 있음 · 베이스 C++ 있음</span>
+      <dl>
+        <dt>입력</dt><dd><code>/path/local</code>, <code>Pose</code>(1.5층)</dd>
+        <dt>출력</dt><dd><code>/control/cmd_vel_candidate</code>: 선속도 v, 각속도 w, 계산 시각, 유효 기한</dd>
+        <dt>하는 일</dt><dd>Pure Pursuit + 횡오차 PID, 곡률·신뢰도·언덕에 따른 속도 프로파일, 급코너 정지 후 회전</dd>
+        <dt>결정</dt><dd><ul><li>lookahead, PID 게인</li><li>실물 속도 상한: 모터 무부하 최고가 11.1 V에서 약 0.24 m/s라 0.22 m/s 안팎</li><li>가감속 한계</li></ul></dd>
+        <dt>할 일</dt><dd>실물 저속(0.10–0.15 m/s) 튜닝 → 점진 상승. 결승 T에서 멈추는 실행만 맡음(판정은 2층)</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="tag">N10 · safety_guard (베이스 노드)</div>
+      <h3>유일한 <code>/cmd_vel</code> 발행자</h3>
+      <span class="status s-wip">베이스 C++ 있음 · Python 노드와 아직 미연결</span>
+      <dl>
+        <dt>입력</dt><dd>명령 후보, <code>/mission/state</code>(주행 허가), <code>/path/status</code>, 센서 신선도, <code>/imu</code> 기울기</dd>
+        <dt>출력</dt><dd><code>/cmd_vel</code> (geometry_msgs/Twist) → turtlebot3_node → OpenCR → 모터</dd>
+        <dt>하는 일</dt><dd>허가 없으면 0, 오래된 영상·경로·후보 차단, 속도·가속·각속도 제한, 이상 시 정지</dd>
+        <dt>결정</dt><dd>타임아웃 값(카메라·odom·후보), 제한값, 실물 E-STOP·워치독 방법</dd>
+        <dt>할 일</dt><dd>우리 Python 파이프라인 출력이 이 노드를 거치도록 연결</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+<div class="up">↑ /path/local · /path/status · /mission/state</div>
+
+<!-- 2F -->
+<div class="floor f2">
+  <div class="rail"><div class="lvl">2F</div><div class="name">판단</div><div class="sub">판단 팀</div></div>
+  <div class="cards">
+    <div class="card">
+      <div class="tag">N7 · path_planner (베이스 노드) · 카메라 프레임마다</div>
+      <h3>지도에서 로컬 경로를 고른다</h3>
+      <span class="status s-ok">Python RulePlanner 있음 · 베이스 C++ 있음</span>
+      <dl>
+        <dt>입력</dt><dd><code>MapView</code>(hit · snap · trace · confidence · seen), <code>Pose</code></dd>
+        <dt>출력</dt><dd><code>/path/local</code>: odom 점 목록(약 2 cm 간격), 끝 상태 <code>open</code>/<code>t</code>/<code>len</code>, 점별 신뢰도, 속도 상한 · <code>/path/status</code>: 유효성, 모드, 검증된 남은 거리 · <code>/path/candidates</code>(개발용)</dd>
+        <dt>하는 일</dt><dd>선 따라가기(trace), 교차로·가짜 길 가지 선택(규칙 또는 MLP), 짧은 오검출 조각 무시, 결승 T 판정, 구간 속도 상한</dd>
+        <dt>결정</dt><dd><ul><li>가지 선택 규칙 (지금은 가장 곧은 가지)</li><li>신뢰도 낮은 구간 감속 기준</li><li>결승 확정 조건 (출발 T 오인 방지)</li></ul></dd>
+        <dt>할 일</dt><dd>가짜 길 시험 맵(decoy1000)에서 가지 선택 정확도 측정</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="tag">N8 · mission_manager (베이스 노드)</div>
+      <h3>시작·종료 상태 머신</h3>
+      <span class="status s-wip">베이스 C++ 있음</span>
+      <dl>
+        <dt>입력</dt><dd>센서 상태, <code>/path/status</code>의 결승 이벤트</dd>
+        <dt>출력</dt><dd><code>/mission/state</code>: STARTUP_WAIT → CHECKING → READY → RUNNING → STOPPING → FINISHED (또는 FAULT, E_STOP), 주행 허가</dd>
+        <dt>결정</dt><dd>실물 평가의 시작 방식(Gazebo 과제의 "20초 대기"를 실물에도 둘지), 완주 확정 규칙</dd>
+        <dt>할 일</dt><dd>실물 평가 규칙 확인 후 상태 전이 조건 확정</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+<div class="up">↑ MapView (같은 프로세스 안) · Pose</div>
+
+<!-- 1.5F -->
+<div class="floor f15">
+  <div class="rail"><div class="lvl">1.5F</div><div class="name">인지↔판단 경계</div><div class="sub">코드는 인지 소유, 실행은 path_planner 쪽과 같은 프로세스</div></div>
+  <div class="cards">
+    <div class="card">
+      <div class="tag">N5 · line_map (Local Path Memory)</div>
+      <h3>선 지도: 본 것을 odom에 쌓는다</h3>
+      <span class="status s-ok">LineMap 있음 (legacy · logodds)</span>
+      <dl>
+        <dt>입력</dt><dd><code>/perception/bev</code> 프레임 관측 + 촬영 시각의 <code>Pose</code></dd>
+        <dt>출력</dt><dd>읽기 전용 <code>MapView</code> → N7 · <code>/lf/map</code> (OccupancyGrid, 2 Hz, 4 m × 4 m, 1 cm)</dd>
+        <dt>하는 일</dt><dd>5 mm 격자, 층: 선 · 본 영역 · 신뢰도 · 복원 · 고정. 촬영 시각 자세로 투영해 누적</dd>
+        <dt>왜 1.5층</dt><dd>베이스 설계는 Local Path Memory를 판단 노드 안에 두지만, 지도 정확도(정밀도·재현율)는 인지의 성적이다</dd>
+        <dt>결정</dt><dd><ul><li>기본 누적 방식: 로그 오즈가 기본 조명에서 정밀도 0.961 → 0.978 (재현율 유지)</li><li>지나간 공간 고정 사용 여부</li></ul></dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="tag">N4 · state_estimator (위치 추정)</div>
+      <h3>시각별 자세</h3>
+      <span class="status s-wip">노드 안 함수로 있음 → 분리 예정</span>
+      <dl>
+        <dt>입력</dt><dd><code>/odom</code>, <code>/imu</code>, 지도 정합 보정량(scanmatch)</dd>
+        <dt>출력</dt><dd><code>/localization/estimate</code> · 함수 <code>pose_at(t)</code>: <code>Pose(t, x, y, yaw, pitch, travel)</code></dd>
+        <dt>하는 일</dt><dd>odom 기록·보간, IMU 피치, 언덕 마루 미끄러짐 보정, 지도 정합 보정 적용</dd>
+        <dt>왜 1.5층</dt><dd>베이스는 "위치 추정 모듈 → path_planner", 우리는 지도 투영에 바로 쓴다. 양쪽이 같은 자세를 봐야 한다</dd>
+        <dt>결정</dt><dd><code>Pose.pitch</code> = 걸러진 피치, 영상과 자세를 맞추는 시간 허용폭</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="tag">N6 · restorer (안 본 곳 복원)</div>
+      <h3>보이지 않는 선 잇기</h3>
+      <span class="status s-ok">있음 · 기본 끔</span>
+      <dl>
+        <dt>입력</dt><dd>선 지도 주변 128 × 128 패치</dd>
+        <dt>출력</dt><dd>지도의 <code>restored</code> 층 (신뢰도 0.31)</dd>
+        <dt>왜 1.5층</dt><dd>인지가 선을 채울지, 판단이 경로를 늘릴지 애매하다. 결정: 인지가 지도에 쓰고 판단은 읽기만 한다</dd>
+        <dt>결정</dt><dd>켤지 여부. 공식 트랙에서 손해가 확인되어 지금은 끔</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+<div class="up">↑ /perception/bev (BEV 선 마스크 · 유효 영역 · 칸 신뢰도 · 촬영 시각 · 촬영 시각 자세) · /perception/status</div>
+
+<!-- 1F -->
+<div class="floor f1">
+  <div class="rail"><div class="lvl">1F</div><div class="name">인지</div><div class="sub">인지 팀 (우리)</div></div>
+  <div class="cards">
+    <div class="card">
+      <div class="tag">N2 · line_detector (베이스 노드 이름) · 카메라 30 Hz</div>
+      <h3>영상 → 바닥 위 선 (BEV)</h3>
+      <span class="status s-ok">Python 인지 플러그인 있음</span>
+      <dl>
+        <dt>입력</dt><dd><code>/camera/image_raw</code> 640 × 480 bgr8, 촬영 시각의 <code>Pose</code>와 피치</dd>
+        <dt>출력</dt><dd><code>/perception/bev</code>: 선 마스크 108 × 220 (0.31–0.85 m, 먼 띠를 켜면 1.3 m까지), 유효 영역, 칸 신뢰도, 촬영 시각 · <code>/perception/status</code>: 지연, 버전, 백엔드</dd>
+        <dt>하는 일</dt><dd><ul><li>가까운 곳: 규칙 임계값(V0 · V1) 또는 학습 모델 선 분할+깊이(V2, TensorRT)</li><li>혼합: 규칙 결과를 DL로 걸러 냄</li><li>그림자 덩어리 폭 필터</li><li>먼 곳: 640 지평선 띠 모델</li><li>언덕: IMU 피치 + 지면 추정</li></ul></dd>
+        <dt>결정</dt><dd><ul><li>기본 버전: 지금 V0-NearRule640</li><li>조명 강건화 방법 (폭 필터 · 구역별 임계 · 혼합)</li><li>먼 띠 사용 (BEV 0.85 m vs 1.3 m)</li></ul></dd>
+        <dt>할 일</dt><dd>실물 카메라 영상으로 재검증, 규칙 파라미터 최적화 결과 반영</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="tag">N1 · camera_driver (실물 전용)</div>
+      <h3>CSI 카메라 → ROS 토픽</h3>
+      <span class="status s-todo">할 일</span>
+      <dl>
+        <dt>입력</dt><dd>IMX219 원시 영상 (CSI, CAM0)</dd>
+        <dt>출력</dt><dd><code>/camera/image_raw</code> 640 × 480 bgr8 30 Hz, <code>/camera/camera_info</code></dd>
+        <dt>하는 일</dt><dd><code>nvarguscamerasrc</code> <b>모드 1640 × 1232 @30</b>(전체 화각) → <code>nvvidconv</code>로 640 × 480 축소 → 발행</dd>
+        <dt>결정</dt><dd>강의 래퍼(packbionics) 수정 vs 자체 노드, 촬영 시각 기준, 노출·화이트밸런스 고정 여부</dd>
+        <dt>할 일</dt><dd>jetson-io로 IMX219-A 켜기 → 30 Hz 확인 → 체커보드 보정</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+<div class="up">↑ /camera/image_raw · /imu · /odom</div>
+
+<!-- 0F -->
+<div class="floor f0">
+  <div class="rail"><div class="lvl">0F</div><div class="name">센서</div><div class="sub">공식 사양 + 우리가 쓰는 범위</div></div>
+  <div class="cards">
+    <div class="card">
+      <div class="tag">S1 · 카메라 · Raspberry Pi Camera v2.1 (Sony IMX219)</div>
+      <dl>
+        <dt>공식</dt><dd>8 MP 3280 × 2464, 픽셀 1.12 µm, 센서 3.68 × 2.76 mm, 초점거리 3.04 mm, F2.0 고정 초점, 수평 62.2° · 수직 48.8°</dd>
+        <dt>모드</dt><dd>3280×2464 @21 · 3280×1848 @28 · 1920×1080 @30 · <b>1640×1232 @30</b> · 1280×720 @60 (강의 보드 실측)</dd>
+        <dt>사용</dt><dd>1640 × 1232 → 640 × 480, 30 Hz. 수평·수직 화각을 모두 그대로 쓰는 유일한 30 fps 모드</dd>
+        <dt>내부값</dt><dd>이론값 fx = fy ≈ <b>529.6 px</b>, cx ≈ 319.5, cy ≈ 239.5 (640 × 480). 시뮬레이션 <code>vision.py</code>는 530.5 px로 거의 같다. 왜곡 계수는 보정으로 구한다</dd>
+        <dt>장착</dt><dd>차축 앞 0.076 m, 높이 0.103 m, 피치 0 (시뮬레이션 기준, 실측 필요). 화면 아래 끝이 보는 땅은 차축 앞 약 0.30 m → 그 안은 사각지대</dd>
+        <dt>토픽</dt><dd><code>/camera/image_raw</code> (N1이 발행)</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="tag">S2 · IMU · OpenCR 1.0 내장</div>
+      <dl>
+        <dt>공식</dt><dd>MPU9250(초기) 또는 ICM-20648(2020년 이후). 6축(자이로 3 + 가속도 3)</dd>
+        <dt>주기</dt><dd>공식 값 없음(170–200 Hz 언급만 있음) → <code>ros2 topic hz /imu</code>로 실측. 시뮬레이션은 200 Hz</dd>
+        <dt>사용</dt><dd>카메라 피치(언덕 투영), 언덕 마루에서 바퀴 미끄러짐 보정, 안전 감시의 기울기</dd>
+        <dt>토픽</dt><dd><code>/imu</code> (sensor_msgs/Imu, turtlebot3_node가 발행)</dd>
+        <dt>할 일</dt><dd>칩과 주기 확인, 정지 기록으로 잡음·바이어스 측정</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <div class="tag">S3 · 바퀴 엔코더 · Dynamixel XM430-W210-T × 2</div>
+      <dl>
+        <dt>공식</dt><dd>절대 엔코더 4096 스텝/회전, 무부하 77 rpm @12 V · 70 rpm @11.1 V, 정지 토크 3.0 N·m @12 V</dd>
+        <dt>환산</dt><dd>바퀴 반지름 0.033 m → 1스텝 0.051 mm. 무부하 최고 속도 0.266 m/s @12 V · <b>0.242 m/s @11.1 V</b>. TurtleBot3 공식 상한 0.26 m/s, 1.82 rad/s. 바퀴 간격 0.287 m</dd>
+        <dt>사용</dt><dd>odom(자세·누적 거리), 지도 좌표의 기준</dd>
+        <dt>토픽</dt><dd><code>/odom</code> (odom → base_footprint), <code>/joint_states</code>. 시뮬레이션 30 Hz</dd>
+        <dt>할 일</dt><dd>직진 기록으로 반지름 오차·미끄러짐 측정</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<!-- -1F -->
+<div class="floor f-1">
+  <div class="rail"><div class="lvl">-1F</div><div class="name">사전 규칙</div><div class="sub">모든 층이 지킨다</div></div>
+  <div class="cards">
+    <div class="card">
+      <div class="tag">R1 · 과제 조건 (베이스 설계서 1장)</div>
+      <ul>
+        <li>한 줄 실행 <code>ros2 launch line_follower_bringup competition.launch.py</code></li>
+        <li>시작 후 20초 대기 뒤 자동 출발 (Gazebo 과제 기준)</li>
+        <li>제공 월드·로봇 모델 수정 금지 (SHA256 확인)</li>
+        <li>카메라 영상으로 선 인식, 로버 토픽만 사용: <code>/camera/image_raw</code> <code>/imu</code> <code>/odom</code> <code>/cmd_vel</code></li>
+        <li><code>/world/</code> 토픽·실제 위치 인터페이스 금지</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag">R2 · 안전 불변 조건 (베이스 설계서 5.3, 9.2)</div>
+      <ul>
+        <li><code>safety_guard</code>만 <code>/cmd_vel</code>을 낸다</li>
+        <li>미션 허가가 없으면 속도 0</li>
+        <li>영상은 촬영 시각 기준으로 odom과 맞춘다 (수신 시각으로 대체 금지)</li>
+        <li>오래된 영상·경로·후보는 버린다</li>
+        <li>실시간 루프는 막히지 않는다. GCS·기록이 죽어도 주행에 영향 없음</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag">R3 · 좌표·단위·시간 예산</div>
+      <ul>
+        <li>odom 좌표: x 전방, y 왼쪽, m · rad · s</li>
+        <li>지도 5 mm 격자, BEV 0.31–0.85 m(먼 띠 1.3 m) × ±0.55 m</li>
+        <li>Jetson 카메라 프레임 예산 33 ms (지금 TensorRT로 21–26 ms)</li>
+        <li>실물: Ubuntu 24.04 + Jazzy, <code>use_sim_time:=false</code>, 라이다 없음</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag">R4 · 우리 팀 규칙</div>
+      <ul>
+        <li>인지는 칠해진 선을 가짜 길까지 모두 넘긴다. 길 선택은 판단 몫</li>
+        <li>인지 평가는 지도 정밀도·재현율로. 공식 트랙 과적합 금지</li>
+        <li>버전 이름 <code>V&lt;n&gt;-부품해상도-데이터</code> (<code>docs/VERSIONS.md</code>)</li>
+        <li><code>rule.yaml</code> 키 변경은 <code>-p follower_node:키:=값</code></li>
+        <li>CI 통과 후 PR, push는 승인 후에만</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<section>
+  <h2>층 사이 데이터 (인풋 → 아웃풋)</h2>
+  <div class="tw"><table>
+    <tr><th>보내는 곳</th><th>받는 곳</th><th>통로</th><th>내용</th><th>주기</th></tr>
+    <tr><td>S1 카메라</td><td>N1 camera_driver</td><td>CSI (CAM0)</td><td>IMX219 원시 영상, 모드 1640 × 1232</td><td class="num">30 Hz</td></tr>
+    <tr><td>N1</td><td>N2 line_detector</td><td><code>/camera/image_raw</code></td><td>640 × 480 bgr8, 촬영 시각 stamp</td><td class="num">30 Hz</td></tr>
+    <tr><td>S2 IMU · S3 엔코더</td><td>N4 state_estimator</td><td><code>/imu</code>, <code>/odom</code></td><td>각속도·가속도·자세 / odom 자세·속도</td><td class="num">IMU 실측, odom ≥ 20 Hz</td></tr>
+    <tr><td>N4</td><td>N2, N5, N7, N9</td><td><code>Pose</code> (<code>pose_at(t)</code>), <code>/localization/estimate</code></td><td>t, x, y, yaw, pitch(걸러진 값), travel</td><td class="num">요청 시 · 30 Hz</td></tr>
+    <tr><td>N2</td><td>N5 line_map</td><td><code>/perception/bev</code></td><td>BEV 선 마스크 · 유효 영역 · 칸 신뢰도 (각 108 × 220 uint8) · 촬영 시각 · 그 시각의 Pose</td><td class="num">30 Hz</td></tr>
+    <tr><td>N2</td><td>N10, 개발 도구</td><td><code>/perception/status</code></td><td>프레임 지연, 인지 버전, 백엔드(TensorRT/CPU), 폴백</td><td class="num">2 Hz</td></tr>
+    <tr><td>N5 (+N6)</td><td>N7 path_planner</td><td><code>MapView</code> (같은 프로세스 함수)</td><td><code>hit</code> · <code>snap</code> · <code>trace</code> · <code>confidence</code> · <code>seen</code></td><td class="num">프레임마다</td></tr>
+    <tr><td>N5</td><td>RViz · GCS</td><td><code>/lf/map</code></td><td>OccupancyGrid 4 m × 4 m, 1 cm, 값 = 신뢰도 0–100</td><td class="num">2 Hz</td></tr>
+    <tr><td>N7</td><td>N9 motion_controller</td><td><code>/path/local</code></td><td>odom 점 목록, 끝 상태, 점별 신뢰도, 속도 상한, T 지점</td><td class="num">30 Hz</td></tr>
+    <tr><td>N7</td><td>N8, N10</td><td><code>/path/status</code></td><td>경로 유효성, 모드, 검증된 남은 거리, 결승 이벤트</td><td class="num">30 Hz</td></tr>
+    <tr><td>N8</td><td>N10, 전체</td><td><code>/mission/state</code></td><td>상태 머신 단계, 주행 허가, 종료 사유</td><td class="num">변경 시 + 2 Hz</td></tr>
+    <tr><td>N9</td><td>N10 safety_guard</td><td><code>/control/cmd_vel_candidate</code></td><td>v, w, 계산 시각, 유효 기한</td><td class="num">50 Hz</td></tr>
+    <tr><td>N10</td><td>turtlebot3_node → OpenCR</td><td><code>/cmd_vel</code></td><td>최종 Twist (유일 발행자)</td><td class="num">50 Hz</td></tr>
+  </table></div>
+  <p class="note">배치: 논리 노드는 위와 같고, 실행은 베이스 설계서 4.3대로 컴포저블 노드 하나의 프로세스로 묶을 수 있다. N2–N7은 같은 프로세스에서 함수 호출로 이어 붙여 지도 복사를 없앤다. N8–N10과 카메라 드라이버는 별도 노드로 둔다.</p>
+</section>
+
+<section>
+  <h2>수평 화각</h2>
+  <div class="tw"><table>
+    <tr><th>카메라 모드</th><th>수평 화각</th><th>수직 화각</th><th>fps</th><th>화면 아래 끝이 보는 땅 (차축 앞)</th><th>판단</th></tr>
+    <tr><td class="num">1640 × 1232</td><td class="num">62.2°</td><td class="num">48.8°</td><td class="num">30</td><td class="num">0.30 m</td><td><b>사용</b>. 이 렌즈의 최대 화각을 30 fps로</td></tr>
+    <tr><td class="num">3280 × 2464</td><td class="num">62.2°</td><td class="num">48.8°</td><td class="num">21</td><td class="num">0.30 m</td><td>30 Hz를 못 맞춤</td></tr>
+    <tr><td class="num">3280 × 1848</td><td class="num">62.2°</td><td class="num">≈ 37.6°</td><td class="num">28</td><td class="num">≈ 0.38 m</td><td>위아래가 잘려 사각지대가 8 cm 늘어남</td></tr>
+    <tr><td class="num">1920 × 1080</td><td class="num">좁아짐 (가운데 잘라냄)</td><td class="num">좁아짐</td><td class="num">30</td><td>더 멂</td><td>강의 예제 기본값. 쓰지 않음</td></tr>
+  </table></div>
+  <p style="margin-top:8px">이 카메라로는 62.2°가 최대다. 더 넓히려면 같은 IMX219 센서에 광각 렌즈를 단 모듈로 바꿔야 한다. 그러면 사각지대가 줄고 옆으로 꺾이는 선을 더 일찍 보지만, 대가가 있다. 렌즈 왜곡을 보정해야 하고, 먼 곳의 픽셀 해상도가 떨어지며, 시뮬레이션 카메라와 학습 데이터를 다시 맞춰야 한다.</p>
+</section>
+
+<section>
+  <h2>팀 이정표 (2026-12-09 마감)</h2>
+  <div class="ms">
+    <div class="card"><div class="tag">M0 · 11-27 (금)</div><h3>베이스 정렬</h3><ul><li>이 청사진과 인터페이스 합의 (세 팀)</li><li>dev/two-track에서 베이스 CI 5단계 통과</li><li>베이스 노드 이름·토픽 계약 유지 결정</li></ul></div>
+    <div class="card"><div class="tag">M1 · 11-29 (일)</div><h3>실물 기동</h3><ul><li>Jetson 24.04 + Jazzy: OpenCR 펌웨어, 라이다 없는 turtlebot3 bringup, teleop</li><li>카메라: IMX219-A, 1640 × 1232 → 640 × 480 30 Hz 발행, 보정</li><li><code>/camera/image_raw</code> · <code>/imu</code> · <code>/odom</code> 주기 실측</li></ul></div>
+    <div class="card"><div class="tag">M2 · 12-01 (화)</div><h3>실물 인지 확인</h3><ul><li>바퀴 끈 상태로 V0 인지 실행, 디버그 영상 확인</li><li>정지·직진 기록으로 IMU·엔코더 잡음 측정</li><li>실물 트랙 bag으로 지도 정밀도·재현율</li><li>노드 경계 정리 (Pose · MapView · /perception/bev)</li></ul></div>
+    <div class="card"><div class="tag">M3 · 12-03 (목)</div><h3>실물 첫 완주</h3><ul><li>판단·제어 연결, safety_guard 경유 <code>/cmd_vel</code></li><li>저속(0.10–0.15 m/s)으로 공식 트랙 완주</li><li>mission_manager 시작·종료 규칙 확정</li></ul></div>
+    <div class="card"><div class="tag">M4 · 12-05 (토)</div><h3>성능 올리기</h3><ul><li>인지 기본값 확정 (조명 강건화, 로그 오즈, 먼 띠)</li><li>속도 상한 올리기 (실측 최고 약 0.24 m/s)</li><li>Jetson TensorRT 엔진 적용</li></ul></div>
+    <div class="card"><div class="tag">M5 · 12-07 (월)</div><h3>기능 동결과 리허설</h3><ul><li>반복 완주 시험, 구간 기록</li><li>실패 사례 bag 수집 → 수정만</li><li>문서·버전 정리</li></ul></div>
+    <div class="card"><div class="tag">M6 · 12-09 (수)</div><h3>제출</h3><ul><li>최종 버전 태그, 제출물 점검</li><li>진행 보고는 11-28부터 이틀마다</li></ul></div>
+  </div>
+</section>
+
+<footer>원본: 저장소 <code>docs/architecture/blueprint_layers.html</code> · 베이스 설계서 <code>docs/design.md</code> (sion, <code>3abe6cb</code>) · 목표 구조 <code>docs/architecture/ARCHITECTURE_SPEC.md</code> · 인계서 <code>docs/PERCEPTION_HANDOFF.md</code> · 실물 세팅 <code>docs/REAL_ROBOT_SETUP.md</code></footer>
+</main>
