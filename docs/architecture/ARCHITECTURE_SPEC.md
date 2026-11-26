@@ -32,7 +32,7 @@
 | **엔코더 odom** | `/odom` (`nav_msgs/Odometry`, `odom` → `base_footprint`) | turtlebot3_node가 Dynamixel 엔코더로 계산. 체크리스트 기준 20 Hz 이상 | 30 Hz, 차동 구동 플러그인 (잡음 없음) | 로봇 자세, 지도 좌표계의 기준. 실물의 반지름 오차, 미끄러짐은 나중에 잡음 시험 |
 | 출력 | `/cmd_vel` (`geometry_msgs/Twist`) | turtlebot3_node → OpenCR | 차동 구동 플러그인 (가속 한계 1.0 m/s²) | 제어 단계가 50 Hz로 낸다 |
 
-시뮬레이션 값은 `src/line_follower_bringup/models/turtlebot3_waffle_pi/model.sdf`와 `vision.py`에 있다. 실물 잡음 측정 절차는 `docs/REAL_ROBOT_TEST.md`에 있다.
+실물 세팅 절차와 강의 자료와의 차이(ROS 배포판, 카메라 래퍼 토픽·주기·센서 모드·내부 파라미터, 라이다 제외)는 `docs/REAL_ROBOT_SETUP.md`에 있다. 시뮬레이션 값은 `src/line_follower_bringup/models/turtlebot3_waffle_pi/model.sdf`와 `vision.py`에 있다. 실물 잡음 측정 절차는 `docs/REAL_ROBOT_TEST.md`에 있다.
 
 ### 실물에서 확인할 것
 
