@@ -142,6 +142,7 @@
 | **판단** | `planning/` (`RulePlanner`, `planner` 파라미터로 교체) | `node.map` + 자세 → 로컬 경로 `node.path`(odom, 약 2 cm 간격), `node.path_end`, `node.t_point` |
 | **제어** | `control/` (`RuleController`: pure pursuit + PID 보정) | 로봇 좌표 경로 → `/cmd_vel` |
 
+- **신뢰도:** `node.map.confidence(x, y)`는 0–1 값을 돌려준다(선이 없으면 0). 가까이서 본 칸은 0.45 m까지 1.0이고 1.6 m에서 0.35까지 떨어진다. 640 먼 띠로 본 칸은 ×0.6, 복원한 칸은 0.31이다. 판단은 이 값으로 경로 구간의 신뢰를 따지거나 속도를 조절할 수 있다.
 - 판단은 지도를 `node.map.hit()` / `snap()` / `trace()`로만 읽는다. 복원한 선(`restored`)도 이 함수들이 본 선과 똑같이 돌려준다.
 - 복원: `restore_mode: map`이면 인지가 복원한 선을 지도에 써서 넘긴다. `path`(기존)는 판단이 경로 끝을 늘린다.
 - 제어 PID: `pid_kp`, `pid_ki`, `pid_kd`(기본 0 = 순수 pure pursuit). 오차는 로봇에 가장 가까운 경로점의 횡오차다.

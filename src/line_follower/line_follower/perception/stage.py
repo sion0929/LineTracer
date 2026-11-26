@@ -139,7 +139,8 @@ class PerceptionStage:
         if not (skip > 0.0 and abs(node.pitch_f) > math.radians(skip)):
             # (while the body tips over a ramp edge the camera-to-ground angle is unknown:
             # such frames drew corners 13-19 cm off. Keep the map from the good frames.)
-            node.map.update(out.line, out.valid, pose_ts, add_only)
+            node.map.update(out.line, out.valid, pose_ts, add_only,
+                            far_mask=far[1] if far is not None else None)
         return True
 
 

@@ -133,3 +133,19 @@ def test_stages_keep_shared_state_on_the_node():
         for name in re.findall(r"(?:get|has)attr\(self, '(\w+)'", src):
             assert name in own, f"{mod.__name__} reads '{name}' from self, not from node"
         assert 'correct(self,' not in src
+
+
+def test_confidence_is_handed_with_the_map():
+    lm = LineMap()
+    bev = np.zeros((vision.BH, vision.BW), np.uint8)
+    valid = np.full_like(bev, 255)
+    col = vision.BW // 2
+    bev[:, col - 2:col + 3] = 255                       # a line straight ahead
+    lm.update(bev, valid, (0.0, 0.0, 0.0))
+    near = lm.confidence(0.4, 0.0)
+    far = lm.confidence(vision.X_FAR - 0.03, 0.0)
+    assert near > 0.9 and 0 < far <= near
+    assert lm.confidence(0.4, 0.3) == 0.0                # no line there
+    lm.restored = np.zeros_like(lm.grid)
+    lm.restored[C0, C0 + int(round(2.0 / RES))] = 255
+    assert 0 < lm.confidence(2.0, 0.0) < far

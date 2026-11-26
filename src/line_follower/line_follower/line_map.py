@@ -31,6 +31,9 @@ class LineMap:
         self.seen = np.zeros((SIZE, SIZE), np.uint8)     # cells the camera has looked at (restore.py)
         self.frozen = None          # cells the robot has already driven over: never rewritten (freeze())
         self.restored = None        # learned route where the camera has not looked (perception restores)
+        # confidence of every line cell, handed to planning with the map (0-255, see confidence()):
+        # near observations high, falling with distance; far-band cells lower; restored cells low
+        self.conf = np.zeros((SIZE, SIZE), np.uint8)
         self.last = None
 
     def freeze(self, x, y, radius):
@@ -97,7 +100,33 @@ class LineMap:
                 stamp = self.seen[i - 1:i + 2, j - 1:j + 2] == 0          # never over seen ground
                 self.restored[i - 1:i + 2, j - 1:j + 2][stamp] = 255
 
-    def update(self, bev_mask, bev_valid, pose, add_only=None):
+    RESTORED_CONF = 80          # confidence reported for a restored (never seen) cell
+    FAR_BAND_SCALE = 0.6        # far band (full-res strip near the horizon) vs near range
+
+    def confidence(self, X, Y):
+        """Confidence 0..1 of the line at odom (X, Y): 0 = no line."""
+        i = int(round(Y / RES)) + C0
+        j = int(round(X / RES)) + C0
+        if not (0 <= i < SIZE and 0 <= j < SIZE):
+            return 0.0
+        if self.grid[i, j] > 0:
+            return self.conf[i, j] / 255.0
+        if self.restored is not None and self.restored[i, j] > 0:
+            return self.RESTORED_CONF / 255.0
+        return 0.0
+
+    @staticmethod
+    def _bev_conf(far_mask=None):
+        """Per-BEV-pixel confidence: 1.0 up to 0.45 m ahead, falling linearly to 0.35 at 1.6 m;
+        far-band pixels scaled by FAR_BAND_SCALE."""
+        x = vision.X_FAR - (np.arange(vision.BH) + 0.5) * RES
+        row = np.clip(1.0 - (x - 0.45) / (1.6 - 0.45) * 0.65, 0.35, 1.0)
+        c = np.repeat((row * 255)[:, None], vision.BW, axis=1)
+        if far_mask is not None:
+            c = np.where(far_mask > 0, c * LineMap.FAR_BAND_SCALE, c)
+        return c.astype(np.uint8)
+
+    def update(self, bev_mask, bev_valid, pose, add_only=None, far_mask=None):
         """Overwrite the part of the map currently seen by the camera.
 
         add_only (BEV mask, optional): there the observation is less trusted. It never
@@ -122,6 +151,8 @@ class LineMap:
         obs = cv2.warpAffine(bev_mask, m, (PATCH, PATCH), flags=cv2.INTER_LINEAR)
         val = cv2.warpAffine(bev_valid, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST)
         win = self.grid[oy:oy + PATCH, ox:ox + PATCH]
+        cwin = self.conf[oy:oy + PATCH, ox:ox + PATCH]
+        cobs = cv2.warpAffine(self._bev_conf(far_mask), m, (PATCH, PATCH), flags=cv2.INTER_NEAREST)
         seen = val > 0
         self.seen[oy:oy + PATCH, ox:ox + PATCH][seen] = 255
         if self.restored is not None:
@@ -135,8 +166,11 @@ class LineMap:
             seen &= ~add
             win[seen] = np.where(obs[seen] > 100, 255, 0)
             win[new] = 255
+            cwin[seen] = np.where(obs[seen] > 100, cobs[seen], 0)
+            cwin[new] = cobs[new]
         else:
             win[seen] = np.where(obs[seen] > 100, 255, 0)
+            cwin[seen] = np.where(obs[seen] > 100, cobs[seen], 0)
         self.last = (ox, oy, obs > 100, seen)       # for the debug image
 
     def hit(self, X, Y):
