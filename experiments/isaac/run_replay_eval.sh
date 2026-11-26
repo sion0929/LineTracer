@@ -46,7 +46,7 @@ exec 9>"$out/.replay.lock"
 flock -n 9 || { echo "Another replay batch is using $out" >&2; exit 1; }
 overlay_hash=$(sha256sum <"$overlay")
 manifest=$(printf '%s\n' "$speed" "$limit" "$overlay" "$overlay_hash" \
-    "${ISAAC_FOLLOWER_ARGS:-}" "${ISAAC_HOLD:-1}" "${maps[@]}")
+    "${ISAAC_FOLLOWER_ARGS:-}" "${ISAAC_HOLD:-1}" "${ISAAC_RENDER_ARGS:-}" "${maps[@]}")
 if [[ -f $out/batch.txt ]]; then
     [[ $(<"$out/batch.txt") == "$manifest" ]] ||
         { echo "Replay configuration differs from $out/batch.txt. Choose another OUTDIR." >&2; exit 2; }
@@ -89,7 +89,8 @@ for index in "${!maps[@]}"; do
     echo "Replaying $name"
     if bash "$root/experiments/isaac/run_isaac_drive.sh" --map-dump \
         --map "$map" --out "$run" --profile-overlay "$overlay" \
-        --replay-speed "$speed" --max-sim-seconds "$limit" --port "${ISAAC_PORT:-18990}" && finished "$run"; then
+        --replay-speed "$speed" --max-sim-seconds "$limit" --port "${ISAAC_PORT:-18990}" \
+        ${ISAAC_RENDER_ARGS:+$ISAAC_RENDER_ARGS --seed $((index + 1))} && finished "$run"; then
         continue
     fi
     echo "Replay incomplete: $name" >&2

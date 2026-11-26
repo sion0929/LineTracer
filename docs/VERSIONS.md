@@ -27,6 +27,7 @@
 | V3-NearB320-Isaac | near_v4b_isaac_r2 | Isaac 2라운드 | 0.935 |
 | V4-NearB320-Isaac | near_v4b_isaac_r3 | Isaac 3라운드 (맵 286개 + 기존) | 0.939 |
 | V5-NearB320-Isaac | near_v4b_r4 | Isaac 4라운드 (맵 488개 + 기존, 학습 프레임 24,484) | 0.943 (깊이 MAE 0.36 cm) |
+| V6-NearB320FP-Isaac | near_b_fp3 | V5에서 오검출 억제 학습(--fp-weight 3 --boundary-band 3) | 0.947 (정밀도 0.980, 재현율 0.965, 깊이 MAE 0.31 cm) |
 
 S는 small, B는 base다.
 

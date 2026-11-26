@@ -2,6 +2,7 @@
 """Train the line-only V4 segmentation and metric-depth model."""
 import argparse
 import json
+import math
 from itertools import islice
 from pathlib import Path
 
@@ -19,6 +20,21 @@ else:
 
 SIZE = (320, 240)
 
+# Camera and BEV geometry, copied from src/line_follower/line_follower/{vision,depth}.py.
+# The Isaac archives store bev_mask/bev_valid on this exact 108x220 grid.
+CAMERA_W, CAMERA_H = 640, 480
+HFOV = 1.085595
+FX = (CAMERA_W / 2.0) / math.tan(HFOV / 2.0)
+CX, CY = (CAMERA_W - 1) / 2.0, (CAMERA_H - 1) / 2.0
+CAM_X = 0.076
+REST_PITCH = math.radians(0.33)
+BEV_RES = 0.005
+BEV_X_NEAR = 0.31
+BEV_X_FAR = 0.85
+BEV_Y_HALF = 0.55
+BEV_W = int(round(2 * BEV_Y_HALF / BEV_RES))
+BEV_H = int(round((BEV_X_FAR - BEV_X_NEAR) / BEV_RES))
+
 
 def block(inputs, outputs, stride=1):
     return nn.Sequential(
@@ -30,6 +46,68 @@ def block(inputs, outputs, stride=1):
 
 def upsample(feature, skip):
     return torch.cat((F.interpolate(feature, size=skip.shape[-2:], mode="nearest"), skip), dim=1)
+
+
+def splat_bev(probability, depth):
+    """Differentiably project per-pixel line probability to the robot BEV grid.
+
+    `probability` is (B, H, W) and `depth` is (B, H, W) or (B, 1, H, W) metric
+    camera-axis depth. Each pixel is bilinearly splatted at the BEV cell that
+    depth.py would pick (x forward, y left); out-of-grid contributions are
+    dropped and the accumulated probability is clamped to [0, 1].
+    """
+    probability = probability.float()
+    depth = depth.float()
+    if probability.dim() == 4:
+        probability = probability[:, 0]
+    if depth.dim() == 4:
+        depth = depth[:, 0]
+    if probability.dim() == 2:
+        probability = probability[None]
+    if depth.dim() == 2:
+        depth = depth[None]
+    device, dtype = probability.device, probability.dtype
+    u = (torch.arange(SIZE[0], device=device, dtype=dtype) + .5) * (CAMERA_W / SIZE[0]) - .5
+    v = (torch.arange(SIZE[1], device=device, dtype=dtype) + .5) * (CAMERA_H / SIZE[1]) - .5
+    ru = (u - CX) / FX
+    rv = (v - CY) / FX
+    down = rv[None, :, None] * depth
+    x = CAM_X + depth * math.cos(REST_PITCH) + down * math.sin(REST_PITCH)
+    y = -ru[None, None, :] * depth
+    columns = (BEV_Y_HALF - y) / BEV_RES
+    rows = (BEV_X_FAR - x) / BEV_RES
+    row0, column0 = torch.floor(rows), torch.floor(columns)
+    row_fraction, column_fraction = rows - row0, columns - column0
+    row0, column0 = row0.long(), column0.long()
+    row1, column1 = row0 + 1, column0 + 1
+    weights = ((1 - row_fraction) * (1 - column_fraction),
+               (1 - row_fraction) * column_fraction,
+               row_fraction * (1 - column_fraction),
+               row_fraction * column_fraction)
+    base = torch.arange(probability.shape[0], device=device).view(-1, 1, 1) * (BEV_H * BEV_W)
+    flat = torch.zeros(probability.shape[0] * BEV_H * BEV_W, device=device, dtype=dtype)
+    for row, column, weight in zip((row0, row0, row1, row1),
+                                   (column0, column1, column0, column1), weights):
+        inside = (row >= 0) & (row < BEV_H) & (column >= 0) & (column < BEV_W)
+        index = (base + row * BEV_W + column)[inside]
+        flat.scatter_add_(0, index, (probability * weight)[inside])
+    return flat.view(probability.shape[0], BEV_H, BEV_W).clamp(0., 1.)
+
+
+def project_to_bev(logits, depth):
+    """Line logits and metric depth -> differentiable BEV line probability."""
+    return splat_bev(logits.float().softmax(1)[:, 1], depth)
+
+
+def bev_loss(probability, mask, valid):
+    """BCE over valid BEV cells; every background cell is scored too."""
+    valid = valid > 0
+    if not bool(valid.any()):
+        return probability.sum() * 0
+    target = (mask > 127).float()
+    with torch.autocast(device_type=probability.device.type, enabled=False):   # BCE is unsafe under AMP
+        p = probability.float()[valid].clamp(1e-6, 1 - 1e-6)
+        return F.binary_cross_entropy(p, target[valid])
 
 
 class V4(nn.Module):
@@ -85,9 +163,16 @@ class Samples(Dataset):
 
     def __getitem__(self, index):
         entry = self.frames[index]
+        bev_mask = np.zeros((BEV_H, BEV_W), np.uint8)
+        bev_valid = np.zeros((BEV_H, BEV_W), np.uint8)
         if isinstance(entry, Path):
             with np.load(entry, allow_pickle=False) as frame:
                 rgb, classes, depth = frame["rgb"], frame["classes"], frame["depth_m"]
+                if "bev_mask" in frame and "bev_valid" in frame:
+                    bev_mask, bev_valid = frame["bev_mask"], frame["bev_valid"]
+                    if bev_mask.shape != (BEV_H, BEV_W) or bev_valid.shape != (BEV_H, BEV_W):
+                        raise ValueError(f"Unexpected BEV grid in {entry}: "
+                                         f"{bev_mask.shape}, {bev_valid.shape}")
         else:
             folder, name = entry
             image = cv2.imread(str(folder / "image" / name))
@@ -102,30 +187,102 @@ class Samples(Dataset):
         line = cv2.resize(classes, SIZE, interpolation=cv2.INTER_NEAREST) == 1
         depth = cv2.resize(depth, SIZE, interpolation=cv2.INTER_NEAREST)
         depth = np.where(line & np.isfinite(depth) & (depth > 0), depth, 0)
-        return rgb, 4 * np.rint(depth * 1000).astype(np.int32) + line
+        return rgb, 4 * np.rint(depth * 1000).astype(np.int32) + line, bev_mask, bev_valid
 
 
 def unpack(batch, device):
-    rgb, packed = (value.to(device, non_blocking=True) for value in batch)
-    return rgb.permute(0, 3, 1, 2).float() / 255, (packed % 4).long(), (packed // 4).float() / 1000
+    values = [value.to(device, non_blocking=True) for value in batch]
+    rgb, packed = values[:2]
+    bev_mask, bev_valid = (values[2], values[3]) if len(values) > 2 else (None, None)
+    return (rgb.permute(0, 3, 1, 2).float() / 255, (packed % 4).long(),
+            (packed // 4).float() / 1000, bev_mask, bev_valid)
+
+
+def background_band(line, band):
+    """Return background pixels within `band` pixels of a target line pixel."""
+    line = line == 1
+    dilated = F.max_pool2d(line.float().unsqueeze(1), 2 * band + 1, stride=1, padding=band)
+    return (dilated.squeeze(1) > 0) & ~line
+
+
+def hard_background_keep(loss, background, ratio):
+    """Keep the hardest `ratio` share of background pixels; keep every line pixel."""
+    flat_loss, flat_background = loss.flatten(), background.flatten()
+    background_loss = flat_loss[flat_background]
+    keep = torch.ones_like(flat_loss, dtype=torch.bool)
+    count = int(background_loss.numel() * ratio)
+    if count < background_loss.numel():
+        threshold = torch.topk(background_loss, max(count, 1)).values[-1]
+        keep &= (~flat_background) | (flat_loss >= threshold)
+    return keep.view_as(loss)
+
+
+def segmentation_loss(logits, line, weights, fp_weight=1., ohem_ratio=0., boundary_band=0):
+    target = line.long()
+    background = target != 1
+    if fp_weight == 1. and ohem_ratio <= 0 and boundary_band <= 0:
+        cross = F.cross_entropy(logits, target, weight=weights)
+    else:
+        per_pixel = F.cross_entropy(logits, target, weight=weights, reduction="none")
+        scale = torch.ones_like(per_pixel)
+        if boundary_band > 0:
+            boost = torch.full_like(scale, fp_weight)
+            scale = torch.where(background_band(target, boundary_band),
+                                torch.maximum(scale, boost), scale)
+        if fp_weight != 1.:
+            false_positive = background & (logits.float().softmax(1)[:, 1] > .5)
+            boost = torch.full_like(scale, fp_weight)
+            scale = torch.where(false_positive, torch.maximum(scale, boost), scale)
+        if ohem_ratio > 0:
+            scale = scale * hard_background_keep(per_pixel, background, ohem_ratio)
+        cross = (per_pixel * scale).sum() / (weights[target] * scale).sum().clamp_min(1e-8)
+    probability = logits.float().softmax(1)[:, 1]
+    dice = (2 * (probability * line).sum() + 1) / (probability.sum() + line.sum() + 1)
+    return cross + .5 * (1 - dice)
+
+
+def training_loss(logits, predicted, line, depth, valid, weights, depth_weight=2.,
+                  bev_weight=0., bev_mask=None, bev_valid=None,
+                  fp_weight=1., ohem_ratio=0., boundary_band=0.):
+    """Segmentation + depth, optionally plus the differentiable BEV projection loss."""
+    seg = segmentation_loss(logits, line, weights, fp_weight, ohem_ratio, boundary_band)
+    predicted_depth = predicted[:, 0] if predicted.dim() == 4 else predicted
+    errors = F.smooth_l1_loss(predicted_depth.float(), depth, reduction="none", beta=.04)
+    loss = seg + depth_weight * (errors * valid).sum() / valid.sum().clamp_min(1)
+    if bev_weight > 0 and bev_mask is not None and bev_valid is not None:
+        loss = loss + bev_weight * bev_loss(project_to_bev(logits, predicted_depth),
+                                            bev_mask, bev_valid)
+    return loss
 
 
 def evaluate(model, batches, device):
     model.eval()
-    totals = torch.zeros(6, dtype=torch.float64, device=device)
+    totals = torch.zeros(11, dtype=torch.float64, device=device)
     with torch.inference_mode():
         for batch in batches:
-            rgb, line, depth = unpack(batch, device)
+            rgb, line, depth, bev_mask, bev_valid = unpack(batch, device)
             logits, predicted = model(rgb)
             detected, actual = logits.argmax(1) == 1, line == 1
             error = (predicted[:, 0] - depth).abs()
             near = actual & (depth >= .20) & (depth <= .95)
             far = actual & (depth >= .75) & (depth <= 1.25)
-            totals += torch.stack(((detected & actual).sum(), (detected | actual).sum(),
-                                   (error * near).sum(), near.sum(), (error * far).sum(), far.sum()))
-    overlap, union, near_error, near_count, far_error, far_count = totals.tolist()
+            values = [(detected & actual).sum(), (detected | actual).sum(),
+                      (error * near).sum(), near.sum(), (error * far).sum(), far.sum(),
+                      detected.sum(), actual.sum()]
+            if bev_mask is not None and bev_valid is not None:
+                projected = project_to_bev(logits, predicted[:, 0])
+                target = (bev_mask > 127) & (bev_valid > 0)
+                guess = (projected > .5) & (bev_valid > 0)
+                values += [(guess & target).sum(), guess.sum(), target.sum()]
+            else:
+                values += [torch.zeros((), dtype=torch.int64, device=device) for _ in range(3)]
+            totals += torch.stack(values)
+    (overlap, union, near_error, near_count, far_error, far_count,
+     detected_count, actual_count, bev_overlap, bev_detected, bev_actual) = totals.tolist()
     return (overlap / max(union, 1), 100 * near_error / near_count if near_count else None,
-            100 * far_error / far_count if far_count else None)
+            100 * far_error / far_count if far_count else None,
+            overlap / max(detected_count, 1), overlap / max(actual_count, 1),
+            bev_overlap / max(bev_detected, 1), bev_overlap / max(bev_actual, 1))
 
 
 def warm_start(model, path):
@@ -154,14 +311,20 @@ def main():
     parser.add_argument("--workers", type=int, default=2)
     parser.add_argument("--lr", type=float, default=4e-4)
     parser.add_argument("--depth-weight", type=float, default=2.)
+    parser.add_argument("--bev-weight", type=float, default=0.)
+    parser.add_argument("--fp-weight", type=float, default=1.)
+    parser.add_argument("--ohem-ratio", type=float, default=0.)
+    parser.add_argument("--boundary-band", type=int, default=0)
     parser.add_argument("--max-train-steps", type=int)
     parser.add_argument("--max-val-steps", type=int)
     args = parser.parse_args()
     if min(args.epochs, args.batch, args.max_train_steps or 1, args.max_val_steps or 1) < 1 or (
         args.max_train_steps == 0 or args.max_val_steps == 0 or args.workers < 0
-        or args.depth_weight < 0 or args.lr <= 0
+        or args.depth_weight < 0 or args.lr <= 0 or args.bev_weight < 0 or args.fp_weight < 0
+        or not 0 <= args.ohem_ratio <= 1 or args.boundary_band < 0
     ):
-        parser.error("Use positive epochs, batch size, learning rate and step limits, and nonnegative workers and depth weight")
+        parser.error("Use positive epochs, batch size, learning rate and step limits, and nonnegative "
+                     "workers, depth weight, bev weight, fp weight and boundary band, with ohem ratio in [0, 1]")
 
     torch.manual_seed(1204)
     cv2.setNumThreads(1)
@@ -190,22 +353,23 @@ def main():
         model.train()
         cumulative = torch.zeros((), device=device)
         for steps, batch in enumerate(islice(train, args.max_train_steps), 1):
-            rgb, line, depth = unpack(batch, device)
+            rgb, line, depth, bev_mask, bev_valid = unpack(batch, device)
             valid = (line == 1) & (depth >= .15) & (depth <= 1.4)
             optimizer.zero_grad(set_to_none=True)
             with torch.autocast(device.type, enabled=device.type == "cuda"):
                 logits, predicted = model(rgb)
-                probability = logits.float().softmax(1)[:, 1]
-                dice = (2 * (probability * line).sum() + 1) / (probability.sum() + line.sum() + 1)
-                seg = F.cross_entropy(logits, line, weight=weights) + .5 * (1 - dice)
-                errors = F.smooth_l1_loss(predicted[:, 0].float(), depth, reduction="none", beta=.04)
-                loss = seg + args.depth_weight * (errors * valid).sum() / valid.sum().clamp_min(1)
+                loss = training_loss(logits, predicted, line, depth, valid, weights,
+                                     args.depth_weight, args.bev_weight, bev_mask, bev_valid,
+                                     args.fp_weight, args.ohem_ratio, args.boundary_band)
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
             cumulative += loss.detach()
-        iou, near_mae, far_mae = evaluate(model, islice(val, args.max_val_steps), device)
+        (iou, near_mae, far_mae, precision, recall,
+         bev_precision, bev_recall) = evaluate(model, islice(val, args.max_val_steps), device)
         row = dict(epoch=epoch, train_steps=steps, loss=float(cumulative / steps), line_iou=iou,
+                   precision=precision, recall=recall,
+                   bev_precision=bev_precision, bev_recall=bev_recall,
                    line_depth_mae_cm=near_mae, far_line_depth_mae_cm=far_mae)
         with (args.out / "epochs.jsonl").open("a") as log:
             print(json.dumps(row), file=log)

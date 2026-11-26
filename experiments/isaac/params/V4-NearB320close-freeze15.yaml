@@ -1,0 +1,8 @@
+follower_node:
+  ros__parameters:
+    perception: depth
+    depth.model_path: /ws/experiments/isaac/models/V4-NearB320-Isaac.onnx
+    depth.splat: close
+    imu_floor: false
+    freeze_passed: true
+    freeze_radius: 0.15

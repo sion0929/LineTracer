@@ -1,0 +1,6 @@
+follower_node:
+  ros__parameters:
+    perception: depth
+    depth.model_path: /ws/experiments/isaac/models/V6-NearB320FP-Isaac.onnx
+    depth.splat: close
+    imu_floor: false
