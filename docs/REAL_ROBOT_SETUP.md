@@ -18,6 +18,19 @@
 
 → 우리 노드에는 **mode 3 (`1640×1232 @30`, 4:3 전체 화각)**을 `640×480`으로 줄여 쓴다.
 
+
+## 현재 진행 상태 (E의 Jetson, 192.168.100.20)
+
+| 날짜 | 한 일 | 결과 |
+|---|---|---|
+| 2026-11-27 | `/boot/extlinux/extlinux.conf` 백업 (`extlinux.conf.bak_before_imx219`) | 완료 |
+| 2026-11-27 | USB-LAN 고정 IP를 NetworkManager 프로필 `lab-direct`(192.168.100.20/24, 자동 연결, 우선순위 100)로 영구화 | 재부팅 후 같은 IP로 접속 확인 |
+| 2026-11-27 | `config-by-hardware.py -n 2="Camera IMX219-A"` (이 보드에서는 "22pin CSI Connector") → `tegra234-p3767-camera-p3768-imx219-A.dtbo`, 기본 부팅 항목 `JetsonIO` | 적용, 재부팅 |
+| 2026-11-27 | 재부팅 후 확인 | 드라이버는 올라옴. `imx219: probe of 9-0010 failed with error -121` (I2C 응답 없음) → **카메라가 물리적으로 연결되지 않았거나 케이블 방향이 반대**. `/dev/video*` 없음. OpenCR(`/dev/ttyACM*`)도 아직 연결 안 됨 |
+
+다음: 카메라를 **CAM0**에 금색 단자가 아래로 향하게 연결(15핀→22핀 케이블) → 재부팅 → `/dev/video0` → `gst-launch-1.0 nvarguscamerasrc sensor-id=0 sensor-mode=3 num-buffers=30 ! fakesink`.
+되돌리기: `sudo cp /boot/extlinux/extlinux.conf.bak_before_imx219 /boot/extlinux/extlinux.conf` 후 재부팅.
+
 ## 1. 강의 자료의 순서
 
 | 단계 | 어디서 | 명령 / 내용 |
