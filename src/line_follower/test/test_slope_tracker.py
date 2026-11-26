@@ -70,7 +70,7 @@ def test_deck_ground_models_the_far_edge():
     xs = np.array([0.0, 0.2, 0.43, 0.44, 0.5, 0.6, 0.8, 0.9, 1.2])
     z = deck_start.deck_ground(xs, deck_elev)
 
-    assert np.allclose(z[xs < 0.44], 0.0)
+    assert np.allclose(z[xs < 0.42], 0.0, atol=1e-3)     # edge estimated within one 5 mm step
     ramp = (xs > 0.44) & (xs < 0.44 + 0.44)
     assert ramp.sum() >= 3
     assert np.all(z[ramp] < 0.0)
@@ -93,3 +93,31 @@ def test_deck_travel_advances_and_edge_offset_moves_the_edge():
     assert t.deck_travel == pytest.approx(0.01)
     t.update(0.01, 0.0, deck_elev)
     assert t.deck_travel == pytest.approx(0.02)
+
+
+def test_deck_edge_with_pitch_lag():
+    """Pitch eases in and out over 0.12 m (wheelbase), as in Isaac and on the robot: the deck is
+    noticed late, but the edge estimate still lands within 4 cm of the true edge (Isaac logs: 0.5 cm)."""
+    ease = 0.12
+
+    def pitch(x):
+        def ramp_up(u):          # 0 -> PITCH over `ease`, centred on the breakpoint
+            return PITCH * min(1.0, max(0.0, (u + ease / 2) / ease))
+        a, b, c, d = X0, X0 + RAMP, X0 + 2 * RAMP, X0 + 3 * RAMP
+        return ramp_up(x - a) - ramp_up(x - b) - ramp_up(x - c) + ramp_up(x - d)
+
+    t = SlopeTracker()
+    elev, x = 0.0, 0.0
+    while x < X0 + 4 * RAMP:
+        p = pitch(x)
+        elev = max(0.0, elev + STEP * math.sin(p))
+        if t.update(STEP, p, elev) == 'deck' and t.deck_travel == 0.0:
+            true_edge = X0 + 2 * RAMP - x
+            z = t.deck_ground(np.array([true_edge - 0.05, true_edge + 0.2]), elev)
+            assert abs(math.degrees(t.climb_slope) - 7.8) < 0.3
+            assert t.up_len == pytest.approx(RAMP, abs=0.02)
+            assert z[0] == pytest.approx(0.0, abs=2e-3)                       # still deck
+            assert z[1] == pytest.approx(-0.2 * math.tan(PITCH), abs=6e-3)    # on the down-ramp (4 cm)
+            return
+        x += STEP
+    pytest.fail('deck never detected')
