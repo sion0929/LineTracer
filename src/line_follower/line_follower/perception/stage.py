@@ -171,7 +171,8 @@ class PerceptionStage:
             node.map.update(out.line, out.valid, pose_ts, add_only,
                             far_mask=far[1] if far is not None else None)
         self.log.record(ts, pose_ts, out.pitch, node.travel, used and pose_ts is not None, out.line, out.valid,
-                        far[1] if far is not None else None)
+                        far[1] if far is not None else None, imu_pitch=node.pitch_f, elev=elev,
+                        slope=node.slope_state)
         return True
 
 

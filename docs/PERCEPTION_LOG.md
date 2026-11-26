@@ -26,7 +26,7 @@
 | `job.json` | 맵 경로(저장소 기준), `odom_origin` = odom 원점의 월드 자세 `[x, y, yaw]` |
 | `result.json` | 주행 결과 요약 |
 
-## 2. 형식 (`lf-perception-log/1`)
+## 2. 형식 (`lf-perception-log/2`, 받은 100개는 `/1`)
 
 `perception_log/meta.json`과 `chunk_NNNN.npz`(60프레임씩)로 되어 있다. 프레임 하나 = 지도에 들어간 카메라 프레임 하나.
 
@@ -40,6 +40,11 @@
 | `line` | (N, BH, BW) | BEV 선 마스크 (bool) |
 | `valid` | (N, BH, BW) | BEV에서 카메라가 실제로 본 칸 |
 | `far` | (N, BH, BW) | 먼 띠로 본 칸 (V0는 전부 0) |
+| `imu_pitch` | (N,) | 걸러 낸 IMU 몸체 피치 [rad], 앞이 들리면 + (형식 2부터) |
+| `elev` | (N,) | 출발 바닥 기준 바퀴 높이 [m], 오도메트리 + IMU로 적분 (형식 2부터) |
+| `slope` | (N,) | 언덕 상태 0 평지, 1 오르막, 2 정상 평지, 3 내리막 (형식 2부터) |
+
+형식 1 로그(받은 100개)에는 마지막 세 필드가 없다. 로더는 이때 `imu_pitch`, `elev`를 NaN으로, `slope`를 −1로 채운다. 형식 1의 `pitch`는 **투영에 쓴 카메라 피치**라서 경사면 위에서는 평지 값(0.33°)으로 나온다. 언덕 구간은 `pose`와 맵 JSON의 `ramps`로 찾는다.
 
 BEV 격자는 `meta.json`의 `grid`에 있다: 칸 5 mm, 차축 앞 `x_near`–`x_far`(0.31–0.85 m), 좌우 ±`y_half`(0.55 m). **행 0이 가장 먼 곳**, 마지막 행이 가장 가까운 곳이고, **열 0이 왼쪽(+y)**이다. 칸 `(r, c)`의 중심은
 

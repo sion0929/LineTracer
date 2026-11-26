@@ -47,3 +47,21 @@ def test_log_off_without_path(monkeypatch):
                np.zeros((vision.BH, vision.BW), np.uint8))
     log.flush()
     assert not log.ok
+
+
+def test_log_hill_fields_and_format1(tmp_path):
+    log = PerceptionLog(Node({}), str(tmp_path))
+    z = np.zeros((vision.BH, vision.BW), np.uint8)
+    for i, s in enumerate(['flat', 'climb', 'deck', 'descent', None]):
+        log.record(i / 30, (0.0, 0.0, 0.0), 0.0, i * 0.01, True, z, z, imu_pitch=0.1 * i, elev=0.01 * i, slope=s)
+    log.flush()
+    _, d = load(tmp_path)
+    assert list(d['slope']) == [0, 1, 2, 3, -1]
+    assert np.allclose(d['imu_pitch'], [0.0, 0.1, 0.2, 0.3, 0.4]) and np.allclose(d['elev'][2], 0.02)
+    # a format-1 chunk (no hill fields) still loads, with the 'unknown' values
+    c = dict(np.load(tmp_path / 'chunk_0000.npz'))
+    for k in ('imu_pitch', 'elev', 'slope'):
+        del c[k]
+    np.savez_compressed(tmp_path / 'chunk_0000.npz', **c)
+    _, d = load(tmp_path)
+    assert np.isnan(d['imu_pitch']).all() and (d['slope'] == -1).all() and len(d['t']) == 5

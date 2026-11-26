@@ -50,6 +50,8 @@ def load_log(path):
         return meta, {}
     out = {k: np.concatenate([p[k] for p in parts]) for k in ('t', 'pose', 'pitch', 'travel', 'used')}
     out['used'] = out['used'].astype(bool)
+    for k, fill in (('imu_pitch', np.nan), ('elev', np.nan), ('slope', -1)):   # format 2 only
+        out[k] = np.concatenate([p[k] if k in p.files else np.full(len(p['t']), fill) for p in parts])
     for k in ('line', 'valid', 'far'):
         bits = np.concatenate([p[k] for p in parts])
         out[k] = np.unpackbits(bits, axis=1)[:, :h * w].reshape(-1, h, w).astype(bool)
