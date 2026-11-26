@@ -1,0 +1,10 @@
+experiments/worlds/suites/decoy_sample/maps/decoy_0000.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0001.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0002.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0003.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0004.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0005.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0006.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0007.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0008.sdf
+experiments/worlds/suites/decoy_sample/maps/decoy_0009.sdf

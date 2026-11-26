@@ -67,7 +67,7 @@ def ramp_height(ramp, x, y):
     c, s = math.cos(ramp["heading"]), math.sin(ramp["heading"])
     u = (x - ramp["x0"]) * c + (y - ramp["y0"]) * s
     v = -(x - ramp["x0"]) * s + (y - ramp["y0"]) * c
-    if abs(v) > RAMP_W / 2:
+    if abs(v) > ramp.get("width", RAMP_W) / 2:
         return 0.0
     up, deck, down, hgt = ramp["up"], ramp["deck"], ramp["down"], ramp["height"]
     if u <= 0 or u >= up + deck + down:
@@ -125,23 +125,24 @@ def arc_of(pts):
 
 
 # ---------------------------------------------------------------- writer
-def write_track(out, name, center, paint_extra, ramps, gaps, case, seed):
-    """Shift everything onto a mat, write SDF/STL/JSON. gaps: list of (s0, s1) on the path."""
+def write_track(out, name, center, paint_extra, ramps, gaps, case, seed, mat=None):
+    """Shift everything onto a mat, write SDF/STL/JSON. gaps: list of (s0, s1) on the path.
+    mat=(w, h): keep the coordinates as given on a fixed w x h mat at the origin (tile tracks)."""
     allp = center + [p for line in paint_extra for p in line]
     for r in ramps:
         L = r["up"] + r["deck"] + r["down"]
         for u, v in ((0, -RAMP_W / 2), (0, RAMP_W / 2), (L, -RAMP_W / 2), (L, RAMP_W / 2)):
             c, s = math.cos(r["heading"]), math.sin(r["heading"])
             allp.append((r["x0"] + u * c - v * s, r["y0"] + u * s + v * c))
-    minx = min(p[0] for p in allp) - MARGIN
-    miny = min(p[1] for p in allp) - MARGIN
+    minx = 0.0 if mat else min(p[0] for p in allp) - MARGIN
+    miny = 0.0 if mat else min(p[1] for p in allp) - MARGIN
     shift = lambda p: (p[0] - minx, p[1] - miny)  # noqa: E731
     center = [shift(p) for p in center]
     paint_extra = [[shift(p) for p in line] for line in paint_extra]
     for r in ramps:
         r["x0"], r["y0"] = shift((r["x0"], r["y0"]))
-    maxx = max(p[0] for p in allp) - minx + MARGIN
-    maxy = max(p[1] for p in allp) - miny + MARGIN
+    maxx = mat[0] if mat else max(p[0] for p in allp) - minx + MARGIN
+    maxy = mat[1] if mat else max(p[1] for p in allp) - miny + MARGIN
     bounds = [0, 0, maxx, maxy]
 
     def height(x, y):
@@ -193,7 +194,7 @@ def write_track(out, name, center, paint_extra, ramps, gaps, case, seed):
             th = r["height"] + 0.015
             um = u0 + length / 2 + math.sin(slope) * th / 2
             pose = (r["x0"] + um * c, r["y0"] + um * s, top - math.cos(slope) * th / 2, 0, -slope, r["heading"])
-            G.surface(link, f"ramp_{k}", (length / math.cos(slope), RAMP_W, th), pose, G.MAT_COLOR)
+            G.surface(link, f"ramp_{k}", (length / math.cos(slope), r.get("width", RAMP_W), th), pose, G.MAT_COLOR)
             u0 += length
             k += 1
     visual = G.add(G.add(track, "link", name="line"), "visual", name="visual")
