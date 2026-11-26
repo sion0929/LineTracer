@@ -8,6 +8,9 @@ experiments/jetson/Dockerfile.jazzy-l4t, so on the Orin the command is:
 The camera driver is expected to publish sensor_msgs/Image on /camera/image_raw.
 The base driver is expected to consume /cmd_vel and publish /odom and /imu.
 """
+import os
+
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
@@ -15,24 +18,27 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    # Same perception/IMU settings as the evaluated V0-NearRule640 (rule.yaml minus sim time and
+    # the track-specific speed_profile). Command-line args below override the file.
+    params_file = os.path.join(get_package_share_directory('line_follower'), 'config', 'robot.yaml')
     return LaunchDescription([
+        DeclareLaunchArgument('params_file', default_value=params_file),
         DeclareLaunchArgument('camera_topic', default_value='/camera/image_raw',
                               description='sensor_msgs/Image from the CSI-2 or USB camera'),
         DeclareLaunchArgument('odom_topic', default_value='/odom'),
         DeclareLaunchArgument('imu_topic', default_value='/imu'),
         DeclareLaunchArgument('cmd_vel_topic', default_value='/cmd_vel'),
         DeclareLaunchArgument('perception', default_value='rule',
-                              description='rule (implemented) or dl (stub until a model is wired)'),
+                              description='rule | depth | hybrid (see docs/VERSIONS.md)'),
         DeclareLaunchArgument('controller', default_value='rule'),
-        DeclareLaunchArgument('restore_model',
-                              default_value='/ws/experiments/jetson/models/V1-Restore128.onnx',
-                              description='ONNX line-restoration model; empty string disables it'),
+        DeclareLaunchArgument('restore_model', default_value='',
+                              description='ONNX line-restoration model; empty (default) = off'),
         Node(
             package='line_follower',
             executable='follower_node',
             name='follower_node',
             output='screen',
-            parameters=[{
+            parameters=[LaunchConfiguration('params_file'), {
                 'use_sim_time': False,
                 'perception': LaunchConfiguration('perception'),
                 'controller': LaunchConfiguration('controller'),
