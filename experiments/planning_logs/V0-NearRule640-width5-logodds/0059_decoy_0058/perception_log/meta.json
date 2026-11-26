@@ -1,0 +1,38 @@
+{
+ "format": "lf-perception-log/1",
+ "created_unix": 1795709754.7354171,
+ "grid": {
+  "res_m": 0.005,
+  "x_near_m": 0.31,
+  "x_far_m": 0.85,
+  "y_half_m": 0.55,
+  "shape": [
+   108,
+   220
+  ],
+  "rows": "row 0 = x_far (ahead), last row = x_near",
+  "cols": "col 0 = +y_half (left)"
+ },
+ "settings": {
+  "perception": "rule",
+  "near_scale": 1.0,
+  "far_band": false,
+  "far_split": 0.85,
+  "far_model": "",
+  "map_mode": "logodds",
+  "freeze_passed": false,
+  "restore_mode": "path",
+  "rule.max_width_m": 0.05,
+  "depth.model_path": null,
+  "depth.splat": null,
+  "imu_floor": true
+ },
+ "fields": {
+  "t": "capture time [s]",
+  "pose": "x, y, yaw at capture (odom) [m, rad]",
+  "pitch": "camera pitch used [rad]",
+  "travel": "odometry distance [m]",
+  "used": "frame written to the map",
+  "line/valid/far": "np.packbits of BEV masks"
+ }
+}

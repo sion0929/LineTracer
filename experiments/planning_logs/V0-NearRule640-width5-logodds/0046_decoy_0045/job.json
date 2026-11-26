@@ -1,0 +1,10 @@
+{
+ "map": "experiments/worlds/suites/decoy1000/part0/maps/decoy_0045.json",
+ "profile": "V0-NearRule640-width5-logodds",
+ "odom_origin": [
+  0.33,
+  0.33,
+  0.0
+ ],
+ "spawn_z": 0.01
+}

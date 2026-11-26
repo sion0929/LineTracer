@@ -9,7 +9,7 @@
 | 항목 | 값 |
 |---|---|
 | 위치 | `experiments/planning_logs/V0-NearRule640-width5-logodds/<번호>_decoy_<맵>/` |
-| 맵 | decoy1000 학습 맵 0000–0099 (언덕 있는 맵 84개 내외, 가짜 길 평균 1.6개). 정답 기하는 `bash experiments/worlds/make_decoy1000.sh 0`으로 만든다 |
+| 맵 | decoy1000 학습 맵 0000–0099 (언덕 있는 맵 85개, 가짜 길 평균 1.6개). 정답 기하는 `bash experiments/worlds/make_decoy1000.sh 0`으로 만든다 |
 | 주행 | Isaac Sim, **정답 경로를 0.2 m/s로 따라감**(재생). 판단·제어는 쓰지 않았다. 그래서 로그는 판단과 무관한 순수한 인지 출력이다 |
 | 인지 | V0-NearRule640 + 폭 필터 5 cm + log-odds 지도 (`experiments/isaac/params/V0-NearRule640-width5-logodds.yaml`) |
 | 렌더링 | 무작위 조명·바닥 텍스처 (시드 = 맵 번호). 그림자 오검출이 들어 있다 |
@@ -81,4 +81,4 @@ python3 $T frames  $L/0001_decoy_0000/perception_log --out frames/ --every 10  #
 
 Isaac 주행은 로그를 기본으로 남긴다(`ISAAC_PERCEPTION_LOG=0`이면 끔). 출력 폴더 안 `perception_log/`에 생긴다. 실물이나 Gazebo에서는 노드 파라미터 `perception_log:=<폴더>` 또는 환경 변수 `LF_PERCEPTION_LOG=<폴더>`로 켠다. 기록 실패는 주행에 영향을 주지 않는다(로그만 꺼진다).
 
-같은 100개를 다시 만드는 배치: `experiments/isaac/run_replay_eval.sh <맵 목록> <출력> experiments/isaac/params/V0-NearRule640-width5-logodds.yaml` (`ISAAC_RENDER_ARGS="--lights --texture"`, 맵당 약 3분).
+같은 100개를 다시 만드는 배치: `experiments/isaac/run_replay_eval.sh <맵 목록> <출력> experiments/isaac/params/V0-NearRule640-width5-logodds.yaml` (`ISAAC_RENDER_ARGS="--lights --texture"`, 맵당 약 3분). 끝난 배치를 이 폴더 형식으로 옮기는 것은 `python3 experiments/isaac/export_planning_logs.py <출력>/runs experiments/planning_logs/<설정 이름>`.
