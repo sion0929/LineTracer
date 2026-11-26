@@ -75,6 +75,30 @@ def metrics(pred, y, unseen):
                 false_rate=float(false))
 
 
+def load_dataset(path):
+    with np.load(path) as archive:
+        return dict(archive)
+
+
+def frontier_loss_weight(x, y, boost, hard_negative):
+    unseen = 1.0 - x[:, 1:2]
+    seeds = x[:, :1] * F.max_pool2d(unseen, 5, stride=1, padding=2)
+    # Pixel centers above x = 0.2 m occupy the first 80 rows.
+    seeds[:, :, 80:] = 0
+    # Half-width 32 cells = 0.4 m. The square window is a training proxy
+    # for the evaluation radius and includes all candidate frontier pixels.
+    near = F.max_pool2d(seeds, (65, 1), stride=1, padding=(32, 0))
+    near = F.max_pool2d(near, (1, 65), stride=1, padding=(0, 32)) * unseen
+    return near * (boost * y + hard_negative * (1.0 - y))
+
+
+def export_onnx(net, path):
+    net.eval().cpu()
+    torch.onnx.export(net, torch.zeros(1, 2, 128, 128), path, input_names=["x"],
+                      output_names=["logit"], dynamic_axes={"x": {0: "batch"}, "logit": {0: "batch"}},
+                      opset_version=17, dynamo=False)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--train", required=True, help="one or more .npz, comma separated")
@@ -85,11 +109,22 @@ def main():
     ap.add_argument("--lr", type=float, default=2e-3)
     ap.add_argument("--width", type=int, default=16)
     ap.add_argument("--unseen-weight", type=float, default=3.0, help="extra loss weight on unseen route pixels")
+    ap.add_argument("--frontier-boost", type=float, default=0.0)
+    ap.add_argument("--frontier-negative", type=float, default=0.0,
+                    help="extra focal loss on off-route predictions near a frontier")
+    ap.add_argument("--init", type=Path, help="warm start from a checkpoint of the same width")
+    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--amp", action="store_true", help="use CUDA mixed precision")
     a = ap.parse_args()
-    torch.set_num_threads(2)
+    if not torch.cuda.is_available():
+        ap.error("CUDA is unavailable")
+    torch.set_num_threads(4)
+    cv2.setNumThreads(4)
+    torch.manual_seed(a.seed)
+    rng = np.random.default_rng(a.seed)
     a.out.mkdir(parents=True, exist_ok=True)
-    parts = [np.load(f) for f in a.train.split(",")]
-    va = np.load(a.val)
+    parts = [load_dataset(f) for f in a.train.split(",")]
+    va = load_dataset(a.val)
     Xt = np.concatenate([t["x"] for t in parts])
     Yt = np.concatenate([t["y"] for t in parts])
     Ut = np.concatenate([t["unseen"] for t in parts])
@@ -98,8 +133,14 @@ def main():
     dev = "cuda"
     w = a.width
     net = UNet((w, 2 * w, 4 * w, 6 * w, 8 * w)).to(dev)
+    if a.init:
+        net.load_state_dict(torch.load(a.init, map_location=dev, weights_only=True))
+    scaler = torch.amp.GradScaler("cuda", enabled=a.amp)
     opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=1e-4)
-    sched = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=a.lr, total_steps=a.epochs * (len(Xt) // a.batch + 1))
+    steps = len(Xt) // a.batch
+    if not steps:
+        ap.error("--batch exceeds the training set size")
+    sched = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=a.lr, epochs=a.epochs, steps_per_epoch=steps)
     pos_w = torch.tensor(8.0, device=dev)
     base = metrics(Xv[:, 0].astype(np.uint8), Yv, Uv)
     print(json.dumps({"baseline_copy_seen": base, "train": len(Xt), "val": len(Xv),
@@ -107,45 +148,53 @@ def main():
     best, hist = -1, []
     for ep in range(a.epochs):
         net.train()
-        perm = np.random.permutation(len(Xt))
-        t0, tot = time.time(), 0.0
+        perm = rng.permutation(len(Xt))
+        t0 = time.time()
+        tot = torch.zeros((), device=dev)
         for i in range(0, len(perm) - a.batch + 1, a.batch):
             idx = np.sort(perm[i:i + a.batch])
             x = torch.from_numpy(Xt[idx]).float().to(dev)
             y = torch.from_numpy(Yt[idx]).float().unsqueeze(1).to(dev)
             u = torch.from_numpy(Ut[idx]).float().unsqueeze(1).to(dev)
-            if np.random.rand() < 0.5:                      # left/right mirror
+            if rng.random() < 0.5:                          # left/right mirror
                 x, y, u = x.flip(-1), y.flip(-1), u.flip(-1)
-            logit = net(x)
+            with torch.autocast("cuda", enabled=a.amp):
+                logit = net(x)
+            logit = logit.float()
             wmap = 1.0 + a.unseen_weight * u
             bce = F.binary_cross_entropy_with_logits(logit, y, pos_weight=pos_w, weight=wmap)
             p = torch.sigmoid(logit)
+            if a.frontier_boost or a.frontier_negative:
+                weight = frontier_loss_weight(x, y, a.frontier_boost, a.frontier_negative)
+                focal = y + (1.0 - y) * p.detach().square()
+                bce += (F.binary_cross_entropy_with_logits(logit, y, reduction="none",
+                                                           pos_weight=pos_w) * weight * focal).mean()
             dice = 1 - (2 * (p * y).sum((1, 2, 3)) + 1) / (p.sum((1, 2, 3)) + y.sum((1, 2, 3)) + 1)
             loss = bce + dice.mean()
             opt.zero_grad(set_to_none=True)
-            loss.backward()
-            opt.step()
+            scaler.scale(loss).backward()
+            scaler.step(opt)
+            scaler.update()
             sched.step()
-            tot += float(loss)
+            tot += loss.detach()
         net.eval()
         preds = []
         with torch.no_grad():
-            for i in range(0, len(Xv), 256):
-                x = torch.from_numpy(Xv[i:i + 256]).float().to(dev)
+            for i in range(0, len(Xv), a.batch):
+                x = torch.from_numpy(Xv[i:i + a.batch]).float().to(dev)
                 preds.append((torch.sigmoid(net(x))[:, 0] > 0.5).cpu().numpy().astype(np.uint8))
         m = metrics(np.concatenate(preds), Yv, Uv)
-        m.update(epoch=ep + 1, loss=tot / max(1, len(perm) // a.batch), sec=round(time.time() - t0, 1))
+        m.update(epoch=ep + 1, loss=float(tot) / steps, sec=round(time.time() - t0, 1))
         hist.append(m)
         print(json.dumps(m), flush=True)
         score = m["route_iou"] + m["unseen_recall"] - m["false_rate"]
         if score > best:
             best = score
             torch.save(net.state_dict(), a.out / "best.pt")
-    net.load_state_dict(torch.load(a.out / "best.pt"))
-    net.eval().cpu()
-    torch.onnx.export(net, torch.zeros(1, 2, 128, 128), a.out / "restore.onnx", input_names=["x"],
-                      output_names=["logit"], opset_version=17, dynamo=False)
-    (a.out / "metrics.json").write_text(json.dumps({"baseline_copy_seen": base, "history": hist}, indent=1))
+        (a.out / "metrics.json").write_text(json.dumps(
+            {"baseline_copy_seen": base, "history": hist, "config": vars(a)}, indent=1, default=str))
+    net.load_state_dict(torch.load(a.out / "best.pt", map_location=dev, weights_only=True))
+    export_onnx(net, a.out / "restore.onnx")
     print("saved", a.out / "restore.onnx")
 
 

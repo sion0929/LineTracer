@@ -1,0 +1,2 @@
+experiments/worlds/suites/tiles60/maps/tile_000.sdf
+experiments/worlds/suites/tiles60/maps/tile_001.sdf
