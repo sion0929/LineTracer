@@ -1,0 +1,5 @@
+follower_node:
+  ros__parameters:
+    perception: rule
+    deck_xfar: 0.0
+    terrain_bend_z: 0.01
