@@ -38,3 +38,6 @@ experiments/farband/data_isaac/
 experiments/isaac/rand_sample/*/
 experiments/rule_tune/data
 docs/reviews/run_*.log
+tools/pylf
+experiments/isaac/runs/
+experiments/isaac/.map-dump.*/
