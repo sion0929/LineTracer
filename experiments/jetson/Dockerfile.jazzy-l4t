@@ -1,0 +1,155 @@
+# syntax=docker/dockerfile:1
+#
+# ROS 2 Jazzy line-follower image for the NVIDIA Jetson Orin Nano 8GB.
+#
+# Base image choice
+# -----------------
+#   dustynv/ros:jazzy-ros-base-r36.4.0-cu128-24.04
+#   digest: sha256:ad157785a7aeea59506c0ddd6c8c28d3d75c4bdf64a5da804f5f00ff6c9154ad
+#
+# Why this exact image:
+#   * It is an L4T r36.4.0 / JetPack 6.1 userspace image (Orin Nano is supported by
+#     JetPack 6.x).  The host stays Ubuntu 22.04; the container userspace is Ubuntu
+#     24.04, which is the Ubuntu release ROS 2 Jazzy is built for.
+#   * It already contains a ROS 2 Jazzy ros_base installation, CUDA 12.8, cuDNN 9.7,
+#     TensorRT 10.7 and an OpenCV 4.11 build for aarch64.  NVIDIA's own
+#     nvcr.io/nvidia/l4t-jetpack:r36.4.0 base is Ubuntu 22.04, so ros-jazzy-* apt
+#     packages do not exist there; ros:jazzy on Docker Hub has no L4T GPU userspace.
+#     This image is the combination that actually runs on the board.
+#   * It is public, aarch64-only, and pinned by digest below so a rebuild is
+#     reproducible.
+#
+# If the board is on a different L4T minor release (check `cat /etc/nv_tegra_release`),
+# rebuild with a matching dustynv/ros:jazzy-*-r36.x.y-* tag.  Mixing container and host
+# L4T/CUDA minor versions is the usual cause of "CUDA driver version is insufficient".
+#
+# ros_gz_bridge / ros_gz_sim are deliberately NOT installed.  On the robot the camera
+# driver publishes sensor_msgs/Image directly on /camera/image_raw; there is no Gazebo.
+#
+# Build (on the Orin, from the repository root):
+#   docker build -f experiments/jetson/Dockerfile.jazzy-l4t -t line_follower:jazzy-l4t .
+#
+# Useful build args:
+#   --build-arg L4T_BASE=...               # a matching L4T Jazzy image tag
+#   --build-arg JETSON_AI_LAB_INDEX=...    # Jetson AI Lab pip index for the JP version
+#   --build-arg ONNXRUNTIME_GPU_SPEC=...   # e.g. "onnxruntime-gpu==1.24.0"
+
+ARG L4T_BASE=dustynv/ros:jazzy-ros-base-r36.4.0-cu128-24.04@sha256:ad157785a7aeea59506c0ddd6c8c28d3d75c4bdf64a5da804f5f00ff6c9154ad
+FROM ${L4T_BASE}
+
+LABEL org.opencontainers.image.title="line_follower ROS 2 Jazzy (Jetson Orin Nano)"
+LABEL org.opencontainers.image.base.name="dustynv/ros:jazzy-ros-base-r36.4.0-cu128-24.04"
+LABEL org.opencontainers.image.description="ROS 2 Jazzy line follower for JetPack 6 / L4T r36.4.0, TensorRT FP16, onnxruntime-gpu"
+
+SHELL ["/bin/bash", "-c"]
+# Keep the image's OpenCV/ROS Python packages ahead of the Ubuntu apt copies;
+# python3-opencv is installed as requested, but the L4T base's OpenCV 4.11 (built
+# against the image numpy) must win at import time.
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_INDEX_URL=https://pypi.org/simple \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/opt/venv/lib/python3.12/site-packages:/usr/local/lib/python3.12/dist-packages:/usr/lib/python3/dist-packages
+
+WORKDIR /ws
+
+# ---------------------------------------------------------------------------
+# 1. System packages the robot needs.  ros_gz_* is intentionally absent.
+# ---------------------------------------------------------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3-opencv \
+      python3-numpy \
+      python3-pip \
+      python3-dev \
+      python3-setuptools \
+      python3-yaml \
+      curl \
+      ca-certificates \
+      gnupg \
+      lsb-release \
+      v4l-utils \
+      libgl1 \
+      libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# The selected L4T Jazzy image already supplies ros-jazzy-ros-base (ROS 2 Jazzy is
+# built into /opt/ros/jazzy).  The block below is a real install path for a bare
+# Ubuntu 24.04 L4T image; on this image /opt/ros/jazzy/setup.bash exists and it is skipped.
+ARG ROS_APT_PACKAGE=ros-jazzy-ros-base
+RUN if [ ! -f /opt/ros/jazzy/setup.bash ]; then \
+      apt-get update && \
+      apt-get install -y --no-install-recommends curl gnupg lsb-release && \
+      curl -fsSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+        -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+      . /etc/os-release && \
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu ${UBUNTU_CODENAME} main" \
+        > /etc/apt/sources.list.d/ros2.list && \
+      apt-get update && \
+      apt-get install -y --no-install-recommends "${ROS_APT_PACKAGE}" && \
+      rm -rf /var/lib/apt/lists/*; \
+    fi && \
+    source /opt/ros/jazzy/setup.bash && \
+    ros2 pkg list | grep -qx rclpy
+
+# ---------------------------------------------------------------------------
+# 2. Python inference stack.
+#
+# onnxruntime-gpu is deliberately installed with the Jetson AI Lab index as an
+# extra index.  The index URL is a build ARG so a JP6.0/6.1/6.2 or future CUDA
+# variant can be selected without editing the file.  pip chooses the wheel that
+# matches this image's Python ABI (the Jazzy 24.04 image is Python 3.12; the
+# current jp6/cu128 index only publishes cp310 wheels, so pip also consults
+# PyPI for the cp312 aarch64 wheel).  The build fails if the installed package
+# has neither the TensorRT nor the CUDA execution provider.
+# ---------------------------------------------------------------------------
+ARG JETSON_AI_LAB_INDEX=https://pypi.jetson-ai-lab.io/jp6/cu128
+ARG ONNXRUNTIME_GPU_SPEC=onnxruntime-gpu
+RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    python3 -m pip install --no-cache-dir \
+      --index-url https://pypi.org/simple \
+      --extra-index-url "${JETSON_AI_LAB_INDEX}" \
+      "${ONNXRUNTIME_GPU_SPEC}" \
+      "onnx>=1.16,<2" && \
+    python3 -c "import onnxruntime as ort, sys; p = ort.get_available_providers(); print('onnxruntime', ort.__version__, 'python', sys.version.split()[0], 'providers', p); assert any(x in p for x in ('TensorrtExecutionProvider', 'CUDAExecutionProvider')), 'onnxruntime-gpu has no GPU execution provider'" && \
+    python3 -c "import cv2, numpy; print('cv2', cv2.__version__, 'numpy', numpy.__version__)"
+
+# TensorRT is installed from a tarball in the L4T Jazzy base; make trtexec
+# available on PATH for to_trt.sh.
+RUN if [ -x /usr/src/tensorrt/bin/trtexec ]; then \
+      ln -sf /usr/src/tensorrt/bin/trtexec /usr/local/bin/trtexec; \
+    fi && \
+    if ! command -v trtexec >/dev/null 2>&1; then \
+      echo "WARNING: trtexec not found; to_trt.sh will fail until TensorRT is installed"; \
+    fi
+
+# ---------------------------------------------------------------------------
+# 3. Line-follower package and robot launch file.
+#    Only src/line_follower is copied.  robot.launch.py is added to the installed
+#    package share so the robot command is exactly:
+#        ros2 launch line_follower robot.launch.py
+# ---------------------------------------------------------------------------
+COPY src/line_follower /ws/src/line_follower
+COPY experiments/jetson/robot.launch.py /ws/src/line_follower/launch/robot.launch.py
+
+RUN source /opt/ros/jazzy/setup.bash && \
+    colcon build --packages-select line_follower --event-handlers console_direct+ && \
+    rm -rf /ws/build /ws/log
+
+# ---------------------------------------------------------------------------
+# 4. Benchmark/conversion scripts and the ONNX models, in the same layout as the
+#    repository (bench_models.py resolves ./models and ./trt_cache itself).
+# ---------------------------------------------------------------------------
+COPY experiments/jetson/bench_models.py /ws/experiments/jetson/bench_models.py
+COPY experiments/jetson/to_trt.sh /ws/experiments/jetson/to_trt.sh
+COPY experiments/jetson/run_bench_with_tegrastats.sh /ws/experiments/jetson/run_bench_with_tegrastats.sh
+COPY experiments/jetson/README.md /ws/experiments/jetson/README.md
+COPY experiments/jetson/models /ws/experiments/jetson/models
+RUN chmod +x /ws/experiments/jetson/to_trt.sh /ws/experiments/jetson/run_bench_with_tegrastats.sh
+
+# ---------------------------------------------------------------------------
+# 5. Entry point: source ROS and the workspace overlay, then run the command.
+# ---------------------------------------------------------------------------
+COPY experiments/jetson/entrypoint.sh /ws/entrypoint.sh
+RUN chmod +x /ws/entrypoint.sh
+
+ENTRYPOINT ["/ws/entrypoint.sh"]
+CMD ["bash"]

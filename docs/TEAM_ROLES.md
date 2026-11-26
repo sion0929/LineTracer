@@ -129,3 +129,20 @@
    - 목표 궤적 자리(제어 개발용) — 새로 만든다.
 3. 채점, 테스트 세트, 텔레메트리, 제출 Docker를 관리한다.
 4. 통합 빌드를 돌리고 결과를 공유한다.
+
+---
+
+## 7. 코드 구조 (2026-11-25 분리)
+
+`follower_node.py`는 세 단계를 순서대로 부르기만 한다. 각 팀은 자기 폴더만 고친다.
+
+| 단계 | 위치 | 입력 → 출력 |
+|---|---|---|
+| **인지** | `perception/stage.py` (`PerceptionStage`), 검출 플러그인 `perception/rule.py` 등, 먼 띠 `far_band.py`, 복원 `restore.py` | 카메라 프레임 → 선 지도 `node.map` (`grid` 본 선, `seen` 본 영역, `restored` 복원한 선) |
+| **판단** | `planning/` (`RulePlanner`, `planner` 파라미터로 교체) | `node.map` + 자세 → 로컬 경로 `node.path`(odom, 약 2 cm 간격), `node.path_end`, `node.t_point` |
+| **제어** | `control/` (`RuleController`: pure pursuit + PID 보정) | 로봇 좌표 경로 → `/cmd_vel` |
+
+- 판단은 지도를 `node.map.hit()` / `snap()` / `trace()`로만 읽는다. 복원한 선(`restored`)도 이 함수들이 본 선과 똑같이 돌려준다.
+- 복원: `restore_mode: map`이면 인지가 복원한 선을 지도에 써서 넘긴다. `path`(기존)는 판단이 경로 끝을 늘린다.
+- 제어 PID: `pid_kp`, `pid_ki`, `pid_kd`(기본 0 = 순수 pure pursuit). 오차는 로봇에 가장 가까운 경로점의 횡오차다.
+- 개발 도구(오라클, 섀도 기록기)는 `node.replan()`을 덮어써서 판단을 바꾼다. 노드의 `replan()`은 판단 플러그인을 부른다.
