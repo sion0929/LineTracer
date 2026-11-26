@@ -64,6 +64,9 @@ class PerceptionStage:
                   and abs(node.pitch_f) < math.radians(gp('steady_pitch_deg').value))
         node.rocking = (not steady) and abs(node.pitch_f) < math.radians(gp('steady_pitch_deg').value)
         x_far = vision.X_FAR if steady else min(vision.X_FAR, gp('x_far_unsteady').value)
+        slope_xfar = gp('x_far_slope').value
+        if slope_xfar > 0.0 and abs(node.pitch_f) >= math.radians(gp('steady_pitch_deg').value):
+            x_far = min(vision.X_FAR, slope_xfar)    # on the ramp itself: only the ground right ahead
         # raised deck: after a climb and before the matching descent the ground beyond the
         # edge lies below the plane the robot stands on, so far lines project too close
         # (3 cm lower at 0.8 m -> ~18 cm short). Trust only the near ground up there.

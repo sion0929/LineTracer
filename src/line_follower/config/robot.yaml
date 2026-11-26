@@ -30,5 +30,5 @@ follower_node:
     # near ground (0.31-0.40 m); on the deck the full range with the ground ahead modelled from the
     # climb (symmetric hill). Held-out test maps: deck map precision 0.672 -> 0.826 (15/15 maps),
     # official track closed loop 10/10 (V0 9/10).
-    x_far_unsteady: 0.40    # camera range on a slope / while rocking [m]
+    x_far_slope: 0.40       # camera range on a slope only (rocking on flat ground keeps x_far_unsteady 0.50) [m]
     deck_model: symmetric   # deck: full range, ground ahead from the measured climb (perception/slope.py)

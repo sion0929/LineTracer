@@ -64,6 +64,7 @@ class FollowerNode(Node):
         self.declare_parameter('steady_rock', 0.08, rng(0.0, 1.0, 'max body rocking for the full camera range'))
         self.declare_parameter('steady_pitch_deg', 3.0, rng(0.0, 20.0, 'max |pitch| for the full camera range [deg]'))
         self.declare_parameter('x_far_unsteady', 0.50, rng(0.3, 1.0, 'camera range while rocking / on a hill [m]'))
+        self.declare_parameter('x_far_slope', 0.0, rng(0.0, 1.0, 'camera range on a slope only (|pitch| >= steady_pitch_deg) [m], 0 = use x_far_unsteady'))
         self.declare_parameter('rock_v_cap', 0.0, rng(0.0, 1.0, 'speed cap while the body rocks on flat ground [m/s], 0 = off'))
         self.declare_parameter('restore_model', '')            # ONNX of the line-restoration net ('' = off)
         self.declare_parameter('restore_replace', False)
