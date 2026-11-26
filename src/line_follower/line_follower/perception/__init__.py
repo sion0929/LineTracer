@@ -8,6 +8,7 @@ line map (`line_map.py`) can use any of them unchanged.
     rule_hill - rule + hill correction from the 2 cm line width (lead experiment)
     dl    - learned segmentation (owner: deep-learning teammate)
     depth - learned line mask placed on the ground with learned metric depth (no flat-floor assumption)
+    hybrid - rule mask with the depth mask as a gate ('and' / 'rule_gated')
 """
 from .base import Perception, PerceptionOutput
 
@@ -25,10 +26,13 @@ def make_perception(name, node):
     if name == 'depth':
         from .depth import DepthPerception
         return DepthPerception(node)
+    if name == 'hybrid':
+        from .hybrid import HybridPerception
+        return HybridPerception(node)
     if name == 'dl':
         from .dl import DlPerception
         return DlPerception(node)
-    raise ValueError(f"unknown perception plugin '{name}' (use 'rule' or 'dl')")
+    raise ValueError(f"unknown perception plugin '{name}' (use 'rule', 'hybrid', 'depth' or 'dl')")
 
 
 __all__ = ['Perception', 'PerceptionOutput', 'make_perception']

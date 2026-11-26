@@ -113,7 +113,12 @@ class FollowerNode(Node):
             description='flat list of (s_from, s_to, v) triples, s = distance driven [m]'))
         self.declare_parameter('debug_image', False)
         # plugins: who sees the line, who drives (see TEAM_GUIDE.md)
-        self.declare_parameter('perception', 'rule')    # rule | dl
+        self.declare_parameter('perception', 'rule')    # rule | hybrid | depth | dl
+        # rule.max_width_m: remove rule-mask components thicker than this [m] (0 = off)
+        self.declare_parameter('rule.max_width_m', 0.0, rng(0.0, 0.5,
+                                                              'rule mask: drop components thicker than this [m], 0 = off'))
+        self.declare_parameter('hybrid.mode', 'rule_gated')  # 'and' | 'rule_gated'
+        self.declare_parameter('hybrid.gate_px', 2)          # cells from the depth line that gate a rule component
         self.declare_parameter('controller', 'rule')    # rule | learned
         self.declare_parameter('planner', 'rule')       # rule
         # control (role 3): pure pursuit + PID trim on the cross-track error (0 = plain PP)

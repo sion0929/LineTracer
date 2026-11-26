@@ -76,6 +76,33 @@ def line_mask(gray, theta=0.0, x_max=X_FAR, thresh_cap=125.0, scale=1.0):
     return ((bev < t) & seen).astype(np.uint8) * 255, valid
 
 
+def remove_wide(mask, max_width_m):
+    """Remove connected components of a BEV line mask thicker than max_width_m [m].
+
+    The true line is 2 cm wide (4 cells at RES = 5 mm). For every connected component
+    the distance transform gives its largest inscribed-circle radius r, so its thickness
+    is 2*r*RES regardless of the direction the line runs. Components thicker than
+    max_width_m are removed WHOLE rather than only their thick core: a shadow blob often
+    has a ragged 1-2 cell rim that would otherwise survive as a false thin line, while a
+    real line joined to a blob is already corrupted at that junction.
+    max_width_m <= 0 disables the filter and returns the mask unchanged (bit-identical).
+    """
+    if max_width_m <= 0.0:
+        return mask
+    binary = (mask > 0).astype(np.uint8)
+    n, labels, _, _ = cv2.connectedComponentsWithStats(binary, connectivity=8)
+    if n <= 1:
+        return mask.copy()
+    dist = cv2.distanceTransform(binary, cv2.DIST_L2, 5)
+    out = mask.copy()
+    limit = max_width_m / RES                    # remove when 2*r > max_width_m/RES
+    for label in range(1, n):
+        component = labels == label
+        if 2.0 * float(dist[component].max()) > limit:
+            out[component] = 0
+    return out
+
+
 def far_band_mask(gray, theta, x0, x1, margin_px=6, thresh_cap=125.0, line_img=None, thin=0.0):
     """Far range x0..x1 [m] from the FULL-resolution image (dual resolution).
 
