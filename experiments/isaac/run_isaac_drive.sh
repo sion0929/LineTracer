@@ -186,7 +186,11 @@ fi
 exit "$status"
 '
 # Preserve original stdin on fd 3 for the EOF watcher.
-docker_args=(docker exec -i -e "LAB_NAME=$lab" -e "ROS_DOMAIN_ID=$domain" -e "FOLLOWER_ARGS=${ISAAC_FOLLOWER_ARGS:-}" -e "ISAAC_HOLD=${ISAAC_HOLD:-1}"
+# Perception log for the planning team (per-frame noisy observations), on by default when the
+# run directory is inside the repo (mounted at /ws). ISAAC_PERCEPTION_LOG=0 turns it off.
+plog=
+if [[ ${ISAAC_PERCEPTION_LOG:-1} != 0 && $out == "$root"/* ]]; then plog=/ws/${out#"$root"/}/perception_log; fi
+docker_args=(docker exec -i -e "LAB_NAME=$lab" -e "ROS_DOMAIN_ID=$domain" -e "FOLLOWER_ARGS=${ISAAC_FOLLOWER_ARGS:-}" -e "ISAAC_HOLD=${ISAAC_HOLD:-1}" -e "LF_PERCEPTION_LOG=$plog"
     -e "ISAAC_STARTUP_SECONDS=${ISAAC_STARTUP_SECONDS:-900}"
     -e "ISAAC_DUMP_DIR=$dump_dir"
     -e ROS2CLI_NO_DAEMON=1 "$lab" bash -c "exec 3<&0

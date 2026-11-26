@@ -98,6 +98,7 @@ class FollowerNode(Node):
         self.declare_parameter('freeze_passed', False)  # keep the map of the road already driven (no rewrites)
         self.declare_parameter('freeze_radius', 0.15)    # [m] around the axle, marked as driven
         self.declare_parameter('map_mode', 'legacy')
+        self.declare_parameter('perception_log', '')   # dir for the per-frame perception log ('' = env LF_PERCEPTION_LOG or off)
         self.declare_parameter('map_l_hit', 0.85)
         self.declare_parameter('map_l_miss', -0.4)
         self.declare_parameter('map_l_min', -2.0)
@@ -423,6 +424,10 @@ def main():
     finally:
         try:
             node.cmd_pub.publish(Twist())
+        except Exception:
+            pass
+        try:
+            node.perception_stage.log.flush()
         except Exception:
             pass
         node.destroy_node()

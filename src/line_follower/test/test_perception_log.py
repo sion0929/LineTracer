@@ -1,0 +1,49 @@
+import numpy as np
+
+from line_follower import vision
+from line_follower.perception.log import CHUNK, PerceptionLog, load
+
+
+class _P:
+    def __init__(self, v):
+        self.value = v
+
+
+class Node:
+    def __init__(self, p):
+        self.p = p
+
+    def has_parameter(self, k):
+        return k in self.p
+
+    def get_parameter(self, k):
+        return _P(self.p[k])
+
+
+def test_log_roundtrip(tmp_path):
+    log = PerceptionLog(Node({'perception': 'rule'}), str(tmp_path))
+    rng = np.random.default_rng(0)
+    frames = []
+    for i in range(CHUNK + 7):
+        line = rng.random((vision.BH, vision.BW)) > 0.97
+        valid = np.ones_like(line)
+        log.record(i / 30, (i * 0.01, 0.0, 0.1), 0.002, i * 0.01, i % 5 != 0,
+                   line.astype(np.uint8) * 255, valid.astype(np.uint8) * 255)
+        frames.append(line)
+    log.flush()
+    meta, d = load(tmp_path)
+    assert meta['settings']['perception'] == 'rule'
+    assert len(d['t']) == CHUNK + 7
+    assert np.array_equal(d['line'], np.stack(frames))
+    assert d['valid'].all() and not d['far'].any()
+    assert d['used'].sum() == sum(i % 5 != 0 for i in range(CHUNK + 7))
+    assert np.allclose(d['pose'][3], [0.03, 0.0, 0.1])
+
+
+def test_log_off_without_path(monkeypatch):
+    monkeypatch.delenv('LF_PERCEPTION_LOG', raising=False)
+    log = PerceptionLog(Node({}), '')
+    log.record(0.0, None, None, 0.0, False, np.zeros((vision.BH, vision.BW), np.uint8),
+               np.zeros((vision.BH, vision.BW), np.uint8))
+    log.flush()
+    assert not log.ok

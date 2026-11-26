@@ -15,6 +15,7 @@ from .. import terrain, vision
 from ..line_map import LineMap
 from ..scanmatch import ScanMatcher
 from .base import PerceptionOutput
+from .log import PerceptionLog
 
 REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
 
@@ -27,6 +28,8 @@ class PerceptionStage:
 
     def __init__(self, node):
         self.node = node
+        path = node.get_parameter('perception_log').value if node.has_parameter('perception_log') else ''
+        self.log = PerceptionLog(node, path)   # off unless perception_log / LF_PERCEPTION_LOG is set
 
     def process(self, msg):
         """One camera frame -> map update. Returns False when the frame was skipped."""
@@ -142,11 +145,14 @@ class PerceptionStage:
         if gp('freeze_passed').value and pose_ts is not None and node.travel > 0.05:
             node.map.freeze(pose_ts[0], pose_ts[1], gp('freeze_radius').value)
         skip = gp('map_skip_pitch_deg').value
-        if not (skip > 0.0 and abs(node.pitch_f) > math.radians(skip)):
+        used = not (skip > 0.0 and abs(node.pitch_f) > math.radians(skip))
+        if used:
             # (while the body tips over a ramp edge the camera-to-ground angle is unknown:
             # such frames drew corners 13-19 cm off. Keep the map from the good frames.)
             node.map.update(out.line, out.valid, pose_ts, add_only,
                             far_mask=far[1] if far is not None else None)
+        self.log.record(ts, pose_ts, out.pitch, node.travel, used and pose_ts is not None, out.line, out.valid,
+                        far[1] if far is not None else None)
         return True
 
 
