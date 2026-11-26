@@ -7,6 +7,8 @@ import math
 
 import numpy as np
 
+from .. import vision
+
 
 class SlopeTracker:
     """Hill state from the IMU pitch: 'flat' -> 'climb' -> 'deck' -> 'descent' -> 'flat'."""
@@ -106,3 +108,12 @@ class SlopeTracker:
         else:
             z = np.where(xs > x_edge, -elev, 0.0)
         return np.maximum(z, -elev)
+
+
+def middle_band(line, half):
+    """BEV line mask with every cell farther than `half` metres to either side cleared.
+    Columns: col 0 = +Y_HALF (left); cell centre y = Y_HALF - (c + 0.5) * RES."""
+    ys = vision.Y_HALF - (np.arange(line.shape[1]) + 0.5) * vision.RES
+    out = line.copy()
+    out[:, np.abs(ys) > half] = 0
+    return out

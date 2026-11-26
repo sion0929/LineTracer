@@ -121,3 +121,15 @@ def test_deck_edge_with_pitch_lag():
             return
         x += STEP
     pytest.fail('deck never detected')
+
+
+def test_middle_band_keeps_centre_and_clears_ramp_edges():
+    from line_follower import vision
+    from line_follower.perception.slope import middle_band
+    line = np.zeros((vision.BH, vision.BW), np.uint8)
+    col = lambda y: int(round((vision.Y_HALF - y) / vision.RES - 0.5))
+    for y in (0.0, 0.33, -0.33, 0.15):
+        line[:, col(y)] = 255
+    out = middle_band(line, 0.22)
+    assert out[:, col(0.0)].all() and out[:, col(0.15)].all()
+    assert not out[:, col(0.33)].any() and not out[:, col(-0.33)].any()

@@ -16,7 +16,7 @@ from ..line_map import LineMap
 from ..scanmatch import ScanMatcher
 from .base import PerceptionOutput
 from .log import PerceptionLog
-from .slope import SlopeTracker
+from .slope import SlopeTracker, middle_band
 
 REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
 
@@ -155,6 +155,11 @@ class PerceptionStage:
             valid = np.maximum(out.valid, far[1])
             out = PerceptionOutput(line=line, valid=valid, obstacle=out.obstacle)
             add_only = far[1] if gp('far_add_only').value else None
+        half = gp('slope_y_half').value
+        if half > 0.0 and getattr(node, 'slope_state', 'flat') in ('climb', 'descent'):
+            # on the ramp the route runs straight up/down its middle; the ramp's side edges and
+            # its shadow (about 0.33 m to each side) look like lines -> keep only the middle band
+            out = PerceptionOutput(line=middle_band(out.line, half), valid=out.valid, obstacle=out.obstacle)
         node.last_obstacle = out.obstacle
         out.pitch = node.pitch_at(ts)
         node.last_observation = out
