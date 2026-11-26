@@ -80,6 +80,8 @@ class FollowerNode(Node):
         self.declare_parameter('imu_floor_min_h', 0.008, rng(0.0, 0.1, 'elevation above which the floor model is used [m]'))
         self.declare_parameter('map_skip_pitch_deg', 0.0, rng(0.0, 30.0, 'do not write the map while |pitch| exceeds this (tipping over a ramp edge) [deg], 0 = off'))
         self.declare_parameter('deck_xfar', 0.0, rng(0.0, 1.0, 'camera range while standing on a raised deck (climbed, not yet descended) [m], 0 = off'))
+        self.declare_parameter('deck_model', '')              # '' = off, 'symmetric' = model the deck edge from the climb
+        self.declare_parameter('deck_edge_offset', 0.0, rng(-0.5, 0.5, 'deck edge distance correction for the symmetric model [m]'))
         self.declare_parameter('climb_slip', 0.0, rng(0.0, 0.3, 'fraction of /odom distance lost to wheel slip while climbing'))
         self.declare_parameter('scan_match', False)          # nudge the pose so fresh line pixels sit on the map (scanmatch.py)
         self.declare_parameter('scan_gain', 0.5, rng(0.0, 1.0, 'fraction of the matched correction applied per frame'))

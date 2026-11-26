@@ -16,6 +16,7 @@ from ..line_map import LineMap
 from ..scanmatch import ScanMatcher
 from .base import PerceptionOutput
 from .log import PerceptionLog
+from .slope import SlopeTracker
 
 REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
 
@@ -30,12 +31,20 @@ class PerceptionStage:
         self.node = node
         path = node.get_parameter('perception_log').value if node.has_parameter('perception_log') else ''
         self.log = PerceptionLog(node, path)   # off unless perception_log / LF_PERCEPTION_LOG is set
+        self.slope = SlopeTracker()
+        self.prev_travel = None
 
     def process(self, msg):
         """One camera frame -> map update. Returns False when the frame was skipped."""
         node = self.node
         if node.pose is None or node.done:
             return False
+        travel = getattr(node, 'travel', 0.0)
+        if self.prev_travel is None:
+            self.prev_travel = travel
+        ds = max(0.0, travel - self.prev_travel)
+        self.prev_travel = travel
+        node.slope_state = self.slope.update(ds, node.pitch_f, getattr(node, 'elev', 0.0))
         if msg.encoding in ('rgb8', 'bgr8'):
             img = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width, 3)
             bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) if msg.encoding == 'rgb8' else img
@@ -63,7 +72,10 @@ class PerceptionStage:
         elif node.pitch_f < -math.radians(3.0):
             node.on_deck = False
         deck = gp('deck_xfar').value
-        if deck > 0.0 and (getattr(node, 'on_deck', False) or getattr(node, 'elev', 0.0) > 0.01):
+        deck_model = gp('deck_model').value
+        symmetric = deck_model == 'symmetric' and node.slope_state == 'deck'
+        if (deck > 0.0 and not symmetric
+                and (getattr(node, 'on_deck', False) or getattr(node, 'elev', 0.0) > 0.01)):
             x_far = min(x_far, deck)
         add_only = None
         if (not steady and gp('far_add_unsteady').value and x_far < vision.X_FAR
@@ -100,6 +112,13 @@ class PerceptionStage:
                 out = PerceptionOutput(line=line, valid=valid, obstacle=None)
                 add_only = None
         elev = getattr(node, 'elev', 0.0)
+        if out is None and symmetric:
+            # on the deck the far view already looks down the matching descent: model the
+            # deck edge from the climb instead of shortening the view
+            edge_offset = gp('deck_edge_offset').value
+            ground = lambda xs: self.slope.deck_ground(xs, elev, edge_offset)
+            line, valid = terrain.line_mask_profile(gray, REST_PITCH, ground, vision.X_FAR)
+            out = PerceptionOutput(line=line, valid=valid, obstacle=None)
         if out is None and gp('imu_floor').value and (on_hill or elev > gp('imu_floor_min_h').value):
             # the floor ahead is level in the world: in the body frame it lies at
             # z = -(h + x sin b) / cos b (h: wheel height above the floor, b: IMU body pitch).
