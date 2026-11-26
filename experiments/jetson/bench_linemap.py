@@ -11,7 +11,7 @@ from time import perf_counter_ns
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def replay(samples, warmup):
+def replay(samples, warmup, map_mode):
     import cv2
     import numpy as np
 
@@ -47,10 +47,10 @@ def replay(samples, warmup):
         far[int(0.3 * vision.BH):] = 0
         observations.append((line, valid, far))
 
-    print(f"X_FAR={vision.X_FAR:g} patch={line_map.PATCH} "
+    print(f"map_mode={map_mode} X_FAR={vision.X_FAR:g} patch={line_map.PATCH} "
           f"saved_frames={len(frames)} OpenCV={cv2.__version__} threads=1", flush=True)
     for use_far in (False, True):
-        mapping = line_map.LineMap()
+        mapping = line_map.LineMap(map_mode=map_mode)
         times = []
         for index in range(samples + warmup):
             angle = index / 45
@@ -72,17 +72,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--samples", type=int, default=600)
     parser.add_argument("--warmup", type=int, default=60)
+    parser.add_argument("--map-mode", choices=("legacy", "logodds"), default="legacy")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.samples < 1 or args.warmup < 0:
         parser.error("samples must be positive and warmup must be nonnegative")
     if args.worker:
-        replay(args.samples, args.warmup)
+        replay(args.samples, args.warmup, args.map_mode)
         return
     for x_far in ("0.85", "1.3"):
         subprocess.run(
             [sys.executable, __file__, "--worker", "--samples", str(args.samples),
-             "--warmup", str(args.warmup)],
+             "--warmup", str(args.warmup), "--map-mode", args.map_mode],
             env={**os.environ, "LF_X_FAR": x_far},
             check=True,
         )

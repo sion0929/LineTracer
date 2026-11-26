@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 
 from .. import terrain, vision
+from ..line_map import LineMap
 from ..scanmatch import ScanMatcher
 from .base import PerceptionOutput
 
@@ -19,6 +20,11 @@ REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat g
 
 
 class PerceptionStage:
+    @staticmethod
+    def make_map(node):
+        parameters = ('map_mode', 'map_l_hit', 'map_l_miss', 'map_l_min', 'map_l_max', 'map_l_thresh')
+        return LineMap(**{name: node.get_parameter(name).value for name in parameters})
+
     def __init__(self, node):
         self.node = node
 

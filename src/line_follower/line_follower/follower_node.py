@@ -22,7 +22,7 @@ from geometry_msgs.msg import Twist
 from . import vision
 from . import line_map
 from . import restore
-from .line_map import LineMap, RES, C0
+from .line_map import RES, C0
 from .perception import make_perception
 from .control import make_controller
 from . import terrain
@@ -97,6 +97,12 @@ class FollowerNode(Node):
         self.declare_parameter('near_scale', 1.0)
         self.declare_parameter('freeze_passed', False)  # keep the map of the road already driven (no rewrites)
         self.declare_parameter('freeze_radius', 0.15)    # [m] around the axle, marked as driven
+        self.declare_parameter('map_mode', 'legacy')
+        self.declare_parameter('map_l_hit', 0.85)
+        self.declare_parameter('map_l_miss', -0.4)
+        self.declare_parameter('map_l_min', -2.0)
+        self.declare_parameter('map_l_max', 3.5)
+        self.declare_parameter('map_l_thresh', 0.6)
         self.declare_parameter('far_add_only', True)   # far band only fills unseen line (False: overwrite like near)
         self.declare_parameter('far_thin', 0.0)       # [m] far band: cut across-runs up to this long to their centre
         self.declare_parameter('far_model', '')      # far-band U-Net ONNX (far_band.py); '' = threshold
@@ -126,7 +132,7 @@ class FollowerNode(Node):
         self.create_subscription(Odometry, '/odom', self.on_odom, qos_profile_sensor_data)
         self.create_subscription(Imu, '/imu', self.on_imu, qos_profile_sensor_data)
 
-        self.map = LineMap()
+        self.map = PerceptionStage.make_map(self)
         self.pose = None            # latest (x, y, yaw) in odom
         self.hist = []              # (stamp, pose) to look up the pose at image time
         self.imu_yaw = None

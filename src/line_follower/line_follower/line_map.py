@@ -38,15 +38,30 @@ def _bev_conf_tables(x_far, height, width, scale):
 
 
 class LineMap:
-    def __init__(self):
+    logodds = None  # Only logodds maps allocate an evidence layer.
+
+    def __init__(self, *, map_mode='legacy', map_l_hit=0.85, map_l_miss=-0.4,
+                 map_l_min=-2.0, map_l_max=3.5, map_l_thresh=0.6):
+        if map_mode not in ('legacy', 'logodds'):
+            raise ValueError(f'Unknown map_mode {map_mode!r}')
         self.grid = np.zeros((SIZE, SIZE), np.uint8)
         self.seen = np.zeros((SIZE, SIZE), np.uint8)     # cells the camera has looked at (restore.py)
         self.frozen = None          # cells the robot has already driven over: never rewritten (freeze())
         self.restored = None        # learned route where the camera has not looked (perception restores)
-        # confidence of every line cell, handed to planning with the map (0-255, see confidence()):
+        # Legacy confidence of every line cell (0-255, see confidence()):
         # near observations high, falling with distance; far-band cells lower; restored cells low
         self.conf = np.zeros((SIZE, SIZE), np.uint8)
         self.last = None
+        if map_mode == 'logodds':
+            if not map_l_min <= 0.0 <= map_l_thresh <= map_l_max:
+                raise ValueError('Expected map_l_min <= 0 <= map_l_thresh <= map_l_max')
+            self.logodds = np.zeros(self.grid.shape, np.float32)
+            self._l_min = float(map_l_min)
+            self._l_max = float(map_l_max)
+            self._l_thresh = float(map_l_thresh)
+            weights = np.arange(256, dtype=np.float32) / 255
+            self._hit_delta = weights * map_l_hit
+            self._miss_delta = weights * map_l_miss
 
     def freeze(self, x, y, radius):
         """Mark the ground within radius [m] of the robot (odom) as final: later frames skip it."""
@@ -116,11 +131,15 @@ class LineMap:
     FAR_BAND_SCALE = 0.6        # far band (full-res strip near the horizon) vs near range
 
     def confidence(self, X, Y):
-        """Confidence 0..1 of the line at odom (X, Y): 0 = no line."""
+        """Line confidence in 0..1, with a sigmoid posterior on seen cells in logodds mode."""
         i = int(round(Y / RES)) + C0
         j = int(round(X / RES)) + C0
         if not (0 <= i < SIZE and 0 <= j < SIZE):
             return 0.0
+        if self.logodds is not None and self.seen[i, j]:
+            evidence = float(self.logodds[i, j])
+            tail = math.exp(-abs(evidence))
+            return (1.0 if evidence >= 0.0 else tail) / (1.0 + tail)
         if self.grid[i, j] > 0:
             return self.conf[i, j] / 255.0
         if self.restored is not None and self.restored[i, j] > 0:
@@ -137,7 +156,7 @@ class LineMap:
         return np.where(far_mask > 0, far, near)
 
     def update(self, bev_mask, bev_valid, pose, add_only=None, far_mask=None):
-        """Overwrite the part of the map currently seen by the camera.
+        """Update the part of the map currently seen by the camera.
 
         add_only (BEV mask, optional): there the observation is less trusted. It never
         erases, and adds line only where the map has no line within ADD_GAP (fills what
@@ -200,14 +219,28 @@ class LineMap:
                 kx, ky = x + bx - left, y + by - top
                 box = np.s_[by:by + bh, bx:bx + bw]
                 new = candidates[box] & (known[ky:ky + bh, kx:kx + bw] == 0)
-                win[box][new] = 255
-                cwin[box][new] = cobs[box][new]
+                if self.logodds is None:
+                    win[box][new] = 255
+                    cwin[box][new] = cobs[box][new]
+                else:
+                    # Eligible add-only hits accumulate until they cross the line threshold.
+                    seen[box] |= new
 
         if width:
             seen_u8 = seen.view(np.uint8)
-            line = cv2.compare(obs.view(np.uint8), 0, cv2.CMP_GT)
-            cv2.copyTo(line, seen_u8, win)
-            cv2.copyTo(cv2.bitwise_and(cobs, line), seen_u8, cwin)
+            if self.logodds is None:
+                line = cv2.compare(obs.view(np.uint8), 0, cv2.CMP_GT)
+                cv2.copyTo(line, seen_u8, win)
+                cv2.copyTo(cv2.bitwise_and(cobs, line), seen_u8, cwin)
+            else:
+                evidence = self.logodds[world]
+                delta = cv2.LUT(cobs, self._miss_delta)
+                cv2.copyTo(cv2.LUT(cobs, self._hit_delta), obs.view(np.uint8), delta)
+                delta += evidence
+                np.clip(delta, self._l_min, self._l_max, out=delta)
+                cv2.copyTo(delta, seen_u8, evidence)
+                active = (delta > self._l_thresh).astype(np.uint8) * 255
+                cv2.copyTo(active, seen_u8, win)
         self.last = debug
 
     def hit(self, X, Y):
