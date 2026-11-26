@@ -83,6 +83,7 @@ PC 검증 결과는 다음과 같다(Isaac 검증 프레임 20장, OpenCV DNN �
 | `V0-NearRule640-DeckFull.yaml` | 언덕 정상 평지에서 원래 범위 (`deck_xfar: 0`) | 실험 중 |
 | `V0-NearRule640-DeckProfile.yaml` | 위 + 선 폭으로 앞 지면 높이 추정 (`terrain_bend_z: 0.01`) | 실험 중 |
 | `V0-NearRule640-Slope40DeckProfile.yaml` | 위 + 경사에서 0.40 m까지만 (`x_far_unsteady: 0.40`) | 실험 중 |
+| `V0-NearRule640-DeckSym.yaml` | 정상 평지에서 원래 범위 + 대칭 언덕 가정으로 앞 지면 높이 계산 (`deck_model: symmetric`, `perception/slope.py`) | 실험 중 |
 | `H1-RuleGatedByV4.yaml` | 규칙 결과를 DL V4로 거름 (`perception: hybrid`) | 오프라인 정밀도 0.998 |
 | `V4-NearB320close-*.yaml`, `V5-…`, `V6-…` | 학습 모델 인지 | 폐루프 3/10 (V4 + logodds) |
 
