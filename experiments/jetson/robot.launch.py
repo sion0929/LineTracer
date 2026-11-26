@@ -25,7 +25,7 @@ def generate_launch_description():
                               description='rule (implemented) or dl (stub until a model is wired)'),
         DeclareLaunchArgument('controller', default_value='rule'),
         DeclareLaunchArgument('restore_model',
-                              default_value='/ws/experiments/jetson/models/restore_r1.onnx',
+                              default_value='/ws/experiments/jetson/models/V1-Restore128.onnx',
                               description='ONNX line-restoration model; empty string disables it'),
         Node(
             package='line_follower',

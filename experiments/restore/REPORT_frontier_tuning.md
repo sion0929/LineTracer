@@ -47,7 +47,7 @@ Run from the workspace root. Each cache is approximately 493 MiB and carries mod
 export OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
 py=/home/rvlab/miniforge3/envs/lf_b_dl/bin/python
 nice -n 10 "$py" experiments/restore/tune_frontier.py \
-  --model experiments/restore/models/restore_r3.onnx \
+  --model experiments/restore/models/V3-Restore128.onnx \
   --cache /tmp/26rp_frontier_r3.npz --scores /tmp/26rp_frontier_r3_scores.npz
 nice -n 10 "$py" experiments/restore/tune_frontier.py \
   --model /home/rvlab/restore_data/runs/R5_w24_160k/restore.onnx \

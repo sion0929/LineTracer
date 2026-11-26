@@ -1,0 +1,3 @@
+follower_node:
+  ros__parameters:
+    perception: rule

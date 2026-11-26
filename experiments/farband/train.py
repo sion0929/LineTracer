@@ -63,13 +63,18 @@ class BandNet(nn.Module):
         return self.head(x)
 
 
-def load(files):
+def load(files, hscale=1):
+    """Read strips, downscaling width per file (a whole-set float64 mean needs ~7 GB and OOMs the host)."""
     X, Y = [], []
     for f in files:
         z = np.load(f)
-        if z["x"].ndim != 4 or not len(z["x"]):
+        x, y = z["x"], z["y"]
+        if x.ndim != 4 or not len(x):
             continue
-        X.append(z["x"]); Y.append(z["y"])
+        if hscale > 1:
+            x = x.reshape(*x.shape[:2], -1, hscale, 3).mean(3, dtype=np.float32).round().astype(np.uint8)
+            y = y.reshape(*y.shape[:2], -1, hscale).max(3)
+        X.append(x); Y.append(y)
     return np.concatenate(X), np.concatenate(Y)
 
 
@@ -166,13 +171,7 @@ def main():
     val_names = set(names[-a.val_maps:])              # same held-out maps in every folder
     tr = [f for f in files if f.stem not in val_names]
     va = [f for f in files if f.stem in val_names]
-    Xt, Yt = load(tr); Xv, Yv = load(va)
-    if a.hscale > 1:
-        s = a.hscale
-        Xt = Xt.reshape(*Xt.shape[:2], -1, s, 3).mean(3).astype(np.uint8)
-        Xv = Xv.reshape(*Xv.shape[:2], -1, s, 3).mean(3).astype(np.uint8)
-        Yt = Yt.reshape(*Yt.shape[:2], -1, s).max(3)
-        Yv = Yv.reshape(*Yv.shape[:2], -1, s).max(3)
+    Xt, Yt = load(tr, a.hscale); Xv, Yv = load(va, a.hscale)
     Yt = ((Yt > a.target * 255) * 255).astype(np.uint8)
     print(f"train {len(Xt)} strips ({len(tr)} maps), val {len(Xv)} ({len(va)} maps)", flush=True)
     rows_d = np.array([row_dist(r) for r in range(Xt.shape[1])])

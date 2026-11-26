@@ -4,7 +4,9 @@ import os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 PKG = os.path.join(HERE, '..', '..', 'src', 'line_follower')
 sys.path.insert(0, PKG)
-extra = sys.argv[1:]
+sys.path.insert(0, HERE)
+from ros_args import node_scoped  # noqa: E402
+extra = node_scoped(sys.argv[1:])
 sys.argv = [sys.argv[0], '--ros-args', '--params-file', os.environ.get('LF_PARAMS', os.path.join(PKG, 'config', 'follower.yaml')),
             '-p', 'use_sim_time:=true', *extra]
 import threading, time

@@ -8,10 +8,12 @@ import os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 PKG = os.environ.get('LF_PKG', os.path.join(HERE, '..', '..', 'src', 'line_follower'))
 sys.path.insert(0, PKG)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ros_args import node_scoped  # noqa: E402
 DUMP = os.environ.get('LF_DUMP', 'line_map_dump.npz')
 sys.argv = [sys.argv[0], '--ros-args', '--params-file',
             os.environ.get('LF_PARAMS', os.path.join(PKG, 'config', 'follower.yaml')),
-            '-p', 'use_sim_time:=true', *sys.argv[1:]]
+            '-p', 'use_sim_time:=true', *node_scoped(sys.argv[1:])]
 import numpy as np
 import rclpy
 from line_follower import follower_node as fn

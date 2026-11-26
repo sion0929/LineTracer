@@ -1,0 +1,5 @@
+# Overlay for Isaac drive runs: learned near seg+depth (Isaac round 2, base). Pass after rule.yaml.
+follower_node:
+  ros__parameters:
+    perception: depth
+    depth.model_path: /ws/experiments/isaac/models/V3-NearB320-Isaac.onnx

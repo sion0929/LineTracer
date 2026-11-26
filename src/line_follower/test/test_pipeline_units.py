@@ -149,3 +149,16 @@ def test_confidence_is_handed_with_the_map():
     lm.restored = np.zeros_like(lm.grid)
     lm.restored[C0, C0 + int(round(2.0 / RES))] = 255
     assert 0 < lm.confidence(2.0, 0.0) < far
+
+
+def test_trt_resolve_prefers_sibling_engine(tmp_path, monkeypatch):
+    from line_follower.trt_runner import resolve_model
+    onnx = tmp_path / 'V4-NearB320-Isaac.onnx'
+    onnx.write_bytes(b'x')
+    assert resolve_model(str(onnx)) == (onnx, False)          # PC: no engine -> ONNX path
+    engine = tmp_path / 'V4-NearB320-Isaac.engine'
+    engine.write_bytes(b'x')
+    assert resolve_model(str(onnx)) == (engine, True)         # Jetson: engine next to it wins
+    monkeypatch.setenv('LF_NO_TRT', '1')
+    assert resolve_model(str(onnx)) == (onnx, False)
+    assert resolve_model(str(engine)) == (engine, True)

@@ -29,6 +29,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 PKG = Path(os.environ.get("LF_PKG", HERE.parents[1] / "src" / "line_follower"))
 sys.path.insert(0, str(PKG))
+sys.path.insert(0, str(HERE.parent / 'user_base'))
+from ros_args import node_scoped  # noqa: E402
 LEVEL = int(os.environ.get("ORACLE_LEVEL", "0"))
 AHEAD = float(os.environ.get("ORACLE_AHEAD", "0.85"))
 
@@ -133,7 +135,7 @@ def main(node_class=OracleNode):
     exit_with_parent()
     sys.argv = [sys.argv[0], "--ros-args", "--params-file",
                 os.environ.get("LF_PARAMS", str(PKG / "config" / "follower.yaml")),
-                "-p", "use_sim_time:=true", *sys.argv[1:]]
+                "-p", "use_sim_time:=true", *node_scoped(sys.argv[1:])]
     fn.FollowerNode = node_class
     init = rclpy.init
     rclpy.init = lambda *a, **k: init(args=sys.argv)

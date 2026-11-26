@@ -236,13 +236,13 @@ ros2 launch line_follower robot.launch.py
 This is the robot launch file (`robot.launch.py`), not the Gazebo launch
 (`line_follower.launch.py`).  It starts `follower_node` with
 `use_sim_time:=false`, `perception:=rule`, and the learned line restorer
-`/ws/experiments/jetson/models/restore_r1.onnx`.
+`/ws/experiments/jetson/models/V1-Restore128.onnx`.
 
 Useful launch arguments:
 
 ```bash
 ros2 launch line_follower robot.launch.py camera_topic:=/camera/image_raw
-ros2 launch line_follower robot.launch.py restore_model:=/ws/experiments/jetson/models/restore_r3.onnx
+ros2 launch line_follower robot.launch.py restore_model:=/ws/experiments/jetson/models/V3-Restore128.onnx
 ros2 launch line_follower robot.launch.py restore_model:=""
 ros2 launch line_follower robot.launch.py cmd_vel_topic:=/cmd_vel
 ```
@@ -352,5 +352,5 @@ mode (`MAXN`) and `jetson_clocks` state as the bench run.
 | Camera topic is empty | Check `/dev/video*`, pass the devices, add `--group-add video`, mount `/tmp/argus_socket`, and use `--network host` with the same `ROS_DOMAIN_ID` on host and container.  Do not run two publishers on `/camera/image_raw`. |
 | `/cmd_vel` is published but the robot does not move | The base driver must subscribe to `/cmd_vel` and publish `/odom` and `/imu`.  Check `ros2 topic info /cmd_vel` and `ros2 topic hz /odom`. |
 | Node waits forever after launch | A simulation YAML with `use_sim_time: true` was loaded.  On the robot use `robot.launch.py` (it sets `use_sim_time:=false`) or pass `--ros-args -p use_sim_time:=false`. |
-| `restore_model not found` | Use the image path `/ws/experiments/jetson/models/restore_r1.onnx`, or pass `restore_model:=/ws/experiments/jetson/models/restore_r3.onnx`.  The node falls back to no restoration when the file is absent. |
+| `restore_model not found` | Use the image path `/ws/experiments/jetson/models/V1-Restore128.onnx`, or pass `restore_model:=/ws/experiments/jetson/models/V3-Restore128.onnx`.  The node falls back to no restoration when the file is absent. |
 | Docker build is extremely slow on an x86 PC | Build on the Orin.  The base is aarch64 L4T; emulation is not a supported deployment path. |

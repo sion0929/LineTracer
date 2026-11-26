@@ -17,21 +17,27 @@ ROW0, ROWS = 256, 64
 
 class FarBandModel:
     def __init__(self, onnx_path):
-        self.sess, self.net = None, None
-        try:
-            import onnxruntime as ort
-            avail = ort.get_available_providers()
-            provs = []
-            if "TensorrtExecutionProvider" in avail:
-                provs.append(("TensorrtExecutionProvider", {"trt_fp16_enable": True, "trt_engine_cache_enable": True,
-                                                            "trt_engine_cache_path": str(Path(onnx_path).parent / "trt_cache")}))
-            provs += [p for p in ("CUDAExecutionProvider", "CPUExecutionProvider") if p in avail]
-            opts = ort.SessionOptions()
-            opts.intra_op_num_threads = 2
-            self.sess = ort.InferenceSession(str(onnx_path), opts, providers=provs)
-            self.inp = self.sess.get_inputs()[0].name
-        except Exception:
-            self.net = cv2.dnn.readNetFromONNX(str(onnx_path))
+        self.sess, self.net, self.trt = None, None, None
+        from .trt_runner import resolve_model
+        model, is_engine = resolve_model(onnx_path)
+        if is_engine:
+            from .trt_runner import TrtRunner
+            self.trt = TrtRunner(model)                 # Jetson: serialized TensorRT engine
+        else:
+            try:
+                import onnxruntime as ort
+                avail = ort.get_available_providers()
+                provs = []
+                if "TensorrtExecutionProvider" in avail:
+                    provs.append(("TensorrtExecutionProvider", {"trt_fp16_enable": True, "trt_engine_cache_enable": True,
+                                                                "trt_engine_cache_path": str(Path(onnx_path).parent / "trt_cache")}))
+                provs += [p for p in ("CUDAExecutionProvider", "CPUExecutionProvider") if p in avail]
+                opts = ort.SessionOptions()
+                opts.intra_op_num_threads = 2
+                self.sess = ort.InferenceSession(str(onnx_path), opts, providers=provs)
+                self.inp = self.sess.get_inputs()[0].name
+            except Exception:
+                self.net = cv2.dnn.readNetFromONNX(str(onnx_path))
         side = Path(onnx_path).with_suffix(".json")
         import json
         self.in_w = json.loads(side.read_text()).get("width", vision.W) if side.is_file() else vision.W
@@ -45,7 +51,9 @@ class FarBandModel:
             strip = cv2.resize(strip, (self.in_w, ROWS), interpolation=cv2.INTER_AREA)
         strip = strip.astype(np.float32) / 255.0      # RGB
         blob = np.ascontiguousarray(strip.transpose(2, 0, 1)[None])
-        if self.sess is not None:
+        if self.trt is not None:
+            logit = self.trt.run(blob)[self.trt.output_names[0]][0, 0]
+        elif self.sess is not None:
             logit = self.sess.run(None, {self.inp: blob})[0][0, 0]
         else:
             self.net.setInput(blob)

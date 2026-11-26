@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src/line_follower"))
 from line_follower import vision, far_band
 D = ROOT / "experiments/results/lead/res_compare"
-m = far_band.load(str(ROOT / "experiments/farband/models/farband_w8h2.onnx"))
+m = far_band.load(str(ROOT / "experiments/farband/models/V2-Far640-Gz.onnx"))
 rows = []
 for n in ("tile_034_ex0", "tile_034_ex2", "tile_009_ex1", "tile_009_ex3"):
     bgr = cv2.imread(str(D / f"{n}.png")); g = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
