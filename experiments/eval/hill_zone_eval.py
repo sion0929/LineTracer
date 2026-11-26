@@ -174,7 +174,7 @@ def _map_path(raw):
 
 def load_map(job):
     raw = job["map"]
-    if raw == "official":
+    if raw == "official" or (str(raw).endswith(".sdf") and pme.is_official(_map_path(raw))):
         meta = pme.official_metadata(OFFICIAL_SDF)
         return meta, official_ramps(), True
     path = _map_path(raw)

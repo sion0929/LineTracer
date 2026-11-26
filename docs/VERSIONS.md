@@ -80,12 +80,12 @@ PC 검증 결과는 다음과 같다(Isaac 검증 프레임 20장, OpenCV DNN �
 | `V0-NearRule640-logodds.yaml` | `map_mode: logodds` | 폐루프 9/10 |
 | `V0-NearRule640-width5-logodds.yaml` | 위 둘 다 | 폐루프 6/10. 판단 팀용 인지 로그 100개는 이 설정 |
 | `V0-NearRule640-freeze15/35.yaml` | 지나간 공간 고정 (반경 0.15 / 0.35 m) | 재생 지도 정밀도 0.961 → 0.978 (0.35) |
-| `V0-NearRule640-DeckFull.yaml` | 언덕 정상 평지에서 원래 범위 (`deck_xfar: 0`) | 나빠짐: 언덕 맵 15개 전체 정밀도 0.947 → 0.878, 0/15맵 우세. 내리막 너머 선이 가깝게 찍힘 |
+| `V0-NearRule640-DeckFull.yaml` | 언덕 정상 평지에서 원래 범위 (`deck_xfar: 0`) | 나빠짐: 언덕 맵 16개 전체 정밀도 0.949 → 0.884, 0/16맵 우세. 내리막 너머 선이 가깝게 찍힘 |
 | `V0-NearRule640-DeckProfile.yaml` | 위 + 선 폭으로 앞 지면 높이 추정 (`terrain_bend_z: 0.01`) | 나빠짐 (8맵 중간 집계 전체 −0.10, 평지도 −0.09). 중단 |
 | `V0-NearRule640-Slope40DeckProfile.yaml` | 위 + 경사에서 0.40 m까지만 (`x_far_unsteady: 0.40`) | 안 돌림 (DeckProfile이 평지를 해쳐 비교 의미 없음) |
 | `V0-NearRule640-DeckSym.yaml` | 정상 평지에서 원래 범위 + 대칭 언덕 가정으로 앞 지면 높이 계산 (`deck_model: symmetric`, `perception/slope.py`) | 첫 구현: 9맵 중간 집계 전체 −0.006(거의 같음). 경사를 평균으로 재서 6.3°(실제 7.8°), 가장자리를 21 cm 멀게 잡음 → 고침 |
-| `V0-NearRule640-DeckSym2.yaml` | 위와 같고 경사·가장자리 추정 고침 (90번째 백분위 경사, 오른 높이 ÷ tan, 지연 보정) | 언덕 맵 15개: 전체 정밀도 V0와 같음(−0.001), 내리막 +0.023 (14/15맵). 정상 평지를 원래 범위로 봐도 손해 없음 |
-| `V0-NearRule640-Slope40DeckSym2.yaml` | 위 + 경사에서 0.40 m까지만 (`x_far_unsteady: 0.40`) | **언덕 맵 15개 최고**: 정상 평지 정밀도 0.805 → 0.897 (+0.097, 14/15맵), 내리막 +0.014 (15/15), 전체 +0.005 (13/15). 공식 트랙 폐루프 확인 중 |
+| `V0-NearRule640-DeckSym2.yaml` | 위와 같고 경사·가장자리 추정 고침 (90번째 백분위 경사, 오른 높이 ÷ tan, 지연 보정) | 언덕 맵 16개(공식 포함): 전체 정밀도 V0와 같음(−0.001), 내리막 +0.022 (15/16맵). 정상 평지를 원래 범위로 봐도 손해 없음 |
+| `V0-NearRule640-Slope40DeckSym2.yaml` | 위 + 경사에서 0.40 m까지만 (`x_far_unsteady: 0.40`) | **언덕 맵 16개 최고**: 정상 평지 정밀도 0.807 → 0.897 (+0.096, 15/16맵), 내리막 +0.013 (16/16), 전체 +0.005 (14/16). 공식 트랙 폐루프 확인 중 |
 | `H1-RuleGatedByV4.yaml` | 규칙 결과를 DL V4로 거름 (`perception: hybrid`) | 오프라인 정밀도 0.998 |
 | `V4-NearB320close-*.yaml`, `V5-…`, `V6-…` | 학습 모델 인지 | 폐루프 3/10 (V4 + logodds) |
 
