@@ -23,7 +23,7 @@ agg = {}
 for p in order:
     rr = [r for r in rs if r["profile"] == p]
     off = [r for r in rr if r["map"].endswith("worlds/line_track.sdf")]
-    til = [r for r in rr if "tiles60" in r["map"]]
+    til = [r for r in rr if not r["map"].endswith("worlds/line_track.sdf")]   # any test map suite
     laps = [r["lap_sec"] for r in off if r["complete"]]
     agg[p] = dict(official=f"{sum(r['complete'] for r in off)}/{len(off)}",
                   lap=round(sum(laps) / len(laps), 2) if laps else None,

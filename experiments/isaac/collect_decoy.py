@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument("--split", choices=(*SPLITS, "all"), required=True)
     parser.add_argument("--limit", type=int, help="Select the first N maps, including resumed maps")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--shard", default="0/1", help="K/N: only maps whose index %% N == K (parallel workers)")
     parser.add_argument("--timeout-minutes", type=float, default=10)
     parser.add_argument("--budget-gb", type=float, default=60)
     parser.add_argument("--min-free-gb", type=float, default=1)
@@ -138,7 +139,9 @@ def capture(args, directory, log):
 
 def collect(args):
     splits = SPLITS if args.split == "all" else (args.split,)
-    selected = [(split, f"decoy_{index:04d}") for split in splits for index in SPLITS[split]]
+    shard_k, shard_n = (int(v) for v in args.shard.split("/"))
+    selected = [(split, f"decoy_{index:04d}") for split in splits for index in SPLITS[split]
+                if index % shard_n == shard_k]
     selected = selected[:args.limit]
     available = {path.stem for path in SUITE.glob("part*/maps/decoy_*.json")}
     missing = [name for _, name in selected if name not in available]
@@ -180,9 +183,10 @@ def collect(args):
             "mean_seconds_per_map": mean, "eta_seconds": mean * remaining if mean is not None
             else (0 if not remaining else None),
         }
-        temp = args.out / ".progress.json.tmp"
+        tag = "" if args.shard == "0/1" else "_" + args.shard.replace("/", "of")
+        temp = args.out / f".progress{tag}.json.tmp"
         temp.write_text(json.dumps(snapshot, indent=2) + "\n")
-        temp.replace(args.out / "progress.json")
+        temp.replace(args.out / f"progress{tag}.json")
 
     for directory in pending:
         label = f"{directory.parent.name}/{directory.name}"
@@ -243,7 +247,7 @@ def main():
     signal.signal(signal.SIGTERM, terminate)
     try:
         args.out.mkdir(parents=True, exist_ok=True)
-        with (args.out / ".collect.lock").open("a") as lock:
+        with (args.out / f".collect{'' if args.shard == '0/1' else '_' + args.shard.replace('/', 'of')}.lock").open("a") as lock:
             try:
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError as exc:
