@@ -5,6 +5,7 @@ odom frame.  The camera cannot see the first 0.3 m in front of the robot, so the
 is what lets the robot follow a line that is already below / beside it.
 """
 import math
+from functools import lru_cache
 import numpy as np
 import cv2
 
@@ -22,7 +23,18 @@ _CONE = np.deg2rad(np.arange(-32, 33, 4))
 _WIDE = np.deg2rad(np.r_[np.arange(-150, -99, 4), np.arange(102, 151, 4)])
 WIDE_TURNS = False                     # set by the node (parameter trace_wide)
 ADD_GAP = 0.06               # add-only observations stay this far from known line [m]
-_ADD_KERNEL = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * round(ADD_GAP / RES) + 1,) * 2)
+_ADD_RADIUS = round(ADD_GAP / RES)
+_ADD_KERNEL = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * _ADD_RADIUS + 1,) * 2)
+
+
+@lru_cache(maxsize=1)
+def _bev_conf_tables(x_far, height, width, scale):
+    x = x_far - (np.arange(height) + 0.5) * RES
+    row = np.clip(1.0 - (x - 0.45) / (1.6 - 0.45) * 0.65, 0.35, 1.0) * 255
+    near = np.repeat(row.astype(np.uint8)[:, None], width, axis=1)
+    # Scale in float before quantizing, as in the original confidence calculation.
+    far = (row * scale).astype(np.uint8)[:, None]
+    return near, far
 
 
 class LineMap:
@@ -119,12 +131,10 @@ class LineMap:
     def _bev_conf(far_mask=None):
         """Per-BEV-pixel confidence: 1.0 up to 0.45 m ahead, falling linearly to 0.35 at 1.6 m;
         far-band pixels scaled by FAR_BAND_SCALE."""
-        x = vision.X_FAR - (np.arange(vision.BH) + 0.5) * RES
-        row = np.clip(1.0 - (x - 0.45) / (1.6 - 0.45) * 0.65, 0.35, 1.0)
-        c = np.repeat((row * 255)[:, None], vision.BW, axis=1)
-        if far_mask is not None:
-            c = np.where(far_mask > 0, c * LineMap.FAR_BAND_SCALE, c)
-        return c.astype(np.uint8)
+        near, far = _bev_conf_tables(vision.X_FAR, vision.BH, vision.BW, LineMap.FAR_BAND_SCALE)
+        if far_mask is None:
+            return near.copy()
+        return np.where(far_mask > 0, far, near)
 
     def update(self, bev_mask, bev_valid, pose, add_only=None, far_mask=None):
         """Overwrite the part of the map currently seen by the camera.
@@ -148,30 +158,57 @@ class LineMap:
             [s, -c, (c * ax - s * ay) / RES + tx],
             [-c, -s, (s * ax + c * ay) / RES + ty],
         ])
-        obs = cv2.warpAffine(bev_mask, m, (PATCH, PATCH), flags=cv2.INTER_LINEAR)
-        val = cv2.warpAffine(bev_valid, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST)
-        win = self.grid[oy:oy + PATCH, ox:ox + PATCH]
-        cwin = self.conf[oy:oy + PATCH, ox:ox + PATCH]
-        cobs = cv2.warpAffine(self._bev_conf(far_mask), m, (PATCH, PATCH), flags=cv2.INTER_NEAREST)
+        warp_size = (PATCH, PATCH)
+        obs = cv2.warpAffine(bev_mask, m, warp_size, flags=cv2.INTER_LINEAR) > 100
+        val = cv2.warpAffine(bev_valid, m, warp_size, flags=cv2.INTER_NEAREST)
         seen = val > 0
-        self.seen[oy:oy + PATCH, ox:ox + PATCH][seen] = 255
+        debug = (ox, oy, obs, seen)  # keep the full patch for the debug image
+
+        # Crop after warping to preserve OpenCV's sampling at the original patch origin.
+        cobs = cv2.warpAffine(self._bev_conf(far_mask), m, warp_size, flags=cv2.INTER_NEAREST)
+        x, y, width, height = cv2.boundingRect(seen.view(np.uint8))
+        region = np.s_[y:y + height, x:x + width]
+        world = np.s_[oy + y:oy + y + height, ox + x:ox + x + width]
+        obs = obs[region]
+        seen = seen[region]
+        self.seen[world][seen] = 255
         if self.restored is not None:
-            self.restored[oy:oy + PATCH, ox:ox + PATCH][seen] = 0      # seen now: the guess is void
+            self.restored[world][seen] = 0
         if self.frozen is not None:
-            seen &= self.frozen[oy:oy + PATCH, ox:ox + PATCH] == 0     # the road already driven stays as it is
+            seen &= self.frozen[world] == 0
+
+        win = self.grid[world]
+        cwin = self.conf[world]
+        cobs = cobs[region]
         if add_only is not None:
-            add = cv2.warpAffine(add_only, m, (PATCH, PATCH), flags=cv2.INTER_NEAREST) > 0
-            known = cv2.dilate((win > 0).astype(np.uint8), _ADD_KERNEL) > 0
-            new = add & seen & (obs > 100) & ~known
+            add = val if add_only is bev_valid else cv2.warpAffine(
+                add_only, m, warp_size, flags=cv2.INTER_NEAREST)
+            add = add[region] > 0
+            candidates = add & seen & obs
             seen &= ~add
-            win[seen] = np.where(obs[seen] > 100, 255, 0)
-            win[new] = 255
-            cwin[seen] = np.where(obs[seen] > 100, cobs[seen], 0)
-            cwin[new] = cobs[new]
-        else:
-            win[seen] = np.where(obs[seen] > 100, 255, 0)
-            cwin[seen] = np.where(obs[seen] > 100, cobs[seen], 0)
-        self.last = (ox, oy, obs > 100, seen)       # for the debug image
+
+            bx, by, bw, bh = cv2.boundingRect(candidates.view(np.uint8))
+            if bw:
+                # Read the original grid, including neighbors outside the valid footprint.
+                # Clip the halo to the old patch to retain its dilation border behavior.
+                left = max(0, x + bx - _ADD_RADIUS)
+                top = max(0, y + by - _ADD_RADIUS)
+                right = min(PATCH, x + bx + bw + _ADD_RADIUS)
+                bottom = min(PATCH, y + by + bh + _ADD_RADIUS)
+                known = cv2.dilate(self.grid[oy + top:oy + bottom, ox + left:ox + right],
+                                   _ADD_KERNEL)
+                kx, ky = x + bx - left, y + by - top
+                box = np.s_[by:by + bh, bx:bx + bw]
+                new = candidates[box] & (known[ky:ky + bh, kx:kx + bw] == 0)
+                win[box][new] = 255
+                cwin[box][new] = cobs[box][new]
+
+        if width:
+            seen_u8 = seen.view(np.uint8)
+            line = cv2.compare(obs.view(np.uint8), 0, cv2.CMP_GT)
+            cv2.copyTo(line, seen_u8, win)
+            cv2.copyTo(cv2.bitwise_and(cobs, line), seen_u8, cwin)
+        self.last = debug
 
     def hit(self, X, Y):
         i = int(round(Y / RES)) + C0
