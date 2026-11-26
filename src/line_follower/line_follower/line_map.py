@@ -43,7 +43,7 @@ class LineMap:
         cv2.circle(self.frozen, (int(round(x / RES)) + C0, int(round(y / RES)) + C0),
                    int(round(radius / RES)), 255, -1)
 
-    def write_restored(self, restorer, pose, thresh=0.6, length=0.4, radius=1.3):
+    def write_restored(self, restorer, pose, thresh=0.6, length=0.4, radius=1.3, min_x=0.2):
         """Line restoration handed to planning: from every place where the seen line runs into
         never-seen ground ("frontier"), follow the learned route (restore.Restorer) for at most
         `length` m and draw that thin route into self.restored. Refreshed within radius of the
@@ -73,7 +73,7 @@ class LineMap:
         for k in range(1, n):
             rows, cols = np.nonzero(lab == k)
             xs, ys = restorer.to_robot(cols, rows)
-            eligible = xs > 0.2
+            eligible = xs > min_x          # min_x near the far edge: only restore past the view's end, not where a curve leaves it sideways
             if not eligible.any():
                 continue
             xs, ys = xs[eligible], ys[eligible]

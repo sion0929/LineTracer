@@ -33,3 +33,6 @@ experiments/restore/models/r2_w24.onnx
 experiments/restore/models/r1_w16.onnx
 experiments/restore/models/smoke.onnx
 experiments/farband/models/smoke.onnx
+experiments/isaac/near_cpu_smoke/
+experiments/farband/data_isaac/
+experiments/isaac/rand_sample/*/

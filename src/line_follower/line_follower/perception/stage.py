@@ -155,4 +155,5 @@ class PerceptionStage:
         if now - getattr(self, 't_restore', -1e9) < gp('restore_period').value:
             return                                   # the net costs ~10-70 ms: run it a few times a second
         self.t_restore = now
-        node.map.write_restored(node.restorer, node.pose, gp('restore_thresh').value, gp('restore_len').value)
+        node.map.write_restored(node.restorer, node.pose, gp('restore_thresh').value, gp('restore_len').value,
+                                min_x=gp('restore_min_x').value)

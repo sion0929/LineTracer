@@ -117,6 +117,7 @@ class FollowerNode(Node):
         # line restoration: 'path' = extend the planned path when it runs out (legacy),
         # 'map' = perception writes the restored route into the map it hands to planning
         self.declare_parameter('restore_mode', 'path')
+        self.declare_parameter('restore_min_x', 0.2, rng(0.0, 2.0, "map mode: restore only from frontier points at least this far ahead [m]"))
         self.declare_parameter('restore_period', 0.2, rng(0.0, 2.0, "map mode: run the restoration net at most this often [s]"))
 
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
