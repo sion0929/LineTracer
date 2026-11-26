@@ -22,9 +22,11 @@
 | V1-NearB320-Gz | seg_depth_v4_base | Gazebo | – |
 | V1-NearB320FarDepth-Gz | seg_depth_t1_far | Gazebo, 먼 깊이 가중 | – |
 | V2-NearS320-Isaac | near_v4s_isaac | Isaac 1라운드 | – |
+| V3-NearS320-Isaac | near_v4s_r3 | Isaac 3라운드 | 0.933 (2라운드 small 0.929) |
 | V2-NearB320-Isaac | near_v4b_isaac | Isaac 1라운드 | – |
 | V3-NearB320-Isaac | near_v4b_isaac_r2 | Isaac 2라운드 | 0.935 |
 | V4-NearB320-Isaac | near_v4b_isaac_r3 | Isaac 3라운드 (맵 286개 + 기존) | 0.939 |
+| V5-NearB320-Isaac | near_v4b_r4 | Isaac 4라운드 (맵 488개 + 기존, 학습 프레임 24,484) | 0.943 (깊이 MAE 0.36 cm) |
 
 S는 small, B는 base다.
 
@@ -37,6 +39,7 @@ S는 small, B는 base다.
 | V3-Far640Hill-Gz | farband_w8h2_hill | Gazebo 평지 + 언덕 |
 | V4-Far640-Isaac | farband_isaac | Isaac 포함 (선택 지표 0.884) |
 | V4-Far640Wide-Isaac | farband_isaac_w12 | Isaac 포함, 폭 12 (0.890, 느려서 미채택) |
+| V5-Far640-Isaac | isaac_w8h2_r2 | Isaac 맵 312개 포함 (선택 지표 0.922, 검증 맵 구성이 V4와 달라 직접 비교 불가) |
 
 ### 선 복원 (로봇 주변 지도 128×128)
 

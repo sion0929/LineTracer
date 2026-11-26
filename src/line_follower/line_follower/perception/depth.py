@@ -2,13 +2,13 @@
 
 The v4 network (b-dlseg experiments/dl/train_v4.py) takes the RGB image (320x240, /255) and
 returns per-pixel line logits and metric camera-axis depth. Every line pixel then becomes a
-3D point in the camera frame and is placed on the robot's ground plane (x forward, y left)
-without any assumption about the shape of the ground: on ramps, crests and their feet the
-line lands where it really is, where the flat-floor projection is off by 10-20 cm.
+3D point in the camera frame and is projected onto the BEV grid (x forward, y left).
 
 Parameters: depth.model_path (ONNX), depth.min_logit_margin, depth.max_depth,
 depth.splat ('dilate': grow projected points by 2 px, widens the line by ~2 cm;
-'close': fill the gaps between projected points without growing the line).
+'close': close gaps between projected points; 'centre': project one pixel per
+horizontal mask run and close gaps). depth.use_pitch levels the projected points
+with the IMU for the yaw-only map transform. Both defaults preserve legacy projection.
 """
 import math
 from pathlib import Path
@@ -21,6 +21,7 @@ from .base import Perception, PerceptionOutput
 
 W_IN, H_IN = 320, 240
 REST_PITCH = math.radians(0.33)
+CAM_MOUNT_Z = 0.093  # Camera height above the Waffle Pi model origin (SDF).
 
 
 class DepthPerception(Perception):
@@ -30,12 +31,16 @@ class DepthPerception(Perception):
         node.declare_parameter('depth.min_logit_margin', 0.0)
         node.declare_parameter('depth.max_depth', 1.4)
         node.declare_parameter('depth.splat', 'dilate')
+        node.declare_parameter('depth.use_pitch', False)
         path = node.get_parameter('depth.model_path').value
         if not path or not Path(path).is_file():
             raise FileNotFoundError(f"depth.model_path not found: {path!r}")
         self.margin = node.get_parameter('depth.min_logit_margin').value
         self.max_depth = node.get_parameter('depth.max_depth').value
         self.splat = node.get_parameter('depth.splat').value
+        self.use_pitch = node.get_parameter('depth.use_pitch').value
+        if self.splat not in ('dilate', 'close', 'centre'):
+            raise ValueError(f"depth.splat must be 'dilate', 'close', or 'centre': {self.splat!r}")
         self.sess = self.net = self.trt = None
         from ..trt_runner import resolve_model
         model, is_engine = resolve_model(path)
@@ -80,21 +85,39 @@ class DepthPerception(Perception):
     def process(self, bgr, gray, pitch, x_max):
         logits, depth = self.infer(bgr)
         line = (logits[1] - logits[0]) > self.margin
-        vv, uu = np.nonzero(line & (depth > 0.1) & (depth < self.max_depth))
+        line &= (depth > 0.1) & (depth < self.max_depth)
+        if self.splat == 'centre':
+            # Pad so runs touching either image edge have a start and an end.
+            edges = np.diff(np.pad(line.astype(np.int8), ((0, 0), (1, 1))), axis=1)
+            vv, starts = np.nonzero(edges == 1)
+            _, ends = np.nonzero(edges == -1)
+            uu = (starts + ends - 1) // 2
+        else:
+            vv, uu = np.nonzero(line)
         bev_line = np.zeros((vision.BH, vision.BW), np.uint8)
         # valid footprint as the flat projection sees it (keeps the node's range gating)
         _, valid = vision.bev_warp(gray, pitch, x_max)
         if len(vv):
             z = depth[vv, uu]
-            c, s = math.cos(REST_PITCH), math.sin(REST_PITCH)
             down = self.rv[vv] * z
-            x = vision.CAM_X + z * c + down * s                # forward along the body
+            if self.use_pitch:
+                # The stage supplies image-time pitch, but substitutes REST_PITCH
+                # on steep grades. Its process interface does not include the image
+                # stamp, so use the latest raw IMU sample when that happens.
+                imu = getattr(self.node, 'imu', ())
+                theta = imu[-1][1] if pitch == REST_PITCH and imu else pitch
+                if not math.isfinite(theta):
+                    theta = REST_PITCH
+                x = ((vision.CAM_X + z) * math.cos(theta)
+                     - (CAM_MOUNT_Z - down) * math.sin(theta))
+            else:
+                x = vision.CAM_X + z * math.cos(REST_PITCH) + down * math.sin(REST_PITCH)
             y = -self.ru[uu] * z                               # left
             col = np.round((vision.Y_HALF - y) / vision.RES).astype(int)
             row = np.round((vision.X_FAR - x) / vision.RES).astype(int)
             ok = (col >= 0) & (col < vision.BW) & (row >= 0) & (row < vision.BH) & (x <= x_max)
             bev_line[row[ok], col[ok]] = 255
-            if self.splat == 'close':
+            if self.splat in ('close', 'centre'):
                 bev_line = cv2.morphologyEx(bev_line, cv2.MORPH_CLOSE, self.kernel, iterations=2)
             else:
                 bev_line = cv2.dilate(bev_line, self.kernel, iterations=2)
