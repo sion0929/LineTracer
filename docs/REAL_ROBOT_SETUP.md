@@ -2,6 +2,22 @@
 
 2026-11-26 · 출처: 강의 자료 "Robot Programming Lab 09: Jetson orin, turtlebot setting" (22쪽)
 
+
+## 0. 강의 영상(22분, 무음, 자막)에서 확인한 사실
+
+| 항목 | 영상 근거 |
+|---|---|
+| 강의용 Jetson OS | `lsb_release -a` → **Ubuntu 22.04.5 LTS (jammy)**, ROS 2 **Humble** 설치 문서를 따라감 (12:22) |
+| OS 설치 | 보드의 **REC와 GND 핀을 점퍼로 연결**(복구 모드) → SDK Manager를 설치한 호스트 PC와 **USB-C 케이블**로 연결 → SD 카드 슬롯에 카드 → SDK Manager로 설치 (2:30–3:20) |
+| 조립 | Jetson 아래판 나사를 풀어 분리, NIC 안테나 선 정리 후 TurtleBot3 판에 장착. OpenCR와 Jetson을 USB로 연결 (4:47–7:14) |
+| **카메라 연결** | Jetson에는 CAM0, CAM1 두 포트가 있다. **CAM0 포트에 금색 단자가 아래쪽을 향하도록** 리본 케이블을 꽂는다 (7:35–7:44) |
+| jetson-io | 24pin CSI Connector → Camera IMX219-A → 저장 후 재부팅 (8:26–9:16) |
+| **IMX219 센서 모드 (실측 출력)** | `3280×2464 @21 fps`, `3280×1848 @28`, `1920×1080 @30`, **`1640×1232 @30`**, `1280×720 @60` (11:28). JetsonHacks 예제는 mode 2 (1920×1080, 16:9, 화각 잘림)로 연다 |
+| 화면 테스트 | `export DISPLAY=:1`이 꼭 필요하다는 자막 (13:43) |
+| TurtleBot3 구동 | `TURTLEBOT3_MODEL`, `LDS_MODEL` export는 `.bashrc`에 넣기 권장, `robot.launch.py` 후 새 터미널에서 `teleop_keyboard`로 확인 (20:57–21:46) |
+
+→ 우리 노드에는 **mode 3 (`1640×1232 @30`, 4:3 전체 화각)**을 `640×480`으로 줄여 쓴다.
+
 ## 1. 강의 자료의 순서
 
 | 단계 | 어디서 | 명령 / 내용 |
@@ -23,7 +39,7 @@
 | 1 | **OS / ROS** | Ubuntu 22.04 (커널 5.15-tegra) + **ROS 2 Humble** | E의 Jetson: Ubuntu 24.04.5, L4T R39.2.2 + **ROS 2 Jazzy**. 코드도 Jazzy 기준 | 로봇에 올릴 보드가 어느 이미지인지 정해야 한다. Jazzy면 `ros-jazzy-*`, `turtlebot3 -b jazzy`로 바꾼다. Humble이면 우리 노드를 Humble에서 시험해야 한다 |
 | 2 | **카메라 토픽** | 래퍼 기본 설정은 스테레오 카메라(IMX219-83)용. `namespace: /camera/left` → `/camera/left/image_raw` | 노드는 `/camera/image_raw`를 구독 | 설정 YAML을 우리 것으로: `namespace: /camera`, `sensor_id: 0` (IMX219-A 슬롯), `frame_id: camera_rgb_frame` |
 | 3 | **주기** | `framerate: 20` | 30 Hz 기준 설계 | 30으로. 다만 아래 4번 때문에 센서 모드도 바꿔야 30 Hz가 나온다 |
-| 4 | **센서 모드 / 화각** | 래퍼가 `3264×2464` 전체 해상도 모드로 열고 `640×480`으로 줄임. IMX219의 이 모드는 최대 약 21 fps | 30 Hz, 4:3 전체 화각 필요 | 래퍼의 GStreamer 문자열을 `1640×1232`(2×2 비닝, 4:3 전체 화각, 30 fps) 모드로 바꾼다. 16:9 모드(1920×1080, 1280×720)는 화각이 잘려 쓰지 않는다. 실제 모드 목록은 보드에서 `nvarguscamerasrc` 로그로 확인 |
+| 4 | **센서 모드 / 화각** | 래퍼가 `3264×2464` 전체 해상도 모드로 열고 `640×480`으로 줄임. IMX219의 이 모드는 최대 약 21 fps | 30 Hz, 4:3 전체 화각 필요 | 래퍼의 GStreamer 문자열을 `1640×1232`(2×2 비닝, 4:3 전체 화각, 30 fps) 모드로 바꾼다. 16:9 모드(1920×1080, 1280×720)는 화각이 잘려 쓰지 않는다. 강의 영상의 실측 모드 목록에 `1640×1232 @30`이 있다 |
 | 5 | **카메라 내부 파라미터** | 래퍼 YAML의 `fx 455.6` 등은 다른 카메라 값 (640 폭에서 수평 화각 약 70°) | `vision.py`는 수평 화각 62.2° (`fx ≈ 530`)를 가정 | 체커보드로 우리 카메라를 보정한다. 결과를 `vision.py`(또는 실물용 파라미터)에 넣는다. 왜곡 계수도 반영 |
 | 6 | **영상 형식** | `bgr8`, 시각은 발행 순간의 벽시계 | 노드는 `rgb8`/`bgr8`/`mono8` 모두 받음 | 그대로 됨. 실물은 `use_sim_time:=false` (`experiments/jetson/robot.launch.py`) |
 | 7 | **라이다** | `ld08_driver` 설치, `LDS_MODEL=LDS-02`, `robot.launch.py`가 라이다도 띄움 | **라이다 없음** | 라이다 노드를 빼고 `turtlebot3_node`(OpenCR: `/odom`, `/imu`, `/cmd_vel`)만 띄우는 launch를 쓴다. 라이다 장치가 없으면 그 노드는 오류를 내며 재시작을 반복할 수 있다 |
