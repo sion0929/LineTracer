@@ -41,3 +41,4 @@ docs/reviews/run_*.log
 tools/pylf
 experiments/isaac/runs/
 experiments/isaac/.map-dump.*/
+.worktrees/
