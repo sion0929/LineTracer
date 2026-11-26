@@ -161,3 +161,15 @@
 - 장애물 회피 (가정: 장애물 없음).
 - C++ 다중 노드 패키지 (`line_follower_perception`, `line_follower_navigation`, `line_follower_mission`, `line_follower_control`). 레거시로 남기고 제출 이미지에는 넣지 않는다.
 - 실험 도구 (`experiments/`): 벤치, 오라클, Isaac 하네스, 평가 스크립트.
+
+## 11. 결정 (Floorplan 청사진 검토에서 나온 질문, 2026-11-26)
+
+| # | 질문 | 결정 |
+|---|---|---|
+| 1 | 판단이 `node.restorer`로 복원을 직접 부른다 | 복원은 인지 책임이다. 인지가 `restored` 층에 쓰고, 판단은 MapView로만 읽는다. `restore_mode: path`(판단이 복원 호출)는 호환용으로만 남기고 새 코드는 쓰지 않는다 |
+| 2 | 판단이 `controller.confirm_finish()`로 제어를 부른다 | 결승 판정은 판단이 한다(`LocalPath.end == 't'`, `t_point`). 제어는 `t_point`에서 멈추는 실행만 한다. `confirm_finish`는 판단 쪽으로 옮긴다 |
+| 3 | `node.travel`이 `Pose`에 없다 | `Pose`에 `travel`(누적 주행 거리, m)을 추가한다 |
+| 4 | 제어가 `node.pitch_f`를 쓴다 | `Pose.pitch`는 걸러진 피치(`pitch_f`)로 정의한다. 원시 IMU 피치는 상태 추정 내부에만 둔다 |
+| 5 | `ScanMatcher`는 선 마스크와 지도가 필요하다 | 인지 단계가 부르고, 보정량을 `StateEstimator.apply_correction(dx, dy, dyaw)`로 넘긴다. 상태 추정은 지도를 모른다 |
+| 6 | `process(frame, …)` 대 `process(bgr, gray, …)` | 새 계약은 `process(frame: Frame, pitch, x_max)`로 한다. 옮기는 동안 기반 클래스가 옛 시그니처를 감싸는 어댑터를 둔다 |
+| 7 | `to_odom` / `to_robot` 위치 | `Pose`의 메서드(`pose.to_odom(x, y)`, `pose.to_robot(X, Y)`)로 `interfaces.py`에 둔다 |

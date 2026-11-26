@@ -36,3 +36,5 @@ experiments/farband/models/smoke.onnx
 experiments/isaac/near_cpu_smoke/
 experiments/farband/data_isaac/
 experiments/isaac/rand_sample/*/
+experiments/rule_tune/data
+docs/reviews/run_*.log
