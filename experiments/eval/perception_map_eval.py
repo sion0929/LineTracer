@@ -38,6 +38,8 @@ STEP = 0.005
 BANDS = ("0-0.5", "0.5-0.9", "0.9-1.3", "1.3+")
 RADII = (1.0, 0.5)
 CLASSES = ("all", "main", "decoy")
+OFFICIAL_WORLDS = [ROOT / "src" / package / "worlds/line_track.sdf"
+                   for package in ("line_follower_bringup", "line_follower")]
 
 
 def segments(paths):
@@ -90,6 +92,83 @@ def official_metadata(world):
     return {"painted": painted, "line_width_m": 0.02}
 
 
+def is_official(world):
+    target = Path(world).resolve()
+    return any(target == path.resolve() for path in OFFICIAL_WORLDS)
+
+
+def _order_polyline(points):
+    points = np.asarray(points, float)
+    if len(points) < 3:
+        return points
+    remaining = list(range(len(points)))
+    ordered = [remaining.pop(0)]
+    while remaining:
+        last = points[ordered[-1]]
+        index = min(remaining, key=lambda i: np.linalg.norm(points[i] - last))
+        remaining.remove(index)
+        ordered.append(index)
+    return points[ordered]
+
+
+def official_centerline(world):
+    path = ROOT / "experiments/gt.npy"
+    if path.is_file():
+        return np.load(path)[:, :2].astype(float)
+    painted = np.asarray(official_metadata(world)["painted"], float).reshape(-1, 2)
+    return _order_polyline(np.unique(painted, axis=0))
+
+
+ROUTE_BAND_CM = 3.0   # offset stats use accepted cells within this distance of the route centre line
+
+
+def signed_offsets(points, centerline):
+    """Signed lateral distance [cm, left positive] to the nearest centreline segment."""
+    points = np.asarray(points, float)[:, :2]
+    centerline = np.asarray(centerline, float)[:, :2]
+    a, b = centerline[:-1], centerline[1:]
+    delta = b - a
+    length2 = np.maximum(np.sum(delta ** 2, axis=1), 1e-20)
+    arclen = np.sqrt(length2)
+    arc = np.r_[0.0, np.cumsum(arclen)]
+    signed = np.empty(len(points))
+    nearest_s = np.empty(len(points))
+    for start in range(0, len(points), 256):
+        chunk = points[start:start + 256]
+        offsets = chunk[:, None, :] - a[None]
+        fraction = np.clip(np.einsum("ijk,jk->ij", offsets, delta) / length2, 0, 1)
+        residual = offsets - fraction[..., None] * delta
+        distances = np.einsum("ijk,ijk->ij", residual, residual)
+        index = distances.argmin(axis=1)
+        chosen = residual[np.arange(len(chunk)), index]
+        tangents = delta[index]
+        cross = tangents[:, 0] * chosen[:, 1] - tangents[:, 1] * chosen[:, 0]
+        signed[start:start + len(chunk)] = cross / arclen[index]
+        nearest_s[start:start + len(chunk)] = arc[index] + fraction[
+            np.arange(len(chunk)), index] * arclen[index]
+    return signed * 100, nearest_s
+
+
+def offset_metrics(values):
+    values = np.asarray(values, float)
+    values = values[np.isfinite(values)]
+    if not len(values):
+        return {"mean": None, "abs_mean": None, "p95_abs": None, "cells": 0}
+    mean = float(values.mean())
+    return {"mean": mean, "abs_mean": abs(mean),
+            "p95_abs": float(np.percentile(np.abs(values), 95)), "cells": int(len(values))}
+
+
+def section_values(values, s, ends):
+    ends = np.asarray(ends, float)
+    index = np.clip(np.searchsorted(ends, s, side="right"), 0, len(ends) - 1)
+    return {str(k + 1): values[index == k] for k in range(len(ends))}
+
+
+def section_offset_metrics(values, s, ends):
+    return {k: offset_metrics(v) for k, v in section_values(values, s, ends).items()}
+
+
 def ground_truth(meta):
     decoys = segments(d["xy"] for d in meta.get("case", {}).get("decoys", []))
     route = segments([meta.get("centerline", [])])
@@ -118,7 +197,7 @@ def fraction(hits, total):
     return {"hits": int(hits), "total": int(total), "rate": float(hits / total) if total else None}
 
 
-def score_map(z, meta):
+def score_map(z, meta, centerline=None, section_ends=None):
     ink, centers, is_decoy = ground_truth(meta)
     width = float(meta.get("line_width_m", 0.02))
     tolerance = width / 2 + 0.01
@@ -131,6 +210,13 @@ def score_map(z, meta):
         path = np.repeat(trajectory[:, None, :], 2, axis=1)
     proximity = segment_distance(centers, path)
     good = segment_distance(xy, ink) <= tolerance + 1e-10
+    if centerline is None:
+        centerline = meta.get("centerline", [])
+    centerline = np.asarray(centerline, float)
+    centerline = centerline.reshape(-1, centerline.shape[-1])[:, :2] if centerline.size else np.empty((0, 2))
+    cell_offsets = cell_s = None
+    if len(centerline) >= 2:
+        cell_offsets, cell_s = signed_offsets(xy, centerline)
 
     def coverage(cells):
         return cKDTree(cells).query(centers)[0] <= tolerance + 1e-10
@@ -144,14 +230,36 @@ def score_map(z, meta):
                                    for name, sel in zip(CLASSES, subsets)}
         return result
 
+    def offset(values):
+        metrics = offset_metrics(values)
+        return metrics, (values if np.isfinite(values).any() else np.empty(0))
+
     covered = coverage(xy[good])
     scores = {"precision": fraction(good.sum(), len(xy)), "recall": recall(covered), "distance": {}}
+    if cell_offsets is not None:
+        # Only cells that belong to the driven route: accepted cells can also lie on crossing
+        # branches, T bars or decoys, which are far from the route centre line.
+        on_route = good & (np.abs(cell_offsets) <= ROUTE_BAND_CM)
+        scores["offset_cm"], scores["_offset_values"] = offset(cell_offsets[on_route])
+        if section_ends is not None:
+            values = cell_offsets[on_route]
+            raw = section_values(values, cell_s[on_route], section_ends)
+            scores["offset_by_section"] = {k: offset_metrics(v) for k, v in raw.items()}
+            scores["_section_values"] = raw
+    else:
+        scores["offset_cm"], scores["_offset_values"] = offset_metrics(np.empty(0)), np.empty(0)
     band_index = np.searchsorted([0.5, 0.9, 1.3], dist, side="right")
     for index, label in enumerate(BANDS):
         band = (band_index == index) & np.isfinite(dist) & (dist >= 0)
         accepted = band & good
-        scores["distance"][label] = {"precision": fraction(accepted.sum(), band.sum()),
-                                     "recall": recall(coverage(xy[accepted]))}
+        block = {"precision": fraction(accepted.sum(), band.sum()),
+                 "recall": recall(coverage(xy[accepted]))}
+        if cell_offsets is not None:
+            block["offset_cm"], block["_offset_values"] = offset(
+                cell_offsets[accepted & (np.abs(cell_offsets) <= ROUTE_BAND_CM)])
+        else:
+            block["offset_cm"], block["_offset_values"] = offset_metrics(np.empty(0)), np.empty(0)
+        scores["distance"][label] = block
     if "conf" in z:
         conf = z["conf"]
         bin_index = np.searchsorted([0.2, 0.4, 0.6, 0.8], conf, side="right")
@@ -167,15 +275,33 @@ def score_map(z, meta):
 
 def pool(scores):
     """Combine matching leaves by denominator, including optional confidence data."""
+    if not scores:
+        return {}
     if "hits" in scores[0]:
         merged = fraction(sum(s["hits"] for s in scores), sum(s["total"] for s in scores))
         if "confidence_sum" in scores[0]:
             count = merged["total"]
             confidence = sum(s["confidence_sum"] for s in scores)
             merged.update(confidence_sum=confidence, mean_confidence=confidence / count if count else None)
+        if any("_offset_values" in s for s in scores):
+            merged["offset_cm"] = offset_metrics(np.concatenate(
+                [s.get("_offset_values", np.empty(0)) for s in scores]))
         return merged
-    keys = dict.fromkeys(key for score in scores for key in score)
-    return {key: pool([s[key] for s in scores if key in s]) for key in keys}
+    keys = dict.fromkeys(key for score in scores for key in score
+                         if key not in ("offset_cm", "offset_by_section") and not key.startswith("_"))
+    merged = {key: pool([s[key] for s in scores if key in s]) for key in keys}
+    if any("_offset_values" in s for s in scores):
+        merged["offset_cm"] = offset_metrics(np.concatenate(
+            [s.get("_offset_values", np.empty(0)) for s in scores]))
+    if any("_section_values" in s for s in scores):
+        combined = {}
+        for score in scores:
+            for key, values in score.get("_section_values", {}).items():
+                combined.setdefault(key, []).append(values)
+        merged["offset_by_section"] = {
+            key: offset_metrics(np.concatenate(values))
+            for key, values in sorted(combined.items(), key=lambda item: int(item[0]))}
+    return merged
 
 
 def overlay(path, data):
@@ -202,9 +328,16 @@ def markdown(report):
         return (f"{metric['rate']:.1%} ({metric['hits']}/{metric['total']})"
                 if metric["total"] else "—")
 
+    def offsets(block):
+        metric = block.get("offset_cm")
+        if not metric or not metric["cells"]:
+            return ["—", "—", "—"]
+        return [f"{metric['mean']:.2f}", f"{metric['abs_mean']:.2f}", f"{metric['p95_abs']:.2f}"]
+
     rows = ["# Perception map evaluation", "",
             "| Run or aggregate | First distance (m) | Precision | Recall 1 m | Main | Decoy "
-            "| Recall 0.5 m | Main | Decoy |", "|---|---|" + "---:|" * 7]
+            "| Recall 0.5 m | Main | Decoy | Offset mean (cm) | Abs offset mean (cm) "
+            "| Offset p95 abs (cm) |", "|---|---|" + "---:|" * 10]
     items = [(r["run"], r["scores"]) for r in report["runs"]]
     if report["aggregate"]:
         items.append(("All runs", report["aggregate"]))
@@ -213,7 +346,8 @@ def markdown(report):
         for label, block in [("All", scores), *scores["distance"].items()]:
             metrics = [block["precision"], *(block["recall"][str(radius)][kind]
                         for radius in RADII for kind in CLASSES)]
-            rows.append("| " + " | ".join([name.replace("|", "\\|"), label, *map(fmt, metrics)]) + " |")
+            rows.append("| " + " | ".join([name.replace("|", "\\|"), label, *map(fmt, metrics),
+                                           *offsets(block)]) + " |")
     rows += ["", "Distance bands use the same recall denominator. Main includes non-decoy markings."]
     calibrated = [(name, score["calibration"]) for name, score in items if "calibration" in score]
     if calibrated:
@@ -230,8 +364,22 @@ def markdown(report):
     return "\n".join(rows) + "\n"
 
 
+def strip_private(value):
+    if isinstance(value, dict):
+        return {key: strip_private(item) for key, item in value.items() if not str(key).startswith("_")}
+    if isinstance(value, list):
+        return [strip_private(item) for item in value]
+    if isinstance(value, np.generic):
+        return value.item()
+    return value
+
+
 def evaluate(runs_dir, out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
+    section_ends = None
+    sections_path = ROOT / "experiments/eval/sections.json"
+    if sections_path.is_file():
+        section_ends = np.asarray(json.loads(sections_path.read_text())["ends_s"], float)
     report = {"runs": [], "skipped": [], "profiles": {}}
     profiles = {}
     for run in sorted(runs_dir.iterdir()):
@@ -247,10 +395,13 @@ def evaluate(runs_dir, out_dir):
             world = Path(job["map"])
             if not world.exists() and world.parts[:2] == ("/", "ws"):
                 world = ROOT.joinpath(*world.parts[2:])  # bench ran in the lab container
+            official = is_official(world)
             sidecar = world.with_suffix(".json")
             meta = json.loads(sidecar.read_text()) if sidecar.is_file() else official_metadata(world)
+            centerline = official_centerline(world) if official else None
             with np.load(run / "map_world.npz") as z:
-                scores, data = score_map(z, meta)
+                scores, data = score_map(z, meta, centerline=centerline,
+                                         section_ends=section_ends if official else None)
         except (OSError, ValueError, KeyError) as error:
             report["skipped"].append({"run": run.name, "reason": str(error)})
             continue
@@ -259,9 +410,11 @@ def evaluate(runs_dir, out_dir):
         profile = job.get("profile", "default")
         profiles.setdefault(profile, []).append(scores)
         report["runs"].append({"run": run.name, "profile": profile, "map": str(world),
-                               "complete": result.get("complete"), "overlay": png, "scores": scores})
+                               "official": official, "complete": result.get("complete"),
+                               "overlay": png, "scores": scores})
     report["aggregate"] = pool([r["scores"] for r in report["runs"]]) if report["runs"] else None
     report["profiles"] = {name: pool(scores) for name, scores in sorted(profiles.items())}
+    report = strip_private(report)
     (out_dir / "perception_map_eval.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
     (out_dir / "perception_map_eval.md").write_text(markdown(report))
     return report

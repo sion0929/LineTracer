@@ -52,6 +52,45 @@ def test_score_exact_precision_visibility_and_distance_bins(metadata):
     assert len(missed) > 0
 
 
+def test_signed_offsets_follow_travel_direction():
+    forward, _ = evaluator.signed_offsets([[0.5, 0.01]], [[0, 0], [1, 0]])
+    backward, _ = evaluator.signed_offsets([[0.5, 0.01]], [[1, 0], [0, 0]])
+    assert forward[0] == pytest.approx(1.0)
+    assert backward[0] == pytest.approx(-1.0)
+
+
+def test_score_offset_metrics_and_sections():
+    meta = {"centerline": [[0, 0], [1, 0]], "painted": [[[0, 0], [1, 0]]], "line_width_m": 0.02}
+    z = {
+        "xy": np.array([[0.2, 0.01], [0.5, -0.02], [0.8, 0.0]]),
+        "dist": np.array([0.2, 0.5, 0.8]),
+        "track": np.array([[0, 0, 0], [1, 1, 0]]),
+    }
+    scores, _ = evaluator.score_map(z, meta, section_ends=[0.5, 1.0])
+    assert scores["offset_cm"]["mean"] == pytest.approx(-1 / 3, abs=1e-9)
+    assert scores["offset_cm"]["abs_mean"] == pytest.approx(1 / 3, abs=1e-9)
+    assert scores["offset_cm"]["p95_abs"] == pytest.approx(1.9)
+    assert scores["offset_cm"]["cells"] == 3
+    assert scores["offset_by_section"]["1"]["cells"] == 1
+    assert scores["offset_by_section"]["1"]["mean"] == pytest.approx(1.0)
+    assert scores["offset_by_section"]["2"]["cells"] == 2
+    assert scores["offset_by_section"]["2"]["mean"] == pytest.approx(-1.0)
+
+
+def test_pool_recomputes_offset_from_cells():
+    meta = {"centerline": [[0, 0], [1, 0]], "painted": [[[0, 0], [1, 0]]], "line_width_m": 0.02}
+    z = {
+        "xy": np.array([[0.2, 0.01], [0.5, -0.02]]),
+        "dist": np.array([0.2, 0.5]),
+        "track": np.array([[0, 0, 0], [1, 1, 0]]),
+    }
+    scores, _ = evaluator.score_map(z, meta)
+    merged = evaluator.pool([scores, scores])
+    assert merged["offset_cm"]["cells"] == 4
+    assert merged["offset_cm"]["mean"] == pytest.approx(-0.5)
+    assert merged["offset_cm"]["p95_abs"] == pytest.approx(2.0)
+
+
 def test_shared_route_point_is_counted_once():
     meta = {"centerline": [[0, 0], [1, 0]], "case": {"decoys": [{"xy": [[0.5, 0], [0.5, 1]]}]}}
     _, points, decoy = evaluator.ground_truth(meta)
@@ -85,5 +124,9 @@ def test_reports_pool_partial_and_empty_maps_skip_error(tmp_path, metadata):
     assert report["aggregate"]["calibration"]["0.8-1.0"]["mean_confidence"] == pytest.approx(0.9)
     assert {p.name for p in out.glob("*.png")} == {"complete.png", "empty.png"}
     assert (out / "complete.png").read_bytes().startswith(b"\x89PNG")
+    assert report["runs"][0]["scores"]["offset_cm"]["cells"] == 1
+    assert report["runs"][0]["scores"]["offset_cm"]["mean"] == pytest.approx(0.0)
+    assert report["aggregate"]["offset_cm"] == report["profiles"]["rule"]["offset_cm"]
     table = (out / "perception_map_eval.md").read_text()
     assert "Recall 0.5 m" in table and "Empirical precision" in table
+    assert "Offset mean (cm)" in table and "Offset p95 abs (cm)" in table
