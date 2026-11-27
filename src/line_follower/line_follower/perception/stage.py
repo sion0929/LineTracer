@@ -5,6 +5,11 @@ plugin, optional full-resolution far band), slope handling (IMU floor / terrain 
 pose-consistent map writing, and line restoration. Planning reads node.map only
 (grid = seen line, seen = looked-at area, restored = learned guess where unseen).
 State stays on the node (shared with planning / control / dev tools).
+
+Map sink: process() writes the map only through node.map.freeze(x, y, radius) and
+node.map.update(line, valid, pose, add_only, far_mask=...). In follower_node node.map is the
+LineMap; in the split perception_node it is split.codec.FrameSink, which records those calls
+and sends them to the map node as one PerceptionFrame (docs/architecture/NODE_SPLIT.md).
 """
 import math
 

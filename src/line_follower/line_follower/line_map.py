@@ -162,6 +162,7 @@ class LineMap:
         erases, and adds line only where the map has no line within ADD_GAP (fills what
         was never seen, e.g. a corner arc, without drawing a second, shifted copy of a
         known line).
+        Returns the map window written, (i0, j0, rows, cols), or None when off the map.
         """
         px, py, th = pose
         ox = int(round(px / RES)) + C0 - PATCH // 2
@@ -242,6 +243,9 @@ class LineMap:
                 active = (delta > self._l_thresh).astype(np.uint8) * 255
                 cv2.copyTo(active, seen_u8, win)
         self.last = debug
+        # every layer this call wrote lies in this window (map rows / cols): the split map node
+        # sends it to planning (map.last's seen is narrowed in place above, so it can be smaller)
+        return (oy + y, ox + x, height, width)
 
     def hit(self, X, Y):
         i = int(round(Y / RES)) + C0
