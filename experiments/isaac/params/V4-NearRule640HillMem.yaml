@@ -1,0 +1,6 @@
+follower_node:
+  ros__parameters:
+    perception: rule
+    deck_model: symmetric
+    x_far_slope: 0.40
+    hill_memory: true
