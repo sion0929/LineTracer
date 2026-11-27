@@ -32,3 +32,6 @@ follower_node:
     # official track closed loop 10/10 (V0 9/10).
     x_far_slope: 0.40       # camera range on a slope only (rocking on flat ground keeps x_far_unsteady 0.50) [m]
     deck_model: symmetric   # deck: full range, ground ahead from the measured climb (perception/slope.py)
+    # V4-NearRule640HillMem (2026-11-27): remember climbed hills; frames from flat ground write no
+    # line cells on them (ramp edges / shadow). Held-out test maps: up 0.640 -> 0.801, down 0.660 -> 0.990.
+    hill_memory: true

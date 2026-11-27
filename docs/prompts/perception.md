@@ -10,7 +10,7 @@
 1. `AGENTS.md` — 팀 규칙 R1–R10, 현재 상태
 2. `docs/NODE_DEV_GUIDE.md`, `docs/architecture/NODE_SPLIT.md` — 노드와 토픽 계약
 3. `docs/PERCEPTION_HANDOFF.md` — 판단에 넘기는 것, 품질 수치, 언덕 처리(7장)
-4. `docs/VERSIONS.md` — 인지 버전 이름표(지금 기본 **V3-NearRule640Hill**), 비교용 설정 오버레이
+4. `docs/VERSIONS.md` — 인지 버전 이름표(지금 기본 **V4-NearRule640HillMem**), 비교용 설정 오버레이
 5. `docs/MAPS.md`, `docs/PERCEPTION_LOG.md` — 맵 세트, 인지 로그
 6. `src/line_follower/line_follower/perception/stage.py`, `slope.py`, `rule.py`, `vision.py`, `line_map.py`, `split/perception_node.py`, `split/map_node.py`
 
@@ -18,7 +18,7 @@
 1. **실물 기동:** Jetson Orin Nano + IMX219 카메라(CSI CAM0) + OpenCR. 카메라·OpenCR 물리 연결 뒤 `/camera/image_raw` 30 Hz, `/odom`, `/imu` 확인. `docs/REAL_ROBOT_SETUP.md`.
 2. **실물에서 언덕 추적기 확인:** IMU로 잰 경사·높이·정상 평지 끝이 맞는지(`perception/slope.py`, 시뮬레이터에서는 경사 7.75°, 끝 오차 0.5 cm).
 3. **처리 시간과 언어:** 분리 노드의 `[timing]` 로그로 PC와 Jetson에서 노드별 p50/p95를 재고, 가장 무거운 단계(예상: 지도 갱신, 규칙 BEV)를 C++로 옮긴 판과 비교한다(`NODE_SPLIT.md` 4장). 30 Hz 예산 33 ms.
-4. **언덕 위치 기억(`hill_memory`):** 오프라인 시험 맵에서 오르막 0.640 → 0.801, 내리막 0.660 → 0.990. 공식 트랙 폐루프 10회로 확인한 뒤 기본값을 정한다(설정 `experiments/isaac/params/V4-NearRule640HillMem.yaml`).
+4. **언덕 위치 기억(`hill_memory`, 기본 켜짐):** 언덕을 처음 오르기 전에 앞·옆에서 본 경사로 옆선·그림자는 아직 못 막는다. 영상으로 경사로를 미리 알아채는 방법을 찾는다.
 5. 그림자 오검출(무작위 조명): 폭 필터는 오프라인 정밀도를 크게 올리지만 폐루프 이득이 없었다. 다시 볼 때는 폐루프로 판정한다.
 
 ## 평가 방법
