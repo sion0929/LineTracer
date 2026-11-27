@@ -64,7 +64,7 @@
 | 무엇 | 어디 | 문서 |
 |---|---|---|
 | 맵 세트 (공식 트랙, decoy1000, hills60 등) | `experiments/worlds/suites/` (큰 세트는 생성 명령으로 다시 만든다. 결정적) | [`docs/MAPS.md`](docs/MAPS.md) |
-| 판단 팀용 인지 로그 | `experiments/planning_logs/` (V0+폭 필터+log-odds 100개, V3 기본값·형식 2 80개+) | [`docs/PERCEPTION_LOG.md`](docs/PERCEPTION_LOG.md) |
+| 판단 팀용 인지 로그 | `experiments/planning_logs/` (V0+폭 필터+log-odds 100개, V3 기본값·형식 2 100개) | [`docs/PERCEPTION_LOG.md`](docs/PERCEPTION_LOG.md) |
 | 공식 채점 14구간 | `experiments/eval/sections.json`, `sections.py` | 채점표: 도달 20, 정확도 28(구간 평균 오차 ≤ 2 cm), 속도 순위 30 |
 
 ## 6. 자주 쓰는 명령
