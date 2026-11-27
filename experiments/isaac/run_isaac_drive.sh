@@ -4,11 +4,13 @@ set -euo pipefail
 
 if [[ ${1:-} == --help || ${1:-} == -h ]]; then
     cat <<'EOF'
-Usage: run_isaac_drive.sh --map official|JSON --out DIR [--run-user|--map-dump]
+Usage: run_isaac_drive.sh --map official|JSON --out DIR [--run-user|--run-split|--map-dump]
                           [--replay-speed V] [--profile-overlay YAML] [renderer options]
 Environment: ISAAC_HOME, LAB_NAME, ROS_DOMAIN_ID (90–109), ISAAC_HOST, ISAAC_BIND,
 ISAAC_HOLD (wall periods per sim tick, default 1), ISAAC_FOLLOWER_ARGS (extra ROS args for the follower, e.g. "-p perception:=depth -p depth.model_path:=/ws/...onnx").
 Use --run-user for a follower with no Gazebo truth logger.
+Use --run-split for the same follower as four nodes (perception, map, planning, control;
+docs/architecture/NODE_SPLIT.md). It needs line_follower_interfaces built in /ws/install.
 EOF
     exit 0
 fi
@@ -27,6 +29,7 @@ drive_args=()
 while (( $# )); do
     case $1 in
         --run-user) profile=run_user; shift ;;
+        --run-split) profile=run_split; shift ;;
         --map-dump) profile=map_dump; shift ;;
         --map) map=${2:?--map needs official or a JSON path}; shift 2 ;;
         --profile-overlay) overlay=${2:?--profile-overlay needs a YAML path}; shift 2 ;;
@@ -151,6 +154,10 @@ if [[ $1 == map_dump ]]; then
     setsid python3 experiments/isaac/run_map_dump.py $FOLLOWER_ARGS &
 elif [[ $1 == run_user ]]; then
     setsid python3 experiments/user_base/run_user.py $FOLLOWER_ARGS &
+elif [[ $1 == run_split ]]; then
+    # the split nodes talk over line_follower_interfaces messages (built in /ws/install)
+    [[ -f install/setup.bash ]] && source install/setup.bash
+    setsid python3 experiments/user_base/run_split.py $FOLLOWER_ARGS &
 else
     setsid python3 experiments/user_base/run_xfar.py --xfar 0.85 $FOLLOWER_ARGS &
 fi

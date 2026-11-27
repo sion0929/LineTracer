@@ -44,3 +44,20 @@
 1. 분리 노드에서 노드별 처리 시간과 CPU를 PC와 Jetson에서 잰다.
 2. 가장 무거운 단계(예상: 지도 갱신, 규칙 기반 BEV)를 C++로 옮긴 판을 만들어 같은 입력으로 비교한다.
 3. 30 Hz 예산(33 ms)과 Jetson CPU 여유를 기준으로, 차이가 크면 옮긴다. 러스트는 ROS 2 Jazzy 지원(rclrs)이 실험 단계라 C++을 먼저 본다. sion의 기존 노드와 OpenCV도 C++이다.
+
+## 5. 구현 (2026-11-27)
+
+| 무엇 | 어디 |
+|---|---|
+| 공용 코드 (파라미터 선언, 상태 추정, 제어 틱, 처리 시간 로그) | `line_follower/node_core.py` — `follower_node`와 분리 노드가 같이 쓴다 |
+| 페이로드 (마스크 packbits, 프레임 적용, 패치, 미러 붙이기) | `line_follower/split/codec.py` (ROS 없이 시험 가능) |
+| 노드 | `line_follower/split/{perception,map,planning,control}_node.py`, 실행 이름 `perception_node` 등 |
+| launch | `ros2 launch line_follower split.launch.py [mode:=rule\|dl] [params_file:=...] [sim:=false]` — yaml의 `follower_node:` 절을 `/**`로 옮긴 임시 사본을 네 노드에 준다 |
+| Isaac | `run_isaac_drive.sh --run-split` → `experiments/user_base/run_split.py` (`/ws/install`에 `line_follower_interfaces`가 빌드돼 있어야 한다) |
+| 시험 | `src/line_follower/test/test_split_nodes.py` — 합성 60프레임에서 단일 지도와 미러 지도(grid/seen/conf/frozen)가 칸마다 같고 RulePlanner 경로가 같다 |
+
+- 인지 단계(`stage.py`)는 그대로다. 분리 모드에서 `node.map`이 `FrameSink`라서 `freeze`/`update` 호출이 지도 대신 프레임으로 나간다.
+- 패치 사각형은 `LineMap.update()`가 돌려주는 쓴 창이다. `map.last`의 `seen`은 frozen/add-only로 제자리에서 줄어들어 실제 쓴 범위보다 작을 수 있다.
+- 0/255가 아닌 마스크(학습 플러그인의 bilinear BEV)는 packbits 대신 원래 uint8로 보낸다(길이로 구분). 그래서 지도 입력이 단일 노드와 같다.
+- 분리 모드 미러에는 log-odds 증거 층이 없다. RulePlanner는 `confidence()`를 쓰지 않아 영향이 없지만, 쓰는 판단은 `map_mode: logodds`에서 값이 다르다.
+- 프레임과 패치는 신뢰 QoS(깊이 100)다. 하나라도 빠지면 미러가 어긋나고, 1초마다 오는 전체 패치(`full=true`)가 다시 맞춘다.

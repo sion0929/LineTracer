@@ -17,3 +17,11 @@ def test_dotted_name_and_other_args_kept():
 
 def test_already_scoped_left_alone():
     assert node_scoped(['-p', 'other:k:=1']) == ['-p', 'other:k:=1']
+
+
+def test_for_node_rescopes_plain_and_follower_scoped():
+    from ros_args import for_node
+    args = ['-p', 'perception:=depth', '-p', 'follower_node:v_max:=0.3', '-p', 'other:k:=1',
+            '--params-file', 'follower_node:x.yaml']
+    assert for_node(args, 'map_node') == ['-p', 'map_node:perception:=depth', '-p', 'map_node:v_max:=0.3',
+                                          '-p', 'other:k:=1', '--params-file', 'follower_node:x.yaml']

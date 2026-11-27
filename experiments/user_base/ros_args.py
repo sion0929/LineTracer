@@ -23,3 +23,12 @@ def node_scoped(args, node=NODE):
             out.append(a)
             i += 1
     return out
+
+
+def for_node(args, node):
+    """node_scoped for another node name (split mode): plain `-p name:=value` and the
+    follower_node-scoped form `-p follower_node:name:=value` both go to `node`."""
+    out = node_scoped(args, node)
+    prefix = NODE + ':'
+    return [f'{node}:{a[len(prefix):]}' if i and out[i - 1] in ('-p', '--param') and a.startswith(prefix) else a
+            for i, a in enumerate(out)]
