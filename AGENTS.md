@@ -32,7 +32,7 @@
 | **제어** | 경로 추종(pure pursuit + PID), 명령 제한 | `src/line_follower/line_follower/control/` |
 | 공용 (바꿀 때 서로 알림) | 노드, 인터페이스 | `follower_node.py`, `*/base.py`, `config/*.yaml`, `launch/` |
 
-**노드 단위 개발 (2026-11-27~):** 인지 `perception_node` · 지도 `map_node`(인지) · 판단 `planning_node` · 제어 `control_node`로 나뉘어 있다. 각 팀은 자기 노드만 만들고, 나머지는 더미로 돈다. 토픽 계약과 바꿔 끼우는 법은 [`docs/NODE_DEV_GUIDE.md`](docs/NODE_DEV_GUIDE.md) (`ros2 launch line_follower split.launch.py planning:=none` 등).
+**노드 단위 개발 (2026-11-27~):** 인지 `perception_node` · 지도 `map_node`(인지) · 판단 `planning_node` · 제어 `control_node`로 나뉘어 있다. 각 팀은 자기 노드만 만들고, 나머지는 더미로 돈다. 파트별 AI 시작 프롬프트는 [`docs/prompts/`](docs/prompts/README.md). 토픽 계약과 바꿔 끼우는 법은 [`docs/NODE_DEV_GUIDE.md`](docs/NODE_DEV_GUIDE.md) (`ros2 launch line_follower split.launch.py planning:=none` 등).
 
 한 노드 실행(기존)의 순서: 카메라 콜백(30 Hz) → **인지** `PerceptionStage.process()`가 `node.map` 갱신 → **판단** `planner.replan()`이 `node.path` 생성 → **제어** 타이머(50 Hz)가 따라간다.
 
