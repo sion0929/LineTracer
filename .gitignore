@@ -42,3 +42,4 @@ tools/pylf
 experiments/isaac/runs/
 experiments/isaac/.map-dump.*/
 .worktrees/
+experiments/isaac/run_isaac_drive.frozen_*.sh
