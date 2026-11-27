@@ -1,0 +1,4 @@
+follower_node:
+  ros__parameters:
+    perception: rule
+    map_mode: logodds

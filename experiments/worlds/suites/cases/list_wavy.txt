@@ -1,0 +1,8 @@
+experiments/worlds/suites/cases/maps/wavy__amp05_wl40.sdf
+experiments/worlds/suites/cases/maps/wavy__amp05_wl40_m.sdf
+experiments/worlds/suites/cases/maps/wavy__amp10_wl50.sdf
+experiments/worlds/suites/cases/maps/wavy__amp10_wl50_m.sdf
+experiments/worlds/suites/cases/maps/wavy__amp15_wl60.sdf
+experiments/worlds/suites/cases/maps/wavy__amp15_wl60_m.sdf
+experiments/worlds/suites/cases/maps/wavy__amp08_wl25.sdf
+experiments/worlds/suites/cases/maps/wavy__amp08_wl25_m.sdf

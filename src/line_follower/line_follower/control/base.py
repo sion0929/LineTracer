@@ -20,6 +20,9 @@ class Controller:
     def compute(self, rp, dt):
         raise NotImplementedError
 
+    def reset(self):
+        """Called while no path is known (search / creep): drop any tracking state."""
+
     def confirm_finish(self, path, observation):
         """Optional finish judge, called when the traced path ends in a T bar.
 

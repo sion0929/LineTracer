@@ -29,6 +29,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 PKG = Path(os.environ.get("LF_PKG", HERE.parents[1] / "src" / "line_follower"))
 sys.path.insert(0, str(PKG))
+sys.path.insert(0, str(HERE.parent / 'user_base'))
+from ros_args import node_scoped  # noqa: E402
 LEVEL = int(os.environ.get("ORACLE_LEVEL", "0"))
 AHEAD = float(os.environ.get("ORACLE_AHEAD", "0.85"))
 
@@ -56,6 +58,17 @@ class OracleNode(Base):
 
     def replan(self):
         tp = self.truth.get()
+        win = os.environ.get("ORACLE_WINDOW")              # "s0,s1": oracle only inside this arc window
+        if win:
+            s0, s1 = (float(v) for v in win.split(","))
+            if tp is not None:
+                d = np.linalg.norm(self.route - np.asarray(tp[:2]), axis=1)
+                lo = max(0, np.searchsorted(self.route_arc, self.progress_s - 0.4) - 1)
+                hi = min(len(d), np.searchsorted(self.route_arc, self.progress_s + 0.6) + 1)
+                k = lo + int(np.argmin(d[lo:hi]))
+                self.progress_s = max(self.progress_s, float(self.route_arc[k]))
+            if not (s0 <= self.progress_s <= s1):
+                return Base.replan(self)                   # camera route outside the window
         if tp is None or self.pose is None:
             return
         c, arc = self.route, self.route_arc
@@ -104,10 +117,25 @@ class OracleNode(Base):
             self.t_point = odom[-1]
 
 
+def exit_with_parent():
+    """A follower outliving its bench keeps publishing /cmd_vel on that ROS domain and drives
+    the robot of the NEXT run there. Exit as soon as the parent (bench) is gone."""
+    import threading
+    import time
+    parent = os.getppid()
+
+    def watch():
+        while os.getppid() == parent:
+            time.sleep(0.5)
+        os._exit(0)
+    threading.Thread(target=watch, daemon=True).start()
+
+
 def main(node_class=OracleNode):
+    exit_with_parent()
     sys.argv = [sys.argv[0], "--ros-args", "--params-file",
                 os.environ.get("LF_PARAMS", str(PKG / "config" / "follower.yaml")),
-                "-p", "use_sim_time:=true", *sys.argv[1:]]
+                "-p", "use_sim_time:=true", *node_scoped(sys.argv[1:])]
     fn.FollowerNode = node_class
     init = rclpy.init
     rclpy.init = lambda *a, **k: init(args=sys.argv)

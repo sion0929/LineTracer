@@ -1,0 +1,456 @@
+<title>라인 트레이서 층별 청사진</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a building cross-section of the robot software. Floors stack -1F (rules) to 3F (control);
+   data climbs upward; the one red line is /cmd_vel coming back down to the motors.
+   Hero = the section drawing + a detail panel. Then camera geometry, contracts, milestones. */
+:root{
+  --paper:#f2f4f3; --sheet:#ffffff; --ink:#111716; --muted:#5b6562; --rule:#d3d9d7; --grid:#e4e9e7;
+  --fr:#6a5aa8; --fs:#8a6a14; --fp:#16775f; --fb:#2a6aa8; --fd:#ad4b26; --fc:#962c57;
+  --frs:#ebe8f5; --fss:#f3eedd; --fps:#e0f0ea; --fbs:#e2ecf6; --fds:#f6e6de; --fcs:#f4e3ea;
+  --hot:#e0520b; --hot-soft:#fde8dc; --sel:#111716;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0f1312; --sheet:#171c1b; --ink:#eef2f0; --muted:#98a4a0; --rule:#2b3331; --grid:#1d2422;
+  --fr:#b0a2ee; --fs:#dcc176; --fp:#5ccaa8; --fb:#7fb4ec; --fd:#f0946c; --fc:#ea7eab;
+  --frs:#211d33; --fss:#2a2414; --fps:#13281f; --fbs:#142233; --fds:#2e1c14; --fcs:#2c1621;
+  --hot:#ff7a3d; --hot-soft:#3a1e10; --sel:#eef2f0; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --paper:#0f1312; --sheet:#171c1b; --ink:#eef2f0; --muted:#98a4a0; --rule:#2b3331; --grid:#1d2422;
+  --fr:#b0a2ee; --fs:#dcc176; --fp:#5ccaa8; --fb:#7fb4ec; --fd:#f0946c; --fc:#ea7eab;
+  --frs:#211d33; --fss:#2a2414; --fps:#13281f; --fbs:#142233; --fds:#2e1c14; --fcs:#2c1621;
+  --hot:#ff7a3d; --hot-soft:#3a1e10; --sel:#eef2f0; color-scheme:dark }
+
+*{ box-sizing:border-box; }
+body{ background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+main{ max-width:1240px; margin:0 auto; padding-block:40px 80px; display:flex; flex-direction:column; gap:56px; }
+.eyebrow{ font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+h1{ font-size:clamp(30px,4.6vw,52px); line-height:1.08; letter-spacing:-.01em; margin:8px 0 12px; text-wrap:balance; font-weight:700; }
+h1 .thin{ font-weight:400; color:var(--muted); }
+h2{ font-size:22px; margin:0; text-wrap:balance; }
+.lede{ max-width:68ch; color:var(--muted); margin:0; }
+.lede b{ color:var(--ink); font-weight:500; }
+code,.m{ font-family:var(--mono); font-size:.88em; }
+.sechead{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+.sechead .no{ font-family:var(--mono); color:var(--muted); font-size:13px; }
+.sechead p{ margin:0; color:var(--muted); font-size:14px; max-width:70ch; }
+
+/* hero */
+.hero{ display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:18px; align-items:start; }
+.board{ background:var(--sheet); border:1px solid var(--rule); border-radius:14px; padding:14px; min-width:0; }
+.board .scroll{ overflow-x:auto; }
+.board svg{ display:block; width:100%; min-width:760px; height:auto; }
+.flows{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 2px 12px; }
+.flows button{ font:inherit; font-size:13px; padding:6px 12px; border-radius:999px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); cursor:pointer; }
+.flows button[aria-pressed="true"]{ background:var(--ink); color:var(--sheet); border-color:var(--ink); }
+.flows button:focus-visible,.nd:focus-visible{ outline:2px solid var(--hot); outline-offset:2px; }
+
+/* svg classes */
+.band{ stroke:none; }
+.b-r{ fill:var(--frs); } .b-s{ fill:var(--fss); } .b-p{ fill:var(--fps); } .b-b{ fill:var(--fbs); } .b-d{ fill:var(--fds); } .b-c{ fill:var(--fcs); }
+.fl{ font-family:var(--mono); font-weight:600; font-size:30px; }
+.fn{ font-family:var(--sans); font-weight:700; font-size:14px; fill:var(--ink); }
+.fsub{ font-family:var(--sans); font-size:11px; fill:var(--muted); }
+.t-r{ fill:var(--fr); } .t-s{ fill:var(--fs); } .t-p{ fill:var(--fp); } .t-b{ fill:var(--fb); } .t-d{ fill:var(--fd); } .t-c{ fill:var(--fc); }
+.nd{ cursor:pointer; }
+.nd rect{ fill:var(--sheet); stroke:var(--rule); stroke-width:1.2; transition:stroke .15s, stroke-width .15s; }
+.nd .bar{ stroke:none; }
+.nd .id{ font-family:var(--mono); font-size:11px; fill:var(--muted); }
+.nd .nm{ font-family:var(--mono); font-size:13.5px; font-weight:600; fill:var(--ink); }
+.nd .rl{ font-family:var(--sans); font-size:11.5px; fill:var(--muted); }
+.nd:hover rect{ stroke:var(--ink); }
+.nd.sel rect{ stroke:var(--sel); stroke-width:2.4; }
+.nd.dim{ opacity:.28; }
+.ed{ fill:none; stroke:var(--muted); stroke-width:1.6; }
+.ed.dash{ stroke-dasharray:5 4; }
+.ed.hot{ stroke:var(--hot); stroke-width:2.4; }
+.ed.lit{ stroke:var(--ink); stroke-width:2.6; }
+.ed.dim{ opacity:.18; }
+.el{ font-family:var(--mono); font-size:11px; fill:var(--ink); paint-order:stroke; stroke:var(--sheet); stroke-width:4px; stroke-linejoin:round; }
+.el.hot{ fill:var(--hot); }
+.el.dim{ opacity:.2; }
+.ah{ fill:var(--muted); } .ah-hot{ fill:var(--hot); } .ah-lit{ fill:var(--ink); }
+
+/* panel */
+.panel{ background:var(--sheet); border:1px solid var(--rule); border-radius:14px; padding:18px 18px 16px; position:sticky; top:calc(env(safe-area-inset-top, 0px) + 12px); min-width:0; }
+.panel .pk{ font-family:var(--mono); font-size:12px; color:var(--muted); display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.chip{ font-family:var(--mono); font-size:11.5px; padding:2px 8px; border-radius:999px; border:1px solid currentColor; }
+.panel h3{ margin:6px 0 2px; font-family:var(--mono); font-size:20px; overflow-wrap:anywhere; }
+.panel .one{ margin:0 0 12px; color:var(--muted); font-size:14px; }
+.panel dl{ margin:0; display:flex; flex-direction:column; gap:10px; }
+.panel dt{ font-size:11.5px; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; font-family:var(--mono); }
+.panel dd{ margin:2px 0 0; font-size:14px; overflow-wrap:anywhere; }
+.panel dd ul{ margin:0; padding-left:18px; } .panel dd li{ margin:2px 0; }
+.st{ display:inline-block; font-size:12px; font-family:var(--mono); padding:2px 8px; border-radius:6px; background:var(--paper); border:1px solid var(--rule); }
+.st.ok{ color:var(--fp); border-color:currentColor; } .st.wip{ color:var(--fs); border-color:currentColor; } .st.todo{ color:var(--hot); border-color:currentColor; }
+
+/* camera */
+.cam{ display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:18px; }
+.fig{ background:var(--sheet); border:1px solid var(--rule); border-radius:14px; padding:16px; min-width:0; margin:0; }
+.fig svg{ width:100%; height:auto; display:block; }
+.fig figcaption{ color:var(--muted); font-size:13px; margin-top:8px; }
+.gl{ stroke:var(--ink); stroke-width:1.4; } .ray{ stroke:var(--fp); stroke-width:1.4; } .axis{ stroke:var(--muted); stroke-dasharray:4 4; }
+.fillp{ fill:var(--fps); } .fillb{ fill:var(--fbs); } .fillh{ fill:var(--hot-soft); }
+.tx{ font-family:var(--mono); font-size:12px; fill:var(--ink); } .txm{ font-family:var(--mono); font-size:11px; fill:var(--muted); }
+.robot{ fill:var(--paper); stroke:var(--ink); stroke-width:1.4; }
+
+.tw{ overflow-x:auto; border:1px solid var(--rule); border-radius:12px; background:var(--sheet); }
+table{ border-collapse:collapse; width:100%; font-size:13.5px; }
+th,td{ text-align:left; padding:9px 12px; border-bottom:1px solid var(--rule); vertical-align:top; }
+th{ font-weight:500; color:var(--muted); font-size:12px; letter-spacing:.04em; background:var(--paper); white-space:nowrap; }
+tr:last-child td{ border-bottom:0; }
+td.n,.n{ font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap; }
+tr.pick td{ background:var(--fps); }
+.sw{ display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; vertical-align:baseline; }
+
+/* sensors */
+.sens{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; }
+.sc{ background:var(--sheet); border:1px solid var(--rule); border-radius:12px; padding:14px 16px; min-width:0; }
+.sc .k{ font-family:var(--mono); font-size:12px; color:var(--fs); }
+.sc h3{ margin:2px 0 8px; font-size:16px; }
+.sc .big{ font-family:var(--mono); font-size:24px; font-weight:600; letter-spacing:-.01em; }
+.sc .big small{ font-size:12px; color:var(--muted); font-weight:400; margin-left:4px; }
+.sc ul{ margin:8px 0 0; padding-left:18px; font-size:13.5px; } .sc li{ margin:2px 0; }
+
+/* timeline */
+.tl svg{ width:100%; height:auto; display:block; min-width:760px; }
+.tl .scroll{ overflow-x:auto; }
+.mst{ font-family:var(--sans); font-size:12.5px; fill:var(--ink); } .msd{ font-family:var(--mono); font-size:11px; fill:var(--muted); }
+.msh{ font-family:var(--mono); font-size:12px; font-weight:600; fill:var(--ink); }
+.track{ stroke:var(--ink); stroke-width:2; } .tick{ stroke:var(--muted); } .rep{ fill:var(--fb); } .now{ stroke:var(--hot); stroke-width:2; }
+.dec{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:10px; }
+.dec div{ background:var(--sheet); border:1px solid var(--rule); border-radius:10px; padding:10px 14px; font-size:13.5px; min-width:0; }
+.dec b{ font-family:var(--mono); font-size:12px; color:var(--muted); font-weight:500; display:block; }
+footer{ color:var(--muted); font-size:12.5px; border-top:1px solid var(--rule); padding-top:14px; }
+@media (max-width:980px){ .hero{ grid-template-columns:1fr; } .panel{ position:static; } .cam{ grid-template-columns:1fr; } .sens{ grid-template-columns:1fr; } }
+@media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+
+<main>
+<header>
+  <div class="eyebrow">TurtleBot3 Waffle Pi · Jetson Orin Nano 8GB · Ubuntu 24.04 · ROS 2 Jazzy · 카메라만, 라이다 없음</div>
+  <h1>라인 트레이서 층별 청사진 <span class="thin">센서에서 모터까지</span></h1>
+  <p class="lede">친구(sion)의 베이스 <code>3abe6cb</code>에 있는 <b>노드 5개, 토픽 계약, 안전 불변 조건</b>을 뼈대로 하고, 우리 인지(V0–V2, 선 지도, TensorRT)를 그 안에 넣었다. 데이터는 아래층에서 위층으로 올라가고, 빨간 선 하나만 모터로 내려간다. 노드를 누르면 오른쪽에 하는 일, 입력, 출력, 결정할 것이 나온다.</p>
+</header>
+
+<section class="hero" aria-label="층별 구조도">
+  <div class="board">
+    <div class="flows" role="group" aria-label="흐름 강조">
+      <button type="button" data-flow="none" aria-pressed="true">전체 보기</button>
+      <button type="button" data-flow="frame" aria-pressed="false">카메라 한 프레임 → 경로</button>
+      <button type="button" data-flow="ctrl" aria-pressed="false">50 Hz 제어 한 번</button>
+      <button type="button" data-flow="pose" aria-pressed="false">자세가 쓰이는 곳</button>
+    </div>
+    <div class="scroll">
+    <svg id="sect" viewBox="0 0 1200 900" role="img" aria-label="여섯 층 구조도. 0층 센서의 영상, IMU, odom이 1층 인지와 1.5층 지도·위치 추정을 거쳐 2층 판단의 경로가 되고, 3층 제어의 safety_guard만 /cmd_vel을 0층 OpenCR로 내려보낸다.">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-hot"/></marker>
+        <marker id="al" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-lit"/></marker>
+      </defs>
+      <!-- floor bands -->
+      <rect class="band b-c" x="0" y="20"  width="1200" height="140" rx="10"/>
+      <rect class="band b-d" x="0" y="170" width="1200" height="140" rx="10"/>
+      <rect class="band b-b" x="0" y="320" width="1200" height="140" rx="10"/>
+      <rect class="band b-p" x="0" y="470" width="1200" height="140" rx="10"/>
+      <rect class="band b-s" x="0" y="620" width="1200" height="140" rx="10"/>
+      <rect class="band b-r" x="0" y="770" width="1200" height="120" rx="10"/>
+      <!-- floor labels -->
+      <text x="22" y="72"  class="fl t-c">3F</text><text x="22" y="96"  class="fn">제어</text><text x="22" y="114" class="fsub">제어 팀</text>
+      <text x="22" y="222" class="fl t-d">2F</text><text x="22" y="246" class="fn">판단</text><text x="22" y="264" class="fsub">판단 팀</text>
+      <text x="22" y="372" class="fl t-b">1.5F</text><text x="22" y="396" class="fn">경계</text><text x="22" y="414" class="fsub">인지 코드 · 판단 프로세스</text>
+      <text x="22" y="522" class="fl t-p">1F</text><text x="22" y="546" class="fn">인지</text><text x="22" y="564" class="fsub">인지 팀 (우리)</text>
+      <text x="22" y="672" class="fl t-s">0F</text><text x="22" y="696" class="fn">센서</text><text x="22" y="714" class="fsub">실물 하드웨어</text>
+      <text x="22" y="818" class="fl t-r">−1F</text><text x="22" y="842" class="fn">사전 규칙</text><text x="22" y="860" class="fsub">모든 층이 지킴</text>
+
+      <!-- edges (drawn under nodes) -->
+      <g id="edges">
+        <path id="e-s1n1"  class="ed" d="M290 654 V580" marker-end="url(#a)"/>
+        <path id="e-n1n2"  class="ed" d="M390 540 H456" marker-end="url(#a)"/>
+        <path id="e-s2n4"  class="ed" d="M600 654 V636 H770 V430" marker-end="url(#a)"/>
+        <path id="e-s3n4"  class="ed" d="M880 654 V430" marker-end="url(#a)"/>
+        <path id="e-n2n5"  class="ed" d="M560 504 V430" marker-end="url(#a)"/>
+        <path id="e-n4n5"  class="ed" d="M730 380 H664" marker-end="url(#a)"/>
+        <path id="e-n6n5"  class="ed dash" d="M390 400 H456" marker-end="url(#a)"/>
+        <path id="e-n5n7"  class="ed" d="M560 354 V280" marker-end="url(#a)"/>
+        <path id="e-n7n9"  class="ed" d="M560 204 V130" marker-end="url(#a)"/>
+        <path id="e-n7n8"  class="ed" d="M660 240 H726" marker-end="url(#a)"/>
+        <path id="e-n8n10" class="ed" d="M830 204 V130" marker-end="url(#a)"/>
+        <path id="e-n9n10" class="ed" d="M660 90 H726" marker-end="url(#a)"/>
+        <path id="e-cmd"   class="ed hot" d="M930 90 H955 V636 H1080 V650" marker-end="url(#ah)"/>
+      </g>
+      <g id="elabels">
+        <text id="l-s1n1"  class="el" x="298" y="622">CSI · 1640×1232 @30</text>
+        <text id="l-n1n2"  class="el" x="423" y="526" text-anchor="middle">image_raw</text>
+        <text id="l-s2n4"  class="el" x="778" y="600">/imu</text>
+        <text id="l-s3n4"  class="el" x="888" y="600">/odom</text>
+        <text id="l-n2n5"  class="el" x="568" y="472">/perception/bev · 30 Hz</text>
+        <text id="l-n4n5"  class="el" x="697" y="368" text-anchor="middle">Pose(t)</text>
+        <text id="l-n6n5"  class="el" x="423" y="388" text-anchor="middle">restored</text>
+        <text id="l-n5n7"  class="el" x="568" y="322">MapView</text>
+        <text id="l-n7n9"  class="el" x="568" y="172">/path/local · 30 Hz</text>
+        <text id="l-n7n8"  class="el" x="693" y="228" text-anchor="middle">/path/status</text>
+        <text id="l-n8n10" class="el" x="838" y="172">/mission/state</text>
+        <text id="l-n9n10" class="el" x="693" y="78" text-anchor="middle">후보 50 Hz</text>
+        <text id="l-cmd"   class="el hot" x="964" y="470">/cmd_vel</text>
+        <text id="l-cmd2"  class="el hot" x="964" y="486">유일 발행자</text>
+      </g>
+
+      <!-- nodes: x,y = top-left; 200 x 72 -->
+      <g id="nodes">
+        <g class="nd" data-id="N9" tabindex="0" role="button" aria-label="N9 motion_controller"><rect x="460" y="54" width="200" height="72" rx="9"/><rect class="bar t-c" x="460" y="54" width="5" height="72" rx="2"/><text class="id" x="474" y="74">N9 · 3F</text><text class="nm" x="474" y="94">motion_controller</text><text class="rl" x="474" y="113">경로 → 속도 후보</text></g>
+        <g class="nd" data-id="N10" tabindex="0" role="button" aria-label="N10 safety_guard"><rect x="730" y="54" width="200" height="72" rx="9"/><rect class="bar t-c" x="730" y="54" width="5" height="72" rx="2"/><text class="id" x="744" y="74">N10 · 3F</text><text class="nm" x="744" y="94">safety_guard</text><text class="rl" x="744" y="113">유일한 /cmd_vel</text></g>
+
+        <g class="nd" data-id="N7" tabindex="0" role="button" aria-label="N7 path_planner"><rect x="460" y="204" width="200" height="72" rx="9"/><rect class="bar t-d" x="460" y="204" width="5" height="72" rx="2"/><text class="id" x="474" y="224">N7 · 2F</text><text class="nm" x="474" y="244">path_planner</text><text class="rl" x="474" y="263">지도 → 로컬 경로</text></g>
+        <g class="nd" data-id="N8" tabindex="0" role="button" aria-label="N8 mission_manager"><rect x="730" y="204" width="200" height="72" rx="9"/><rect class="bar t-d" x="730" y="204" width="5" height="72" rx="2"/><text class="id" x="744" y="224">N8 · 2F</text><text class="nm" x="744" y="244">mission_manager</text><text class="rl" x="744" y="263">시작 · 종료 상태</text></g>
+
+        <g class="nd" data-id="N6" tabindex="0" role="button" aria-label="N6 restorer"><rect x="190" y="354" width="200" height="72" rx="9"/><rect class="bar t-b" x="190" y="354" width="5" height="72" rx="2"/><text class="id" x="204" y="374">N6 · 1.5F</text><text class="nm" x="204" y="394">restorer</text><text class="rl" x="204" y="413">안 본 선 잇기 (끔)</text></g>
+        <g class="nd" data-id="N5" tabindex="0" role="button" aria-label="N5 line_map"><rect x="460" y="354" width="200" height="72" rx="9"/><rect class="bar t-b" x="460" y="354" width="5" height="72" rx="2"/><text class="id" x="474" y="374">N5 · 1.5F</text><text class="nm" x="474" y="394">line_map</text><text class="rl" x="474" y="413">본 것을 odom에 누적</text></g>
+        <g class="nd" data-id="N4" tabindex="0" role="button" aria-label="N4 state_estimator"><rect x="730" y="354" width="200" height="72" rx="9"/><rect class="bar t-b" x="730" y="354" width="5" height="72" rx="2"/><text class="id" x="744" y="374">N4 · 1.5F</text><text class="nm" x="744" y="394">state_estimator</text><text class="rl" x="744" y="413">시각별 자세 pose_at(t)</text></g>
+
+        <g class="nd" data-id="N1" tabindex="0" role="button" aria-label="N1 camera_driver"><rect x="190" y="504" width="200" height="72" rx="9"/><rect class="bar t-p" x="190" y="504" width="5" height="72" rx="2"/><text class="id" x="204" y="524">N1 · 1F · 실물 전용</text><text class="nm" x="204" y="544">camera_driver</text><text class="rl" x="204" y="563">CSI → ROS 영상</text></g>
+        <g class="nd" data-id="N2" tabindex="0" role="button" aria-label="N2 line_detector"><rect x="460" y="504" width="200" height="72" rx="9"/><rect class="bar t-p" x="460" y="504" width="5" height="72" rx="2"/><text class="id" x="474" y="524">N2 · 1F</text><text class="nm" x="474" y="544">line_detector</text><text class="rl" x="474" y="563">영상 → 바닥 위 선</text></g>
+
+        <g class="nd" data-id="S1" tabindex="0" role="button" aria-label="S1 카메라"><rect x="190" y="654" width="200" height="72" rx="9"/><rect class="bar t-s" x="190" y="654" width="5" height="72" rx="2"/><text class="id" x="204" y="674">S1 · 0F</text><text class="nm" x="204" y="694">카메라 IMX219</text><text class="rl" x="204" y="713">62.2° · 30 fps</text></g>
+        <g class="nd" data-id="S2" tabindex="0" role="button" aria-label="S2 IMU"><rect x="460" y="654" width="200" height="72" rx="9"/><rect class="bar t-s" x="460" y="654" width="5" height="72" rx="2"/><text class="id" x="474" y="674">S2 · 0F</text><text class="nm" x="474" y="694">IMU (OpenCR)</text><text class="rl" x="474" y="713">6축 · 주기 실측</text></g>
+        <g class="nd" data-id="S3" tabindex="0" role="button" aria-label="S3 바퀴 엔코더"><rect x="730" y="654" width="200" height="72" rx="9"/><rect class="bar t-s" x="730" y="654" width="5" height="72" rx="2"/><text class="id" x="744" y="674">S3 · 0F</text><text class="nm" x="744" y="694">엔코더 XM430</text><text class="rl" x="744" y="713">4096 스텝/회전</text></g>
+        <g class="nd" data-id="OC" tabindex="0" role="button" aria-label="OpenCR와 turtlebot3_node"><rect x="980" y="654" width="200" height="72" rx="9"/><rect class="bar t-s" x="980" y="654" width="5" height="72" rx="2"/><text class="id" x="994" y="674">0F · 구동</text><text class="nm" x="994" y="694">OpenCR 1.0</text><text class="rl" x="994" y="713">turtlebot3_node · 모터</text></g>
+
+        <g class="nd" data-id="R1" tabindex="0" role="button" aria-label="R1 과제 조건"><rect x="190" y="796" width="200" height="66" rx="9"/><rect class="bar t-r" x="190" y="796" width="5" height="66" rx="2"/><text class="id" x="204" y="816">R1</text><text class="nm" x="204" y="836">과제 조건</text><text class="rl" x="204" y="853">한 줄 실행 · 로버 토픽만</text></g>
+        <g class="nd" data-id="R2" tabindex="0" role="button" aria-label="R2 안전 불변 조건"><rect x="460" y="796" width="200" height="66" rx="9"/><rect class="bar t-r" x="460" y="796" width="5" height="66" rx="2"/><text class="id" x="474" y="816">R2</text><text class="nm" x="474" y="836">안전 불변 조건</text><text class="rl" x="474" y="853">safety_guard만 구동</text></g>
+        <g class="nd" data-id="R3" tabindex="0" role="button" aria-label="R3 좌표 단위 시간"><rect x="730" y="796" width="200" height="66" rx="9"/><rect class="bar t-r" x="730" y="796" width="5" height="66" rx="2"/><text class="id" x="744" y="816">R3</text><text class="nm" x="744" y="836">좌표 · 단위 · 예산</text><text class="rl" x="744" y="853">odom · 5 mm · 33 ms</text></g>
+        <g class="nd" data-id="R4" tabindex="0" role="button" aria-label="R4 팀 규칙"><rect x="980" y="796" width="200" height="66" rx="9"/><rect class="bar t-r" x="980" y="796" width="5" height="66" rx="2"/><text class="id" x="994" y="816">R4</text><text class="nm" x="994" y="836">팀 규칙</text><text class="rl" x="994" y="853">가짜 길은 판단 몫</text></g>
+      </g>
+    </svg>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-live="polite">
+    <div class="pk"><span id="p-floor" class="chip">1F 인지</span><span id="p-team"></span></div>
+    <h3 id="p-name">line_detector</h3>
+    <p class="one" id="p-one"></p>
+    <dl id="p-dl"></dl>
+  </aside>
+</section>
+
+<section aria-labelledby="h-sens">
+  <div class="sechead"><span class="no">0F</span><h2 id="h-sens">센서 공식 사양과 우리가 쓰는 범위</h2><p>왼쪽부터 카메라, IMU, 엔코더. 라이다는 없다.</p></div>
+  <div class="sens">
+    <div class="sc"><div class="k">S1 · Raspberry Pi Camera v2.1 · Sony IMX219 · CSI CAM0</div><h3>카메라</h3>
+      <div class="big">529.6<small>px · fx = fy (640×480 이론값)</small></div>
+      <ul><li>8 MP 3280×2464, 픽셀 1.12 µm, 초점 3.04 mm, F2.0 고정 초점</li><li>수평 62.2°, 수직 48.8° (시뮬 <code>vision.py</code> fx 530.5와 일치)</li><li>사용: 1640×1232 @30 → 640×480 bgr8</li><li>금색 단자가 아래로 향하게 CAM0에 연결</li></ul></div>
+    <div class="sc"><div class="k">S2 · OpenCR 1.0 내장</div><h3>IMU</h3>
+      <div class="big">6축<small>자이로 3 + 가속도 3</small></div>
+      <ul><li>MPU9250(초기) 또는 ICM-20648(2020년 이후)</li><li>공식 발행 주기 없음 → <code>ros2 topic hz /imu</code>로 실측 (시뮬 200 Hz)</li><li>사용: 카메라 피치, 언덕 마루 미끄러짐 보정, 안전 기울기</li></ul></div>
+    <div class="sc"><div class="k">S3 · Dynamixel XM430-W210-T × 2</div><h3>바퀴 엔코더</h3>
+      <div class="big">0.051<small>mm / 스텝 (4096 스텝, 반지름 0.033 m)</small></div>
+      <ul><li>무부하 77 rpm @12 V → 0.266 m/s</li><li>배터리 11.1 V에서 70 rpm → <b>0.242 m/s</b> (공식 상한 0.26 m/s)</li><li>바퀴 간격 0.287 m · <code>/odom</code> → 자세와 지도 좌표의 기준</li></ul></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-cam">
+  <div class="sechead"><span class="no">S1</span><h2 id="h-cam">카메라가 실제로 보는 땅</h2><p>장착 높이 0.103 m, 차축 앞 0.076 m, 피치 0 (시뮬레이션 기준, 실측 필요).</p></div>
+  <div class="cam">
+    <figure class="fig">
+      <svg viewBox="0 0 700 230" role="img" aria-label="옆에서 본 카메라 시야. 화면 아래 끝 광선이 차축 앞 0.30 m에서 땅에 닿고, 그 안쪽은 사각지대다. 인지가 쓰는 BEV는 0.31에서 0.85 m, 먼 띠를 켜면 1.3 m까지다.">
+        <!-- scale: 450 px per m; axle at x=50; ground y=180 -->
+        <rect class="fillh" x="50" y="180" width="136" height="18"/>
+        <rect class="fillp" x="190" y="180" width="243" height="18"/>
+        <rect class="fillb" x="433" y="180" width="202" height="18"/>
+        <line class="gl" x1="10" y1="180" x2="690" y2="180"/>
+        <rect class="robot" x="14" y="140" width="110" height="34" rx="5"/>
+        <circle class="robot" cx="50" cy="168" r="12"/>
+        <circle cx="84" cy="134" r="5" fill="currentColor"/>
+        <line class="axis" x1="84" y1="134" x2="680" y2="134"/>
+        <line class="ray" x1="84" y1="134" x2="186" y2="180"/>
+        <line class="ray" x1="84" y1="134" x2="300" y2="36"/>
+        <text class="txm" x="610" y="128">광축 (피치 0)</text>
+        <text class="txm" x="300" y="30">수직 화각 48.8°</text>
+        <line class="tick" x1="50" y1="200" x2="50" y2="210" stroke="currentColor"/><text class="txm" x="50" y="224" text-anchor="middle">차축 0</text>
+        <line class="tick" x1="186" y1="200" x2="186" y2="210" stroke="currentColor"/><text class="tx" x="186" y="224" text-anchor="middle">0.30 m</text>
+        <line class="tick" x1="433" y1="200" x2="433" y2="210" stroke="currentColor"/><text class="tx" x="433" y="224" text-anchor="middle">0.85 m</text>
+        <line class="tick" x1="635" y1="200" x2="635" y2="210" stroke="currentColor"/><text class="tx" x="635" y="224" text-anchor="middle">1.30 m</text>
+        <text class="txm" x="118" y="194" text-anchor="middle">사각지대</text>
+        <text class="txm" x="311" y="194" text-anchor="middle">BEV 가까운 곳</text>
+        <text class="txm" x="534" y="194" text-anchor="middle">먼 띠 (선택)</text>
+        <text class="txm" x="100" y="125">0.103 m</text>
+      </svg>
+      <figcaption>실제 비율(1 m = 450 px). 앞 0.30 m 안은 지금 보이지 않아서 지도에 남은 기억으로 판단한다.</figcaption>
+    </figure>
+    <div>
+      <div class="tw"><table>
+        <tr><th>센서 모드</th><th>수평</th><th>수직</th><th>fps</th><th>사각지대</th></tr>
+        <tr class="pick"><td class="n">1640 × 1232</td><td class="n">62.2°</td><td class="n">48.8°</td><td class="n">30</td><td class="n">0.30 m</td></tr>
+        <tr><td class="n">3280 × 2464</td><td class="n">62.2°</td><td class="n">48.8°</td><td class="n">21</td><td class="n">0.30 m</td></tr>
+        <tr><td class="n">3280 × 1848</td><td class="n">62.2°</td><td class="n">≈37.6°</td><td class="n">28</td><td class="n">≈0.38 m</td></tr>
+        <tr><td class="n">1920 × 1080</td><td>잘림</td><td>잘림</td><td class="n">30</td><td>더 멂</td></tr>
+      </table></div>
+      <p style="font-size:13.5px;color:var(--muted);margin:10px 2px 0">1640 × 1232가 이 렌즈의 최대 화각을 30 fps로 쓰는 유일한 모드다. 화각을 더 넓히려면 광각 IMX219 모듈로 바꿔야 하고, 그러면 왜곡 보정과 시뮬레이션·학습 데이터 재조정이 따라온다.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-io">
+  <div class="sechead"><span class="no">I/O</span><h2 id="h-io">층 사이 데이터 계약</h2><p>보내는 곳과 받는 곳, 토픽, 내용, 주기.</p></div>
+  <div class="tw"><table>
+    <tr><th>보내는 곳 → 받는 곳</th><th>통로</th><th>내용</th><th>주기</th></tr>
+    <tr><td><span class="sw" style="background:var(--fs)"></span>S1 → N1</td><td class="n">CSI CAM0</td><td>IMX219 원시 영상, 모드 1640 × 1232</td><td class="n">30 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fp)"></span>N1 → N2</td><td class="n">/camera/image_raw</td><td>640 × 480 bgr8, 촬영 시각 stamp</td><td class="n">30 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fs)"></span>S2, S3 → N4</td><td class="n">/imu · /odom</td><td>각속도·가속도 / 자세·속도 (turtlebot3_node 발행)</td><td class="n">실측 · ≥20 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fb)"></span>N4 → N2, N5, N7, N9</td><td class="n">Pose · pose_at(t)</td><td>t, x, y, yaw, pitch(걸러진 값), travel</td><td class="n">요청 시</td></tr>
+    <tr><td><span class="sw" style="background:var(--fp)"></span>N2 → N5</td><td class="n">/perception/bev</td><td>BEV 선 마스크 · 유효 영역 · 칸 신뢰도 (108 × 220) · 촬영 시각 · 그 시각 Pose</td><td class="n">30 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fp)"></span>N2 → N10, 도구</td><td class="n">/perception/status</td><td>지연, 인지 버전, 백엔드(TensorRT/CPU), 폴백</td><td class="n">2 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fb)"></span>N5 (+N6) → N7</td><td class="n">MapView</td><td>hit · snap · trace · confidence · seen (같은 프로세스 함수)</td><td class="n">프레임마다</td></tr>
+    <tr><td><span class="sw" style="background:var(--fb)"></span>N5 → RViz · GCS</td><td class="n">/lf/map</td><td>OccupancyGrid 4 m × 4 m, 1 cm, 값 = 신뢰도 0–100</td><td class="n">2 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fd)"></span>N7 → N9</td><td class="n">/path/local</td><td>odom 점 목록(약 2 cm), 끝 상태 open/t/len, 점별 신뢰도, 속도 상한, T 지점</td><td class="n">30 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fd)"></span>N7 → N8, N10</td><td class="n">/path/status</td><td>유효성, 모드, 검증된 남은 거리, 결승 이벤트</td><td class="n">30 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fd)"></span>N8 → N10, 전체</td><td class="n">/mission/state</td><td>상태 머신 단계, 주행 허가, 종료 사유</td><td class="n">변경 시 + 2 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--fc)"></span>N9 → N10</td><td class="n">/control/cmd_vel_candidate</td><td>v, w, 계산 시각, 유효 기한</td><td class="n">50 Hz</td></tr>
+    <tr><td><span class="sw" style="background:var(--hot)"></span>N10 → OpenCR</td><td class="n">/cmd_vel</td><td>최종 Twist. 이 토픽을 내는 노드는 safety_guard 하나뿐</td><td class="n">50 Hz</td></tr>
+  </table></div>
+  <p style="font-size:13.5px;color:var(--muted);margin:10px 2px 0">배치: N2부터 N7까지는 베이스 설계서 4.3대로 한 프로세스에 묶어 함수 호출로 잇는다(지도 복사 없음). N8, N9, N10과 카메라 드라이버는 별도 노드다. 프레임 예산은 33 ms이고, Jetson TensorRT 실측은 21–26 ms다.</p>
+</section>
+
+<section class="tl" aria-labelledby="h-ms">
+  <div class="sechead"><span class="no">M0–M6</span><h2 id="h-ms">팀 이정표 · 마감 12월 9일</h2><p>파란 점은 이틀마다 하는 진행 보고, 주황 선은 오늘.</p></div>
+  <div class="board"><div class="scroll">
+    <svg viewBox="0 0 1200 250" role="img" aria-label="11월 27일부터 12월 9일까지의 이정표. M0 베이스 정렬, M1 실물 기동, M2 실물 인지 확인, M3 실물 첫 완주, M4 성능 올리기, M5 기능 동결, M6 제출.">
+      <!-- 11-27 .. 12-09 : 12 days, x = 60 + d*90 -->
+      <line class="track" x1="60" y1="70" x2="1140" y2="70"/>
+      <line class="now" x1="60" y1="40" x2="60" y2="100"/><text class="msd" x="66" y="36" style="fill:var(--hot)">오늘 11-27</text>
+      <g class="rep">
+        <circle cx="150" cy="70" r="5"/><circle cx="330" cy="70" r="5"/><circle cx="510" cy="70" r="5"/><circle cx="690" cy="70" r="5"/><circle cx="870" cy="70" r="5"/><circle cx="1050" cy="70" r="5"/>
+      </g>
+      <g>
+        <line class="tick" x1="60"   y1="76" x2="60"   y2="96" stroke="currentColor"/><text class="msh" x="60"   y="116">M0 · 11-27</text><text class="mst" x="60" y="136">베이스 정렬</text><text class="msd" x="60" y="154">청사진 합의</text><text class="msd" x="60" y="170">CI 5단계 통과</text>
+        <line class="tick" x1="240"  y1="76" x2="240"  y2="96" stroke="currentColor"/><text class="msh" x="240"  y="116">M1 · 11-29</text><text class="mst" x="240" y="136">실물 기동</text><text class="msd" x="240" y="154">OpenCR · teleop</text><text class="msd" x="240" y="170">카메라 30 Hz · 보정</text><text class="msd" x="240" y="186">센서 주기 실측</text>
+        <line class="tick" x1="420"  y1="76" x2="420"  y2="96" stroke="currentColor"/><text class="msh" x="420"  y="116">M2 · 12-01</text><text class="mst" x="420" y="136">실물 인지 확인</text><text class="msd" x="420" y="154">바퀴 끈 V0 인지</text><text class="msd" x="420" y="170">IMU · 엔코더 잡음</text><text class="msd" x="420" y="186">실물 bag 지도 품질</text>
+        <line class="tick" x1="600"  y1="76" x2="600"  y2="96" stroke="currentColor"/><text class="msh" x="600"  y="116">M3 · 12-03</text><text class="mst" x="600" y="136">실물 첫 완주</text><text class="msd" x="600" y="154">safety_guard 경유</text><text class="msd" x="600" y="170">0.10–0.15 m/s</text><text class="msd" x="600" y="186">미션 규칙 확정</text>
+        <line class="tick" x1="780"  y1="76" x2="780"  y2="96" stroke="currentColor"/><text class="msh" x="780"  y="116">M4 · 12-05</text><text class="mst" x="780" y="136">성능 올리기</text><text class="msd" x="780" y="154">인지 기본값 확정</text><text class="msd" x="780" y="170">속도 ↑ (≈0.22 m/s)</text><text class="msd" x="780" y="186">TensorRT 적용</text>
+        <line class="tick" x1="960"  y1="76" x2="960"  y2="96" stroke="currentColor"/><text class="msh" x="960"  y="116">M5 · 12-07</text><text class="mst" x="960" y="136">기능 동결</text><text class="msd" x="960" y="154">반복 완주 리허설</text><text class="msd" x="960" y="170">실패 bag → 수정만</text>
+        <line class="tick" x1="1140" y1="76" x2="1140" y2="96" stroke="currentColor"/><text class="msh" x="1140" y="116" text-anchor="end">M6 · 12-09</text><text class="mst" x="1140" y="136" text-anchor="end">제출</text><text class="msd" x="1140" y="154" text-anchor="end">최종 버전 태그</text>
+      </g>
+      <text class="msd" x="150" y="58" text-anchor="middle">보고</text><text class="msd" x="330" y="58" text-anchor="middle">보고</text><text class="msd" x="510" y="58" text-anchor="middle">보고</text><text class="msd" x="690" y="58" text-anchor="middle">보고</text><text class="msd" x="870" y="58" text-anchor="middle">보고</text><text class="msd" x="1050" y="58" text-anchor="middle">보고</text>
+    </svg>
+  </div></div>
+</section>
+
+<section aria-labelledby="h-dec">
+  <div class="sechead"><span class="no">?</span><h2 id="h-dec">아직 열린 결정</h2><p>층마다 누가 무엇을 정해야 하는지.</p></div>
+  <div class="dec">
+    <div><b>1F · N1 · 인지</b>카메라 발행: 강의 래퍼 수정 vs 자체 노드, 노출·화이트밸런스 고정</div>
+    <div><b>1F · N2 · 인지</b>기본 인지 버전과 조명 강건화 방법 (폭 필터 · 구역별 임계 · 혼합)</div>
+    <div><b>1.5F · N5 · 인지</b>지도 누적 방식: 로그 오즈 채택 여부 (Isaac 폐루프 30바퀴로 판정 중)</div>
+    <div><b>2F · N7 · 판단</b>교차로 가지 선택 규칙, 신뢰도 낮은 구간 감속, 결승 확정 조건</div>
+    <div><b>2F · N8 · 판단</b>실물 평가의 시작 방식(20초 대기 유지?), 완주 확정 규칙</div>
+    <div><b>3F · N9 · 제어</b>lookahead·PID 게인, 실물 속도 상한(≈0.22 m/s), 가감속 한계</div>
+    <div><b>3F · N10 · 제어</b>타임아웃 값, 제한값, 실물 E-STOP·워치독</div>
+  </div>
+</section>
+
+<footer>저장소 <code>docs/architecture/blueprint_layers.html</code> · 글 버전 <code>docs/architecture/LAYERED_SPEC.md</code> · 베이스 설계서 <code>docs/design.md</code> (sion, <code>3abe6cb</code>) · 인지 인계서 <code>docs/PERCEPTION_HANDOFF.md</code> · 실물 세팅 <code>docs/REAL_ROBOT_SETUP.md</code></footer>
+</main>
+
+<script>
+(function(){
+  var F = { r:['−1F 사전 규칙','var(--fr)'], s:['0F 센서','var(--fs)'], p:['1F 인지','var(--fp)'], b:['1.5F 인지↔판단 경계','var(--fb)'], d:['2F 판단','var(--fd)'], c:['3F 제어','var(--fc)'] };
+  var N = {
+    N9:{f:'c',name:'motion_controller',team:'제어 팀 · 베이스 노드 · 50 Hz',one:'경로를 속도 명령 후보로 바꾼다.',st:['ok','Python RuleController · 베이스 C++ 있음'],
+      does:'Pure Pursuit + 횡오차 PID, 곡률·신뢰도·언덕 속도 프로파일, 급코너 정지 후 회전',in:'/path/local, Pose (1.5F N4)',out:'/control/cmd_vel_candidate: v, w, 계산 시각, 유효 기한',
+      dec:['lookahead, PID 게인','실물 속도 상한: 11.1 V 무부하 최고 ≈0.24 m/s → 0.22 m/s 안팎','가감속 한계'],todo:'실물 0.10–0.15 m/s 튜닝 후 상승. 결승 T에서 멈추는 실행만 (판정은 2F)'},
+    N10:{f:'c',name:'safety_guard',team:'제어 팀 · 베이스 노드',one:'/cmd_vel을 내는 유일한 노드.',st:['wip','베이스 C++ 있음 · Python 노드와 미연결'],
+      does:'허가 없으면 0, 오래된 영상·경로·후보 차단, 속도·가속·각속도 제한, 이상 시 정지',in:'명령 후보, /mission/state, /path/status, 센서 신선도, /imu 기울기',out:'/cmd_vel → turtlebot3_node → OpenCR → 모터',
+      dec:['타임아웃 값 (카메라 · odom · 후보)','제한값','실물 E-STOP · 워치독'],todo:'우리 Python 파이프라인 출력이 이 노드를 거치게 연결'},
+    N7:{f:'d',name:'path_planner',team:'판단 팀 · 베이스 노드 · 프레임마다',one:'선 지도에서 로컬 경로를 고른다.',st:['ok','Python RulePlanner · 베이스 C++ 있음'],
+      does:'선 따라가기(trace), 교차로·가짜 길 가지 선택(규칙 또는 MLP), 짧은 오검출 조각 무시, 결승 T 판정, 구간 속도 상한',in:'MapView (hit · snap · trace · confidence · seen), Pose',out:'/path/local (점 목록, 끝 상태, 신뢰도, 속도 상한) · /path/status · /path/candidates(개발)',
+      dec:['가지 선택 규칙 (지금 가장 곧은 가지)','신뢰도 낮은 구간 감속 기준','결승 확정 조건 (출발 T 오인 방지)'],todo:'가짜 길 시험 맵(decoy1000)에서 가지 선택 정확도 측정'},
+    N8:{f:'d',name:'mission_manager',team:'판단 팀 · 베이스 노드',one:'시작과 종료 상태 머신.',st:['wip','베이스 C++ 있음'],
+      does:'STARTUP_WAIT → CHECKING → READY → RUNNING → STOPPING → FINISHED (FAULT, E_STOP)',in:'센서 상태, /path/status 결승 이벤트',out:'/mission/state, 주행 허가',
+      dec:['실물 평가 시작 방식 (20초 대기 유지?)','완주 확정 규칙'],todo:'실물 평가 규칙 확인 후 전이 조건 확정'},
+    N6:{f:'b',name:'restorer',team:'인지 코드 · 판단 프로세스',one:'안 본 곳의 선을 잇는다. 지금은 끔.',st:['ok','있음 · 기본 끔'],
+      does:'선 지도 주변 128 × 128 패치로 안 본 선을 이어 restored 층(신뢰도 0.31)에 쓴다',in:'선 지도 패치',out:'line_map의 restored 층',
+      dec:['켤지 여부: 공식 트랙에서 손해가 확인되어 끔'],todo:'—',why:'인지가 선을 채울지 판단이 경로를 늘릴지 애매 → 인지가 쓰고 판단은 읽기만'},
+    N5:{f:'b',name:'line_map',team:'인지 코드 · 판단 프로세스',one:'본 것을 odom 5 mm 격자에 쌓는 Local Path Memory.',st:['ok','LineMap 있음 (legacy · logodds)'],
+      does:'촬영 시각 자세로 BEV를 투영해 누적. 층: 선 · 본 영역 · 신뢰도 · 복원 · 고정',in:'/perception/bev + 촬영 시각 Pose',out:'MapView → N7, /lf/map (OccupancyGrid 2 Hz)',
+      dec:['기본 누적 방식: 로그 오즈 (V0 0.961 → 0.978, DL 0.890 → 0.983, 재현율 유지) — 폐루프 판정 중','지나간 공간 고정 사용 여부'],todo:'Isaac 공식 트랙 30바퀴 구간 오차로 판정',why:'베이스 설계는 판단 노드 안에 두지만, 지도 정확도는 인지의 성적'},
+    N4:{f:'b',name:'state_estimator',team:'인지 코드 · 공용',one:'시각별 자세를 모두에게 준다.',st:['wip','노드 안 함수 → 분리 예정'],
+      does:'odom 기록·보간, IMU 피치, 언덕 마루 미끄러짐 보정, 지도 정합 보정 적용',in:'/odom, /imu, 지도 정합 보정량',out:'Pose(t, x, y, yaw, pitch, travel) via pose_at(t), /localization/estimate',
+      dec:['Pose.pitch = 걸러진 피치','영상·자세 시간 허용폭'],todo:'state/ 모듈로 분리 (실물 첫 주행 뒤)',why:'베이스는 판단에 주고 우리는 지도 투영에 쓴다. 양쪽이 같은 자세를 봐야 한다'},
+    N1:{f:'p',name:'camera_driver',team:'인지 팀 · 실물 전용',one:'CSI 카메라를 ROS 영상 토픽으로.',st:['todo','할 일 · jetson-io IMX219-A 적용함'],
+      does:'nvarguscamerasrc 모드 1640 × 1232 @30 → nvvidconv로 640 × 480 축소 → 발행',in:'IMX219 원시 영상 (CSI CAM0)',out:'/camera/image_raw 640 × 480 bgr8 30 Hz, /camera/camera_info',
+      dec:['강의 래퍼(packbionics) 수정 vs 자체 노드','노출 · 화이트밸런스 고정 여부'],todo:'카메라 물리 연결 (지금 probe −121) → 30 Hz 확인 → 체커보드 보정'},
+    N2:{f:'p',name:'line_detector',team:'인지 팀 · 베이스 노드 이름 · 30 Hz',one:'영상에서 바닥 위 선(BEV)을 뽑는다.',st:['ok','Python 인지 플러그인 있음'],
+      does:'가까운 곳: 규칙 임계값(V0 640 · V1 320) 또는 선 분할+깊이 모델(V2, TensorRT) · 혼합 · 그림자 폭 필터 · 먼 곳: 640 지평선 띠 · 언덕: IMU 피치+지면 추정',in:'/camera/image_raw, 촬영 시각 Pose와 피치',out:'/perception/bev (선 마스크 · 유효 영역 · 칸 신뢰도 108 × 220, 촬영 시각, Pose) · /perception/status',
+      dec:['기본 버전: 지금 V0-NearRule640','조명 강건화: 폭 필터 · 구역별 임계 · 혼합','먼 띠 사용 (0.85 m vs 1.3 m)'],todo:'실물 카메라 영상으로 재검증, 규칙 파라미터 최적화 반영'},
+    S1:{f:'s',name:'카메라 IMX219',team:'Raspberry Pi Camera v2.1 · CSI CAM0',one:'유일한 인지 입력.',st:['wip','보드 설정 완료 · 물리 연결 대기'],
+      does:'8 MP 3280 × 2464, 픽셀 1.12 µm, 초점 3.04 mm, F2.0, 수평 62.2° · 수직 48.8°',in:'—',out:'원시 영상 → N1',
+      dec:['모드: 1640 × 1232 @30 (최대 화각 + 30 fps)'],todo:'금색 단자를 아래로 CAM0에 연결, 장착 높이·피치 실측',why:'내부값 이론 fx = fy ≈ 529.6 px, cx ≈ 319.5, cy ≈ 239.5 (시뮬 530.5와 일치)'},
+    S2:{f:'s',name:'IMU (OpenCR)',team:'OpenCR 1.0 내장 · 6축',one:'피치와 미끄러짐 보정의 근거.',st:['todo','주기 · 잡음 실측 필요'],
+      does:'MPU9250(초기) 또는 ICM-20648(2020년 이후), 자이로 3 + 가속도 3',in:'—',out:'/imu (turtlebot3_node 발행) → N4',
+      dec:['—'],todo:'칩 확인, ros2 topic hz /imu, 정지 기록으로 잡음·바이어스'},
+    S3:{f:'s',name:'엔코더 XM430-W210-T',team:'Dynamixel × 2 · 차동 구동',one:'odom과 지도 좌표의 기준.',st:['todo','반지름 오차 실측 필요'],
+      does:'절대 엔코더 4096 스텝/회전 → 1스텝 0.051 mm. 무부하 77 rpm @12 V, 70 rpm @11.1 V',in:'—',out:'/odom (odom → base_footprint), /joint_states → N4',
+      dec:['실물 속도 상한 근거: 11.1 V에서 무부하 ≈0.242 m/s'],todo:'직진 기록으로 반지름 오차·미끄러짐'},
+    OC:{f:'s',name:'OpenCR 1.0 · turtlebot3_node',team:'구동 보드',one:'/cmd_vel을 받아 모터를 돌리고 /imu, /odom을 낸다.',st:['todo','펌웨어 · 연결 필요'],
+      does:'모터 구동, IMU · 엔코더 읽기, 배터리',in:'/cmd_vel (N10에서만)',out:'/imu, /odom, /joint_states',
+      dec:['라이다 없는 bringup launch'],todo:'펌웨어(waffle) 업데이트, 모터 설정, teleop 확인'},
+    R1:{f:'r',name:'과제 조건',team:'베이스 설계서 1장',one:'평가가 요구하는 것.',st:['ok','유지'],
+      does:'한 줄 실행 competition.launch.py · 20초 대기 뒤 자동 출발(Gazebo 과제) · 제공 월드·모델 수정 금지(SHA256) · 카메라 영상 인식 · 로버 토픽만(/camera/image_raw, /imu, /odom, /cmd_vel) · /world/ 토픽 금지',in:'—',out:'—',dec:['실물 평가에 그대로 적용되는 항목 확인'],todo:'—'},
+    R2:{f:'r',name:'안전 불변 조건',team:'베이스 설계서 5.3, 9.2',one:'누구도 어기지 않는 규칙.',st:['ok','유지'],
+      does:'safety_guard만 /cmd_vel · 미션 허가 없으면 속도 0 · 영상은 촬영 시각으로 odom과 맞춤 · 오래된 데이터 폐기 · 실시간 루프 비차단, GCS·기록이 죽어도 주행 유지',in:'—',out:'—',dec:['—'],todo:'—'},
+    R3:{f:'r',name:'좌표 · 단위 · 예산',team:'공통',one:'모든 층이 같은 단위로 말한다.',st:['ok','유지'],
+      does:'odom 좌표(x 전방, y 왼쪽), m · rad · s · 지도 5 mm · BEV 0.31–0.85 m(먼 띠 1.3 m) × ±0.55 m · 카메라 프레임 33 ms · 실물 use_sim_time:=false',in:'—',out:'—',dec:['—'],todo:'—'},
+    R4:{f:'r',name:'팀 규칙',team:'우리 팀',one:'역할과 작업 방식.',st:['ok','유지'],
+      does:'인지는 칠해진 선을 가짜 길까지 모두 넘기고 길 선택은 판단 · 인지 평가는 지도 정밀도·재현율·중심선 오프셋 · 공식 트랙 과적합 금지 · 버전 이름 V<n>-부품해상도-데이터 · rule.yaml 키는 -p follower_node:키:=값 · CI 통과 후 PR, push는 승인 후',in:'—',out:'—',dec:['—'],todo:'—'}
+  };
+  var FLOWS = {
+    frame:{n:['S1','N1','N2','N4','N5','N7','N9','N10','OC'],e:['e-s1n1','e-n1n2','e-n2n5','e-n4n5','e-n5n7','e-n7n9','e-n9n10','e-cmd','e-s2n4','e-s3n4']},
+    ctrl:{n:['N7','N8','N9','N10','OC'],e:['e-n7n9','e-n7n8','e-n8n10','e-n9n10','e-cmd']},
+    pose:{n:['S2','S3','N4','N5','N2','N7','N9'],e:['e-s2n4','e-s3n4','e-n4n5']}
+  };
+  var svg=document.getElementById('sect');
+  var nodes=[].slice.call(svg.querySelectorAll('.nd'));
+  var edges=[].slice.call(svg.querySelectorAll('#edges path'));
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+  function show(id){
+    var d=N[id]; if(!d) return;
+    nodes.forEach(function(g){ g.classList.toggle('sel', g.getAttribute('data-id')===id); });
+    var fl=F[d.f]; var chip=document.getElementById('p-floor'); chip.textContent=fl[0]; chip.style.color=fl[1];
+    document.getElementById('p-team').textContent=d.team;
+    document.getElementById('p-name').textContent=(id.charAt(0)==='N'||id.charAt(0)==='S'||id.charAt(0)==='R'?id+' · ':'')+d.name;
+    document.getElementById('p-one').textContent=d.one;
+    var h='';
+    h+='<div><dt>현재 상태</dt><dd><span class="st '+d.st[0]+'">'+esc(d.st[1])+'</span></dd></div>';
+    h+='<div><dt>하는 일</dt><dd>'+esc(d.does)+'</dd></div>';
+    if(d.in!=='—') h+='<div><dt>입력</dt><dd>'+esc(d.in)+'</dd></div>';
+    if(d.out!=='—') h+='<div><dt>출력</dt><dd>'+esc(d.out)+'</dd></div>';
+    if(d.why) h+='<div><dt>'+(d.f==='b'?'왜 1.5층':'참고')+'</dt><dd>'+esc(d.why)+'</dd></div>';
+    if(d.dec && d.dec[0]!=='—') h+='<div><dt>결정할 것</dt><dd><ul>'+d.dec.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></dd></div>';
+    if(d.todo && d.todo!=='—') h+='<div><dt>할 일</dt><dd>'+esc(d.todo)+'</dd></div>';
+    document.getElementById('p-dl').innerHTML=h;
+  }
+  function flow(k){
+    var f=FLOWS[k];
+    nodes.forEach(function(g){ g.classList.toggle('dim', !!f && f.n.indexOf(g.getAttribute('data-id'))<0); });
+    edges.forEach(function(p){
+      var on=!!f && f.e.indexOf(p.id)>=0;
+      p.classList.toggle('dim', !!f && !on);
+      p.classList.toggle('lit', on && p.id!=='e-cmd');
+      if(p.id!=='e-cmd') p.setAttribute('marker-end', on?'url(#al)':'url(#a)');
+      var l=document.getElementById('l'+p.id.slice(1)); if(l) l.classList.toggle('dim', !!f && !on);
+      if(p.id==='e-cmd'){ var l2=document.getElementById('l-cmd2'); if(l2) l2.classList.toggle('dim', !!f && !on); }
+    });
+    [].slice.call(document.querySelectorAll('.flows button')).forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-flow')===k || (!f && b.getAttribute('data-flow')==='none'))); });
+  }
+  nodes.forEach(function(g){
+    g.addEventListener('click',function(){ show(g.getAttribute('data-id')); });
+    g.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); show(g.getAttribute('data-id')); } });
+  });
+  [].slice.call(document.querySelectorAll('.flows button')).forEach(function(b){ b.addEventListener('click',function(){ flow(b.getAttribute('data-flow')); }); });
+  show('N2');
+})();
+</script>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인지 · 판단 · 제어</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Geist','Noto Sans KR',sans-serif; background: #f5f5f5; color: #2d3142; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+    .frame { max-width: 1280px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow { font-family: 'Geist Mono', monospace; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em;
+      text-transform: uppercase; color: #4f5d75; margin-bottom: 0.5rem; }
+    h1 { font-family: 'Instrument Serif','Noto Serif KR',serif; font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 1280px; display: block; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · Line follower</p>
+    <h1>인지 · 판단 · 제어가 각각 하는 일</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="roles-title roles-desc">
+        <title id="roles-title">인지 · 판단 · 제어가 각각 하는 일</title>
+        <desc id="roles-desc">로봇 센서에서 인지, 판단, 제어를 거쳐 속도 명령으로 돌아가는 루프와, 각 파트가 맡는 일과 넘기는 인터페이스.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f5f5f5"/>
+<line x1="400" y1="444" x2="462" y2="444" stroke="#bf4520" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
+<line x1="816" y1="444" x2="878" y2="444" stroke="#4f5d75" stroke-width="1.6" marker-end="url(#arrow)"/>
+<line x1="224" y1="580" x2="224" y2="510" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+<line x1="1056" y1="508" x2="1056" y2="578" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arrow)"/>
+<rect x="234" y="536" width="141" height="20" rx="2" fill="#f5f5f5"/>
+<text x="240" y="550" font-family="'Geist Mono',ui-monospace,monospace" font-size="11" fill="#4f5d75">camera · IMU · odom</text>
+<rect x="1066" y="536" width="66" height="20" rx="2" fill="#f5f5f5"/>
+<text x="1072" y="550" font-family="'Geist Mono',ui-monospace,monospace" font-size="11" fill="#4f5d75">/cmd_vel</text>
+<rect x="48" y="40" width="352" height="468" rx="8" fill="#f5f5f5"/>
+<rect x="48" y="40" width="352" height="468" rx="8" fill="rgba(191,69,32,0.06)" stroke="#bf4520" stroke-width="1.6"/>
+<rect x="68" y="60" width="86" height="18" rx="2" fill="none" stroke="#bf4520" stroke-width="0.8"/>
+<text x="76" y="73" font-family="'Geist Mono',ui-monospace,monospace" font-size="10" letter-spacing="0.08em" fill="#bf4520">PERCEPTION</text>
+<text x="68" y="110" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="26" font-weight="600" fill="#2d3142">인지</text>
+<rect x="252" y="92" width="128" height="24" rx="4" fill="#bf4520"/>
+<text x="316.0" y="108" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" font-weight="500" fill="#ffffff">우리 팀 · 개선 중</text>
+<text x="68" y="138" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" fill="#4f5d75">선이 어디 있는지 정확히 기록한다</text>
+<line x1="68" y1="156" x2="380" y2="156" stroke="rgba(45,49,66,0.12)"/>
+<text x="68" y="184" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">선 감지</text>
+<text x="68" y="203" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">영상에서 선 픽셀 찾기 (임계값 · 분할 모델)</text>
+<text x="68" y="228" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">BEV 투영</text>
+<text x="68" y="247" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">바닥 좌표로 펴기, 경사로는 IMU · 깊이로 보정</text>
+<text x="68" y="272" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">선 지도</text>
+<text x="68" y="291" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">odom 좌표 5 mm 격자에 누적</text>
+<text x="68" y="316" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">위치 보정</text>
+<text x="68" y="335" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">엔코더 + IMU로 미끄러짐 보정</text>
+<text x="68" y="360" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">선 복원</text>
+<text x="68" y="379" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">안 보이는 구간을 학습 모델로 잇기</text>
+<rect x="64" y="412" width="320" height="80" rx="6" fill="#f5f5f5" stroke="#bf4520" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="80" y="436" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" font-weight="500" fill="#5a6580">출력</text>
+<text x="80" y="458" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="15" font-weight="600" fill="#2d3142">차선 경로 (Route)</text>
+<text x="80" y="478" font-family="'Geist Mono',ui-monospace,monospace" font-size="11" fill="#4f5d75">points · end: open | t</text>
+<rect x="464" y="40" width="352" height="468" rx="8" fill="#f5f5f5"/>
+<rect x="464" y="40" width="352" height="468" rx="8" fill="#ffffff" stroke="#bfc0c0" stroke-width="1"/>
+<rect x="484" y="60" width="72" height="18" rx="2" fill="none" stroke="#bfc0c0" stroke-width="0.8"/>
+<text x="492" y="73" font-family="'Geist Mono',ui-monospace,monospace" font-size="10" letter-spacing="0.08em" fill="#5a6580">PLANNING</text>
+<text x="484" y="110" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="26" font-weight="600" fill="#2d3142">판단</text>
+<rect x="688" y="92" width="108" height="24" rx="4" fill="#ececec"/>
+<text x="742.0" y="108" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">기준 구현 고정</text>
+<text x="484" y="138" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" fill="#4f5d75">어느 길로, 얼마나 빠르게 갈지 정한다</text>
+<line x1="484" y1="156" x2="796" y2="156" stroke="rgba(45,49,66,0.12)"/>
+<text x="484" y="184" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">길 선택</text>
+<text x="484" y="203" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">교차로 직진, 끊긴 길 잇기 (trace)</text>
+<text x="484" y="228" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">종점 판정</text>
+<text x="484" y="247" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">종점 T자 확인, 정지 위치 결정</text>
+<text x="484" y="272" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">복구</text>
+<text x="484" y="291" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">선을 놓쳤을 때 다시 찾기</text>
+<text x="484" y="316" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">속도 계획</text>
+<text x="484" y="335" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">곡률 · 경사 · 시야 끝에 맞춰 감속</text>
+<text x="484" y="360" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">레이싱 라인</text>
+<text x="484" y="379" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">허용 폭 안에서 더 빠른 경로</text>
+<rect x="480" y="412" width="320" height="80" rx="6" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="496" y="436" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" font-weight="500" fill="#5a6580">출력</text>
+<text x="496" y="458" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="15" font-weight="600" fill="#2d3142">목표 궤적 (Trajectory)</text>
+<text x="496" y="478" font-family="'Geist Mono',ui-monospace,monospace" font-size="11" fill="#4f5d75">points · v_target · action</text>
+<rect x="880" y="40" width="352" height="468" rx="8" fill="#f5f5f5"/>
+<rect x="880" y="40" width="352" height="468" rx="8" fill="#ffffff" stroke="#bfc0c0" stroke-width="1"/>
+<rect x="900" y="60" width="65" height="18" rx="2" fill="none" stroke="#bfc0c0" stroke-width="0.8"/>
+<text x="908" y="73" font-family="'Geist Mono',ui-monospace,monospace" font-size="10" letter-spacing="0.08em" fill="#5a6580">CONTROL</text>
+<text x="900" y="110" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="26" font-weight="600" fill="#2d3142">제어</text>
+<rect x="1104" y="92" width="108" height="24" rx="4" fill="#ececec"/>
+<text x="1158.0" y="108" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">기준 구현 고정</text>
+<text x="900" y="138" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" fill="#4f5d75">궤적을 실제 바퀴 명령으로 바꾼다</text>
+<line x1="900" y1="156" x2="1212" y2="156" stroke="rgba(45,49,66,0.12)"/>
+<text x="900" y="184" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">경로 추종</text>
+<text x="900" y="203" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">pure pursuit (Stanley · PID · MPC 후보)</text>
+<text x="900" y="228" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">명령 제한</text>
+<text x="900" y="247" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">가속도 · 각속도 한계 지키기</text>
+<text x="900" y="272" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">제자리 회전</text>
+<text x="900" y="291" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">급코너에서 회전 시작 각도 조절</text>
+<text x="900" y="316" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">과속 억제</text>
+<text x="900" y="335" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">내리막 · 미끄러짐에서 속도 줄이기</text>
+<text x="900" y="360" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="14" font-weight="600" fill="#2d3142">실물 튜닝</text>
+<text x="900" y="379" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12.5" fill="#5a6580">모터 PID, 오도메트리 보정 (Jetson)</text>
+<rect x="896" y="412" width="320" height="80" rx="6" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="912" y="436" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" font-weight="500" fill="#5a6580">출력</text>
+<text x="912" y="458" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="15" font-weight="600" fill="#2d3142">속도 명령 (/cmd_vel)</text>
+<text x="912" y="478" font-family="'Geist Mono',ui-monospace,monospace" font-size="11" fill="#4f5d75">v [m/s] · ω [rad/s]</text>
+<rect x="48" y="580" width="1184" height="76" rx="8" fill="#ececec" stroke="#bfc0c0"/>
+<text x="68" y="612" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="18" font-weight="600" fill="#2d3142">로봇</text>
+<text x="68" y="636" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="13" fill="#4f5d75">TurtleBot3 Waffle Pi · Gazebo 시뮬레이션 / 실물 Jetson Orin Nano 8GB</text>
+<text x="1212" y="626" text-anchor="end" font-family="'Geist Mono',ui-monospace,monospace" font-size="11" fill="#5a6580">ROS 2 Jazzy · follower_node</text>
+<rect x="48" y="684" width="14" height="14" rx="3" fill="rgba(191,69,32,0.06)" stroke="#bf4520" stroke-width="1.4"/>
+<text x="70" y="696" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" fill="#4f5d75">우리 팀이 바꾸는 부분</text>
+<rect x="228" y="684" width="14" height="14" rx="3" fill="#ffffff" stroke="#bfc0c0"/>
+<text x="250" y="696" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" fill="#4f5d75">고정 (기준 구현, 공식 트랙 약 64초)</text>
+<rect x="488" y="684" width="28" height="14" rx="3" fill="#f5f5f5" stroke="#bfc0c0" stroke-dasharray="4,3"/>
+<text x="524" y="696" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo',sans-serif" font-size="12" fill="#4f5d75">다음 파트로 넘기는 인터페이스</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

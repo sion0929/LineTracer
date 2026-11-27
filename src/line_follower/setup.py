@@ -29,5 +29,12 @@ setup(
     install_requires=['setuptools'],
     tests_require=['pytest'],
     zip_safe=True,
-    entry_points={'console_scripts': ['follower_node = line_follower.follower_node:main']},
+    entry_points={'console_scripts': [
+        'follower_node = line_follower.follower_node:main',
+        # split mode (docs/architecture/NODE_SPLIT.md, launch/split.launch.py)
+        'perception_node = line_follower.split.perception_node:main',
+        'map_node = line_follower.split.map_node:main',
+        'planning_node = line_follower.split.planning_node:main',
+        'control_node = line_follower.split.control_node:main',
+    ]},
 )

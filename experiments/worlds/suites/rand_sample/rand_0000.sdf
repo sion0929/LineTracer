@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.9">
+  <world name="line_track">
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <physics type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+      <dart>
+        <collision_detector>bullet</collision_detector>
+      </dart>
+    </physics>
+    <gravity>0 0 -9.8</gravity>
+    <scene>
+      <grid>false</grid>
+      <ambient>0.654773 0.654773 0.654773 1</ambient>
+      <background>0.465429 0.344188 0.533456 1</background>
+      <shadows>true</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <pose>0 0 500 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>0.763975</intensity>
+      <direction>0.158294 -0.734154 -0.660273</direction>
+      <diffuse>1 0.924649 0.860131 1</diffuse>
+      <specular>0.190994 0.190994 0.190994 1</specular>
+    </light>
+    <model name="room_floor">
+      <static>true</static>
+      <pose>1.65 1.65 -0.104 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>20 20 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>20 20 0.2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.577218 0.658959 0.734242 1</ambient>
+            <diffuse>0.577218 0.658959 0.734242 1</diffuse>
+            <specular>0 0 0 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <include>
+      <uri>model://turtlebot3_waffle_pi</uri>
+      <name>turtlebot3_waffle_pi</name>
+      <pose>0.33 0.33 0.01 0 0 0</pose>
+    </include>
+    <model name="track">
+      <static>true</static>
+      <link name="surface">
+        <collision name="mat_collision">
+          <pose>1.65 1.65 -0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>3.3 3.3 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="mat_visual">
+          <pose>1.65 1.65 -0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>3.3 3.3 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.820769 0.688585 0.578138 1</ambient>
+            <diffuse>0.820769 0.688585 0.578138 1</diffuse>
+            <specular>0.185511 0.185511 0.185511 1</specular>
+          </material>
+        </visual>
+        <collision name="ramp_0_collision">
+          <pose>2.75 1.32506675 -0.0071561313 0 -0.135527714 1.57079633</pose>
+          <geometry>
+            <box>
+              <size>0.444072066 0.66 0.075</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="ramp_0_visual">
+          <pose>2.75 1.32506675 -0.0071561313 0 -0.135527714 1.57079633</pose>
+          <geometry>
+            <box>
+              <size>0.444072066 0.66 0.075</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.820769 0.688585 0.578138 1</ambient>
+            <diffuse>0.820769 0.688585 0.578138 1</diffuse>
+            <specular>0.185511 0.185511 0.185511 1</specular>
+          </material>
+        </visual>
+        <collision name="ramp_1_collision">
+          <pose>2.75 1.76 0.0225 0 -0 1.57079633</pose>
+          <geometry>
+            <box>
+              <size>0.44 0.66 0.075</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="ramp_1_visual">
+          <pose>2.75 1.76 0.0225 0 -0 1.57079633</pose>
+          <geometry>
+            <box>
+              <size>0.44 0.66 0.075</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.820769 0.688585 0.578138 1</ambient>
+            <diffuse>0.820769 0.688585 0.578138 1</diffuse>
+            <specular>0.185511 0.185511 0.185511 1</specular>
+          </material>
+        </visual>
+        <collision name="ramp_2_collision">
+          <pose>2.75 2.19493325 -0.0071561313 0 0.135527714 1.57079633</pose>
+          <geometry>
+            <box>
+              <size>0.444072066 0.66 0.075</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="ramp_2_visual">
+          <pose>2.75 2.19493325 -0.0071561313 0 0.135527714 1.57079633</pose>
+          <geometry>
+            <box>
+              <size>0.444072066 0.66 0.075</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.820769 0.688585 0.578138 1</ambient>
+            <diffuse>0.820769 0.688585 0.578138 1</diffuse>
+            <specular>0.185511 0.185511 0.185511 1</specular>
+          </material>
+        </visual>
+      </link>
+      <link name="line">
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <mesh>
+              <uri>./decoy_0000.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.0317734 0.032571 0.0306866 1</ambient>
+            <diffuse>0.0317734 0.032571 0.0306866 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

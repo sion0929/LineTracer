@@ -1,0 +1,14 @@
+experiments/worlds/suites/cases/maps/corner90__r00.sdf
+experiments/worlds/suites/cases/maps/corner90__r00_m.sdf
+experiments/worlds/suites/cases/maps/corner90__r05.sdf
+experiments/worlds/suites/cases/maps/corner90__r05_m.sdf
+experiments/worlds/suites/cases/maps/corner90__r08.sdf
+experiments/worlds/suites/cases/maps/corner90__r08_m.sdf
+experiments/worlds/suites/cases/maps/corner90__r12.sdf
+experiments/worlds/suites/cases/maps/corner90__r12_m.sdf
+experiments/worlds/suites/cases/maps/corner90__r18.sdf
+experiments/worlds/suites/cases/maps/corner90__r18_m.sdf
+experiments/worlds/suites/cases/maps/corner90__r25.sdf
+experiments/worlds/suites/cases/maps/corner90__r25_m.sdf
+experiments/worlds/suites/cases/maps/corner90__r40.sdf
+experiments/worlds/suites/cases/maps/corner90__r40_m.sdf

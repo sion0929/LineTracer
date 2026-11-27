@@ -1,0 +1,6 @@
+experiments/worlds/suites/cases/maps/finish_like__cross_bar20.sdf
+experiments/worlds/suites/cases/maps/finish_like__cross_bar20_m.sdf
+experiments/worlds/suites/cases/maps/finish_like__cross_bar40.sdf
+experiments/worlds/suites/cases/maps/finish_like__cross_bar40_m.sdf
+experiments/worlds/suites/cases/maps/finish_like__after_corner.sdf
+experiments/worlds/suites/cases/maps/finish_like__after_corner_m.sdf

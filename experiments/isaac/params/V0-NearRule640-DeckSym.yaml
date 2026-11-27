@@ -1,0 +1,4 @@
+follower_node:
+  ros__parameters:
+    perception: rule
+    deck_model: symmetric

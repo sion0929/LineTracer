@@ -1,0 +1,10 @@
+experiments/worlds/suites/cases/maps/cross_bar__a30.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a30_m.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a45.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a45_m.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a60.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a60_m.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a75.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a75_m.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a90.sdf
+experiments/worlds/suites/cases/maps/cross_bar__a90_m.sdf

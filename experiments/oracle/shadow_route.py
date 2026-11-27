@@ -36,7 +36,7 @@ import run_oracle  # noqa: E402  (sets up the package path; its main() starts th
 Base = run_oracle.OracleNode if os.environ.get("SHADOW_ORACLE") == "1" else run_oracle.fn.FollowerNode
 
 D = np.array([0.15, 0.30, 0.45, 0.60, 0.80])
-FIELDS = ("t", "travel", "s", "turn_back", "turn_ahead", "slope", "end", "plen", "robot_off", "pitch")
+FIELDS = ("t", "travel", "s", "turn_back", "turn_ahead", "slope", "end", "plen", "robot_off", "pitch", "rock")
 
 
 def resample(rp, dists):
@@ -101,10 +101,78 @@ class ShadowNode(Base):
         end = {"open": 0, "t": 1, "len": 2}.get(self.path_end, 3) if len(self.path) >= 2 else -1
         self.rows.append((t, self.travel, s, self.heading_change(k, -0.6, 0.0),
                           self.heading_change(k, 0.0, 0.8), float(self.slope[k]), end, plen,
-                          robot_off, float(self.pitch_f)))
+                          robot_off, float(self.pitch_f), float(getattr(self, 'rock', np.nan))))
         self.errs.append(err)
+        self.snapshot(plen, robot_off, err)
         if len(self.rows) % 60 == 0:
             self.save()
+
+    def snapshot(self, plen, robot_off, err=None):
+        """SHADOW_SNAP=1: dump BEV masks + map crop when the route runs short before a turn
+        (the 'route stops at a sharp corner' failure), at most 8 per run, 0.3 s apart (SHADOW_SNAP_PLEN sets the length threshold)."""
+        if os.environ.get("SHADOW_SNAP") != "1" or getattr(self, "n_snap", 0) >= 8:
+            return
+        t = self.get_clock().now().nanoseconds * 1e-9
+        lim = os.environ.get("SHADOW_SNAP_ERR")
+        if lim is not None:                       # trigger on route error instead of length
+            e = np.nanmax(err) if err is not None and np.isfinite(err).any() else 0.0
+            if e < float(lim) or t - getattr(self, "t_snap", -9) < 0.2:
+                return
+        elif plen > float(os.environ.get("SHADOW_SNAP_PLEN", "0.20")) or self.rows[-1][4] < 60 \
+                or t - getattr(self, "t_snap", -9) < 0.3:
+            return
+        from line_follower.line_map import C0, RES
+        self.n_snap = getattr(self, "n_snap", 0) + 1
+        self.t_snap = t
+        px, py, _ = self.pose
+        ix, iy, r = round(px / RES) + C0, round(py / RES) + C0, round(1.0 / RES)
+        obs = self.last_observation
+        np.savez_compressed(gt.job_dir() / f"snap{self.n_snap}.npz",
+                            grid=np.asarray(self.map.grid[iy - r:iy + r + 1, ix - r:ix + r + 1]),
+                            origin=np.array([(ix - r - C0) * RES, (iy - r - C0) * RES]), res=RES,
+                            pose=np.array(self.pose), truth=np.array(self.truth.get() or (0, 0, 0)),
+                            path=np.asarray(self.path, float).reshape(-1, 2),
+                            line=np.asarray(obs.line) if obs is not None else np.zeros(1),
+                            valid=np.asarray(obs.valid) if obs is not None else np.zeros(1),
+                            route=self.route[:, :2], t=t, plen=plen, robot_off=robot_off)
+
+    def on_image(self, msg):
+        super().on_image(msg)
+        # SHADOW_RAW=1: keep every Nth raw frame with the IMU history and the true pose
+        # (incl. pitch) for offline projection studies (experiments/eval/pitch_offline.py)
+        if os.environ.get("SHADOW_RAW") != "1" or self.pose is None:
+            return
+        self.n_img = getattr(self, "n_img", 0) + 1
+        if self.n_img % int(os.environ.get("SHADOW_RAW_EVERY", "2")) or len(getattr(self, "raw", [])) >= 900:
+            return
+        full = self.truth.get_full()
+        if full is None or msg.encoding not in ("rgb8", "bgr8", "mono8"):
+            return
+        ch = 1 if msg.encoding == "mono8" else 3
+        img = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width, ch)
+        gray = img[..., 0] if ch == 1 else (0.299 * img[..., 0] + 0.587 * img[..., 1] + 0.114 * img[..., 2]).astype(np.uint8)
+        if msg.encoding == "bgr8":
+            gray = (0.114 * img[..., 0] + 0.587 * img[..., 1] + 0.299 * img[..., 2]).astype(np.uint8)
+        ts = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        self.raw = getattr(self, "raw", [])
+        self.raw.append((gray, ts, np.array(self.imu[-120:], float), np.array(full), float(self.rock),
+                         float(self.pitch_f), np.array(self.pose)))
+        if len(self.raw) % 100 == 0:
+            self.save_raw()
+
+    def save_raw(self):
+        raw = getattr(self, "raw", [])
+        if not raw:
+            return
+        imu = np.full((len(raw), 120, 2), np.nan)
+        for i, r in enumerate(raw):
+            imu[i, :len(r[2])] = r[2]
+        tmp = gt.job_dir() / "raw.tmp.npz"
+        np.savez_compressed(tmp, gray=np.stack([r[0] for r in raw]), ts=np.array([r[1] for r in raw]), imu=imu,
+                            truth=np.stack([r[3] for r in raw]), rock=np.array([r[4] for r in raw]),
+                            pitch_f=np.array([r[5] for r in raw]), pose=np.stack([r[6] for r in raw]),
+                            route=self.route)
+        os.replace(tmp, gt.job_dir() / "raw.npz")
 
     def save(self):
         if not self.rows:
@@ -118,6 +186,7 @@ class ShadowNode(Base):
     def destroy_node(self):
         try:
             self.save()
+            self.save_raw()
         finally:
             return super().destroy_node()
 

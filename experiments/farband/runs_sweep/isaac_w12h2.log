@@ -1,0 +1,35 @@
+train 13701 strips (177 maps), val 2000 (50 maps)
+rule threshold on val: {"iou": 0.412, "precision": 0.632, "recall_0.8-1.0": 0.803, "recall_1.0-1.2": 0.68, "recall_1.2-1.5": 0.612, "recall_1.5-2.0": 0.543}
+ep 0 loss 1.7344 iou 0.072 precision 0.073 recall_0.8-1.0 0.971 recall_1.0-1.2 0.890 recall_1.2-1.5 0.863 recall_1.5-2.0 0.805  16s
+ep 1 loss 1.6211 iou 0.304 precision 0.318 recall_0.8-1.0 0.980 recall_1.0-1.2 0.897 recall_1.2-1.5 0.826 recall_1.5-2.0 0.699  17s
+ep 2 loss 1.5295 iou 0.322 precision 0.335 recall_0.8-1.0 0.985 recall_1.0-1.2 0.916 recall_1.2-1.5 0.851 recall_1.5-2.0 0.736  13s
+ep 3 loss 1.3751 iou 0.352 precision 0.367 recall_0.8-1.0 0.988 recall_1.0-1.2 0.926 recall_1.2-1.5 0.866 recall_1.5-2.0 0.760  16s
+ep 4 loss 1.1604 iou 0.322 precision 0.334 recall_0.8-1.0 0.991 recall_1.0-1.2 0.940 recall_1.2-1.5 0.889 recall_1.5-2.0 0.769  18s
+ep 5 loss 0.9109 iou 0.393 precision 0.419 recall_0.8-1.0 0.982 recall_1.0-1.2 0.907 recall_1.2-1.5 0.824 recall_1.5-2.0 0.675  12s
+ep 6 loss 0.6881 iou 0.527 precision 0.586 recall_0.8-1.0 0.976 recall_1.0-1.2 0.876 recall_1.2-1.5 0.791 recall_1.5-2.0 0.670  18s
+ep 7 loss 0.5931 iou 0.401 precision 0.436 recall_0.8-1.0 0.968 recall_1.0-1.2 0.879 recall_1.2-1.5 0.816 recall_1.5-2.0 0.698  16s
+ep 8 loss 0.5642 iou 0.527 precision 0.574 recall_0.8-1.0 0.988 recall_1.0-1.2 0.927 recall_1.2-1.5 0.864 recall_1.5-2.0 0.711  14s
+ep 9 loss 0.5458 iou 0.540 precision 0.585 recall_0.8-1.0 0.986 recall_1.0-1.2 0.935 recall_1.2-1.5 0.874 recall_1.5-2.0 0.741  19s
+ep 10 loss 0.5342 iou 0.631 precision 0.704 recall_0.8-1.0 0.991 recall_1.0-1.2 0.942 recall_1.2-1.5 0.880 recall_1.5-2.0 0.732  14s
+ep 11 loss 0.5282 iou 0.687 precision 0.793 recall_0.8-1.0 0.991 recall_1.0-1.2 0.955 recall_1.2-1.5 0.893 recall_1.5-2.0 0.735  15s
+ep 12 loss 0.5249 iou 0.662 precision 0.726 recall_0.8-1.0 0.995 recall_1.0-1.2 0.964 recall_1.2-1.5 0.914 recall_1.5-2.0 0.782  16s
+ep 13 loss 0.5165 iou 0.481 precision 0.581 recall_0.8-1.0 0.919 recall_1.0-1.2 0.815 recall_1.2-1.5 0.756 recall_1.5-2.0 0.625  15s
+ep 14 loss 0.5130 iou 0.682 precision 0.759 recall_0.8-1.0 0.989 recall_1.0-1.2 0.955 recall_1.2-1.5 0.907 recall_1.5-2.0 0.763  16s
+ep 15 loss 0.5104 iou 0.670 precision 0.751 recall_0.8-1.0 0.987 recall_1.0-1.2 0.954 recall_1.2-1.5 0.907 recall_1.5-2.0 0.772  16s
+ep 16 loss 0.5082 iou 0.704 precision 0.780 recall_0.8-1.0 0.996 recall_1.0-1.2 0.968 recall_1.2-1.5 0.932 recall_1.5-2.0 0.805  16s
+ep 17 loss 0.5025 iou 0.643 precision 0.706 recall_0.8-1.0 0.988 recall_1.0-1.2 0.957 recall_1.2-1.5 0.918 recall_1.5-2.0 0.775  18s
+ep 18 loss 0.5008 iou 0.715 precision 0.796 recall_0.8-1.0 0.991 recall_1.0-1.2 0.958 recall_1.2-1.5 0.913 recall_1.5-2.0 0.769  15s
+ep 19 loss 0.4968 iou 0.710 precision 0.776 recall_0.8-1.0 0.994 recall_1.0-1.2 0.965 recall_1.2-1.5 0.932 recall_1.5-2.0 0.800  15s
+ep 20 loss 0.4971 iou 0.727 precision 0.802 recall_0.8-1.0 0.996 recall_1.0-1.2 0.969 recall_1.2-1.5 0.937 recall_1.5-2.0 0.797  16s
+ep 21 loss 0.4930 iou 0.733 precision 0.823 recall_0.8-1.0 0.995 recall_1.0-1.2 0.968 recall_1.2-1.5 0.931 recall_1.5-2.0 0.797  15s
+ep 22 loss 0.4922 iou 0.729 precision 0.795 recall_0.8-1.0 0.994 recall_1.0-1.2 0.971 recall_1.2-1.5 0.946 recall_1.5-2.0 0.819  15s
+ep 23 loss 0.4883 iou 0.744 precision 0.833 recall_0.8-1.0 0.997 recall_1.0-1.2 0.971 recall_1.2-1.5 0.941 recall_1.5-2.0 0.813  16s
+ep 24 loss 0.4864 iou 0.693 precision 0.749 recall_0.8-1.0 0.994 recall_1.0-1.2 0.967 recall_1.2-1.5 0.940 recall_1.5-2.0 0.808  16s
+ep 25 loss 0.4855 iou 0.722 precision 0.782 recall_0.8-1.0 0.995 recall_1.0-1.2 0.969 recall_1.2-1.5 0.944 recall_1.5-2.0 0.817  15s
+ep 26 loss 0.4854 iou 0.737 precision 0.807 recall_0.8-1.0 0.996 recall_1.0-1.2 0.971 recall_1.2-1.5 0.944 recall_1.5-2.0 0.814  15s
+ep 27 loss 0.4848 iou 0.733 precision 0.799 recall_0.8-1.0 0.996 recall_1.0-1.2 0.971 recall_1.2-1.5 0.945 recall_1.5-2.0 0.813  14s
+ep 28 loss 0.4852 iou 0.738 precision 0.807 recall_0.8-1.0 0.996 recall_1.0-1.2 0.971 recall_1.2-1.5 0.944 recall_1.5-2.0 0.814  16s
+ep 29 loss 0.4829 iou 0.740 precision 0.810 recall_0.8-1.0 0.996 recall_1.0-1.2 0.971 recall_1.2-1.5 0.944 recall_1.5-2.0 0.812  17s
+/home/rvlab/26_robotprogramming_project/experiments/farband/train.py:221: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(net, torch.zeros(1, 3, 64, 640 // a.hscale), a.out / "farband.onnx", input_names=["rgb"],
+saved runs_sweep/isaac_w12h2/farband.onnx best iou 0.89

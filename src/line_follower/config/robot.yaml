@@ -1,0 +1,37 @@
+# Real robot (Jetson Orin Nano, Ubuntu 24.04, Jazzy): rule.yaml minus sim time and the
+# track-specific speed_profile. Same perception settings as the evaluated V0-NearRule640.
+/**:
+  ros__parameters:
+    use_sim_time: false
+follower_node:
+  ros__parameters:
+    perception: rule      # rule | dl
+    controller: rule      # rule | learned
+    v_max: 0.12           # first real runs (docs/REAL_ROBOT_TEST.md); control team raises it. Motor no-load top ~0.24 m/s at 11.1 V
+    v_min: 0.06
+    a_lat: 0.25
+    a_dec: 0.3
+    a_acc: 0.6
+    v_hill: 0.30
+    omega_max: 3.0
+    lookahead_min: 0.10
+    lookahead_gain: 0.30
+    finish_min_dist: 14.0
+    debug_image: true      # /line_follower/debug for checking detection on the robot
+    restore_model: ''      # restoration off (hurt the official track)
+    # Ramp handling with the IMU (adopted 2026-11-25, docs/OPEN_SOURCE_SURVEY.md 5-9):
+    # never-pass case maps 5.4 % -> 16.7 % per run (Fisher p = 0.003), no regression on the
+    # 251 always-pass maps, official track 8/8, hills60 subset 0/24 -> 2/24 (progress +56 %).
+    imu_slip: true          # encoder vs IMU speed: ignore wheel spin ...
+    imu_slip_rate: 0.3      # ... only while the body tips over a crest (|pitch rate| > 0.3 rad/s)
+    imu_floor: true         # project onto the floor tracked with the IMU while on/near a ramp
+    deck_xfar: 0.45         # deck cap when the deck model is not active
+    # V3-NearRule640Hill (adopted 2026-11-27, docs/PERCEPTION_HANDOFF.md 7): on a slope only the
+    # near ground (0.31-0.40 m); on the deck the full range with the ground ahead modelled from the
+    # climb (symmetric hill). Held-out test maps: deck map precision 0.672 -> 0.826 (15/15 maps),
+    # official track closed loop 10/10 (V0 9/10).
+    x_far_slope: 0.40       # camera range on a slope only (rocking on flat ground keeps x_far_unsteady 0.50) [m]
+    deck_model: symmetric   # deck: full range, ground ahead from the measured climb (perception/slope.py)
+    # V4-NearRule640HillMem (2026-11-27): remember climbed hills; frames from flat ground write no
+    # line cells on them (ramp edges / shadow). Held-out test maps: up 0.640 -> 0.801, down 0.660 -> 0.990.
+    hill_memory: true

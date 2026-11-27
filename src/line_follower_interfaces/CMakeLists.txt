@@ -30,6 +30,10 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GcsLinkStatus.msg"
   "msg/GcsCommandRequest.msg"
   "msg/GcsCommandEvent.msg"
+  "msg/PerceptionFrame.msg"
+  "msg/LineMapPatch.msg"
+  "msg/LinePath.msg"
+  "msg/LfPose.msg"
   "srv/BagCommand.srv"
   "srv/MissionCommand.srv"
   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs

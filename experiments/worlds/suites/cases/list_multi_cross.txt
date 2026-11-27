@@ -1,0 +1,6 @@
+experiments/worlds/suites/cases/maps/multi_cross__n2_sp15.sdf
+experiments/worlds/suites/cases/maps/multi_cross__n2_sp15_m.sdf
+experiments/worlds/suites/cases/maps/multi_cross__n2_sp30.sdf
+experiments/worlds/suites/cases/maps/multi_cross__n2_sp30_m.sdf
+experiments/worlds/suites/cases/maps/multi_cross__n3_sp20.sdf
+experiments/worlds/suites/cases/maps/multi_cross__n3_sp20_m.sdf

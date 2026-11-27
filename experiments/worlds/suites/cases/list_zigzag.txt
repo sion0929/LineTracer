@@ -1,0 +1,12 @@
+experiments/worlds/suites/cases/maps/zigzag__a45_s10.sdf
+experiments/worlds/suites/cases/maps/zigzag__a45_s10_m.sdf
+experiments/worlds/suites/cases/maps/zigzag__a90_s10.sdf
+experiments/worlds/suites/cases/maps/zigzag__a90_s10_m.sdf
+experiments/worlds/suites/cases/maps/zigzag__a45_s20.sdf
+experiments/worlds/suites/cases/maps/zigzag__a45_s20_m.sdf
+experiments/worlds/suites/cases/maps/zigzag__a90_s20.sdf
+experiments/worlds/suites/cases/maps/zigzag__a90_s20_m.sdf
+experiments/worlds/suites/cases/maps/zigzag__a45_s30.sdf
+experiments/worlds/suites/cases/maps/zigzag__a45_s30_m.sdf
+experiments/worlds/suites/cases/maps/zigzag__a90_s30.sdf
+experiments/worlds/suites/cases/maps/zigzag__a90_s30_m.sdf

@@ -1,0 +1,14 @@
+experiments/worlds/suites/cases/maps/self_cross__a30.sdf
+experiments/worlds/suites/cases/maps/self_cross__a30_m.sdf
+experiments/worlds/suites/cases/maps/self_cross__a45.sdf
+experiments/worlds/suites/cases/maps/self_cross__a45_m.sdf
+experiments/worlds/suites/cases/maps/self_cross__a60.sdf
+experiments/worlds/suites/cases/maps/self_cross__a60_m.sdf
+experiments/worlds/suites/cases/maps/self_cross__a75.sdf
+experiments/worlds/suites/cases/maps/self_cross__a75_m.sdf
+experiments/worlds/suites/cases/maps/self_cross__a90.sdf
+experiments/worlds/suites/cases/maps/self_cross__a90_m.sdf
+experiments/worlds/suites/cases/maps/self_cross__a120.sdf
+experiments/worlds/suites/cases/maps/self_cross__a120_m.sdf
+experiments/worlds/suites/cases/maps/self_cross__a150.sdf
+experiments/worlds/suites/cases/maps/self_cross__a150_m.sdf

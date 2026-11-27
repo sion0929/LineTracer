@@ -145,3 +145,20 @@ python3 experiments/worlds/summarize_suite.py out/general200 experiments/worlds/
 - 기준 브랜치: `wlsgur0317/two-track`
 - 작업 브랜치: 룰 담당은 `rule/<이름>`, 딥러닝 담당은 `dl/<이름>`. 기준 브랜치에서 따서 작업한다.
 - 병합 조건: 공식 트랙 회귀가 없고(같은 설정 3회 이상), 자기 담당 지표가 기준선보다 좋아야 한다. 결과 폴더와 `telemetry.json` 수치를 PR 본문에 적는다.
+
+## 4-2. 목적별 케이스 세트 (`suites/cases`, 334개, 장애물 없음)
+
+`python3 experiments/worlds/gen_cases.py --preview`로 만든다. 트랙마다 상황이 하나씩 들어간다. 모든 케이스는 좌우 반전 쌍으로 만든다. 교차 지점의 위치와 각도는 생성 후 자동으로 계산해 JSON `case.crossings`에 넣는다.
+
+| 분류 | 그룹 (개수) |
+|---|---|
+| 기하 | corner90 반경 0–0.40 m (14), turn_angle 30–150° (28), s_curve (24), hairpin (14), zigzag (12), wavy (8), spiral (2) |
+| 교차·겹침 | cross_bar 30–90° (10), multi_cross (6), corner_loop (8), self_cross 30–90° (14), parallel 3–20 cm·곡선 (26), y_split (16), y_merge (16), t_stub (18), overlap (4), touching (6), near_track (2) |
+| 선 품질 | gap 3–20 cm 직선·곡선 (20), dashed (6) |
+| 언덕 | ramp (6), ramp_then_turn 높이×거리×코너 종류 (48), turn_then_ramp (8), ramp_cross (4), ramp_gap (4), double_ramp (4) |
+| 출발·도착 | finish_like (6) |
+
+- 그룹별 목록은 `list_<그룹>.txt`, 미리보기는 `preview_<그룹>.png`다.
+- 결과 집계는 `python3 experiments/worlds/summarize_cases.py <bench 출력> [--by-name]`로 한다. 실패 위치를 케이스 구간 앞, 구간 안, 구간 뒤로 나눠 센다.
+
+**기준선 3회 반복 (2026-11-25, rule, 1,002회):** 항상 성공 251, 들쭉날쭉 27, 항상 실패 56. 목록은 `suites/cases/list_base3_{always,flaky,never}.txt`, 맵별 결과는 `experiments/results/lead/base3_permap.json`에 있다. 인지 수정은 `never`를 줄이고 `always`를 깨지 않는지로 판정한다. 1회 실행은 그룹당 ±3개 흔들리므로 그것만으로 판정하지 않는다.
