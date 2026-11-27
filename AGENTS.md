@@ -32,7 +32,9 @@
 | **제어** | 경로 추종(pure pursuit + PID), 명령 제한 | `src/line_follower/line_follower/control/` |
 | 공용 (바꿀 때 서로 알림) | 노드, 인터페이스 | `follower_node.py`, `*/base.py`, `config/*.yaml`, `launch/` |
 
-한 프레임의 순서: 카메라 콜백(30 Hz) → **인지** `PerceptionStage.process()`가 `node.map` 갱신 → **판단** `planner.replan()`이 `node.path` 생성 → **제어** 타이머(50 Hz)가 따라간다.
+**노드 단위 개발 (2026-11-27~):** 인지 `perception_node` · 지도 `map_node`(인지) · 판단 `planning_node` · 제어 `control_node`로 나뉘어 있다. 각 팀은 자기 노드만 만들고, 나머지는 더미로 돈다. 토픽 계약과 바꿔 끼우는 법은 [`docs/NODE_DEV_GUIDE.md`](docs/NODE_DEV_GUIDE.md) (`ros2 launch line_follower split.launch.py planning:=none` 등).
+
+한 노드 실행(기존)의 순서: 카메라 콜백(30 Hz) → **인지** `PerceptionStage.process()`가 `node.map` 갱신 → **판단** `planner.replan()`이 `node.path` 생성 → **제어** 타이머(50 Hz)가 따라간다.
 
 ## 3. 인지 → 판단 인터페이스 (요약)
 
@@ -62,7 +64,7 @@
 | 무엇 | 어디 | 문서 |
 |---|---|---|
 | 맵 세트 (공식 트랙, decoy1000, hills60 등) | `experiments/worlds/suites/` (큰 세트는 생성 명령으로 다시 만든다. 결정적) | [`docs/MAPS.md`](docs/MAPS.md) |
-| 판단 팀용 인지 로그 100개 | `experiments/planning_logs/` | [`docs/PERCEPTION_LOG.md`](docs/PERCEPTION_LOG.md) |
+| 판단 팀용 인지 로그 | `experiments/planning_logs/` (V0+폭 필터+log-odds 100개, V3 기본값·형식 2 80개+) | [`docs/PERCEPTION_LOG.md`](docs/PERCEPTION_LOG.md) |
 | 공식 채점 14구간 | `experiments/eval/sections.json`, `sections.py` | 채점표: 도달 20, 정확도 28(구간 평균 오차 ≤ 2 cm), 속도 순위 30 |
 
 ## 6. 자주 쓰는 명령

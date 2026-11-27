@@ -5,6 +5,10 @@ The params file's `follower_node:` section is applied to all four nodes.
 
     ros2 launch line_follower split.launch.py [mode:=rule|dl] [params_file:=<yaml>]
                                               [sim:=true] [gui:=true] [start_delay:=20.0]
+                                              [planning:=dummy|none] [control:=dummy|none]
+
+planning:=none / control:=none leave that node out so a team runs its own node in its place
+(same topics: /lf/map/patch + /lf/pose -> /lf/path -> /cmd_vel; docs/NODE_DEV_GUIDE.md).
 """
 import os
 
@@ -23,9 +27,11 @@ from line_follower.split.params import SPLIT_NODES, write_all_nodes
 def split_nodes(context):
     params = write_all_nodes(LaunchConfiguration('params_file').perform(context))
     sim_time = LaunchConfiguration('use_sim_time').perform(context).lower() == 'true'
+    skip = {f'{role}_node' for role in ('planning', 'control')
+            if LaunchConfiguration(role).perform(context) == 'none'}
     nodes = [Node(package='line_follower', executable=name, name=name,
                   parameters=[params, {'use_sim_time': sim_time}], output='screen')
-             for name in SPLIT_NODES]
+             for name in SPLIT_NODES if name not in skip]
     return [TimerAction(period=LaunchConfiguration('start_delay'), actions=nodes)]
 
 
@@ -46,6 +52,10 @@ def generate_launch_description():
         DeclareLaunchArgument('use_sim_time', default_value=LaunchConfiguration('sim')),
         # mode:=rule (default) or mode:=dl picks config/<mode>.yaml; params_file:=<file> overrides it
         DeclareLaunchArgument('mode', default_value='rule'),
+        DeclareLaunchArgument('planning', default_value='dummy',
+                              description='dummy (current RulePlanner) or none (run your own planning node)'),
+        DeclareLaunchArgument('control', default_value='dummy',
+                              description='dummy (current controller) or none (run your own control node)'),
         DeclareLaunchArgument('params_file', default_value=PythonExpression(
             ["'", os.path.join(pkg, 'config'), "/' + '", LaunchConfiguration('mode'), "' + '.yaml'"])),
         AppendEnvironmentVariable('GZ_SIM_RESOURCE_PATH', os.path.join(pkg, 'models'), condition=sim),
