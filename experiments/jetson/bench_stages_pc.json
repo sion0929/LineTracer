@@ -1,0 +1,48 @@
+{
+ "machine": {
+  "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "processor": "x86_64",
+  "cpu_count": 16,
+  "python": "3.12.13",
+  "numpy": "2.2.6",
+  "opencv": "4.13.0",
+  "opencv_threads": 16
+ },
+ "inputs": {
+  "frames": "/home/rvlab/isaac_datasets/26_robotprogramming/decoy1000/test/decoy_0950",
+  "log": "experiments/planning_logs/V3-NearRule640Hill/0001_decoy_0000/perception_log",
+  "max_frames": 300,
+  "frames_loaded": 40
+ },
+ "stages": {
+  "perception": {
+   "n": 40,
+   "mean_ms": 0.38911062729312107,
+   "p50_ms": 0.3763725399039686,
+   "p95_ms": 0.44538180809468025,
+   "max_ms": 0.6492239772342145
+  },
+  "perception_total": {
+   "n": 40,
+   "mean_ms": 1.6249585925834253,
+   "p50_ms": 1.6165229899343103,
+   "p95_ms": 1.6958800290012732,
+   "max_ms": 1.8839350086636841
+  },
+  "map_update": {
+   "n": 300,
+   "mean_ms": 0.5344166239956394,
+   "p50_ms": 0.49871846567839384,
+   "p95_ms": 0.682223099283874,
+   "max_ms": 1.0407250374555588
+  },
+  "planning": {
+   "n": 300,
+   "mean_ms": 5.534599300978395,
+   "p50_ms": 6.0342779906932265,
+   "p95_ms": 6.386888548149727,
+   "max_ms": 9.23034397419542
+  }
+ }
+}

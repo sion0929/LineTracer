@@ -65,3 +65,19 @@
 ## 6. 검증 (Isaac 공식 트랙, 2026-11-27)
 
 분리 모드(`run_isaac_drive.sh --run-split`, V3 설정) 5/5 완주, 평균 랩 67.51 s, 14구간 모두 평균 횡오차 2 cm 이하(14.0/14). 같은 날 단일 노드 V3는 67.64 s, 13.3/14(실패 2회는 12.6 m 교차). 분리해도 주행 품질이 같다.
+
+## 7. 단계별 처리 시간과 언어 결정 (2026-11-27)
+
+같은 코드·같은 데이터(Isaac 시험 맵 프레임 40장, 인지 로그 300프레임)로 ROS 없이 단계만 잰 값이다(`experiments/jetson/bench_stages.py`, 결과 `bench_stages_pc.json`, `bench_stages_jetson.json`).
+
+| 단계 | PC p50 / p95 | Jetson Orin Nano (MAXN_SUPER) p50 / p95 | 30 Hz 예산 33 ms 중 (Jetson) |
+|---|---|---|---|
+| 인지 (색 변환 + 규칙 BEV) | 1.6 / 1.7 ms | 3.6 / 3.6 ms | 11 % |
+| 지도 갱신 (`LineMap.update`) | 0.5 / 0.7 ms | 2.4 / 2.5 ms | 7 % |
+| 판단 더미 (`RulePlanner.replan`, `trace`) | 6.0 / 6.4 ms | 20.0 / 20.4 ms | 62 % |
+
+Isaac 분리 모드 주행의 노드 로그(PC)도 같은 순서다: 인지 0.9 / 1.3 ms, 지도 1.2 / 1.5 ms, 판단 약 9 / 13 ms, 제어 0.16 / 0.25 ms.
+
+- **인지·지도는 파이썬 그대로 둔다.** 무거운 계산은 이미 OpenCV·numpy(C 내부)가 해서, C++로 옮겨도 Jetson에서 몇 ms밖에 줄지 않는다.
+- **C++로 옮길 후보는 판단의 경로 찾기**(`line_map.trace`와 판단 반복문)다. 파이썬 반복문이라 Jetson에서 프레임당 20 ms를 쓴다. 판단 팀이 새 판단 노드를 C++로 만들거나 `trace`만 C++ 확장으로 옮기는 것을 권한다.
+- 러스트는 ROS 2 Jazzy 지원이 실험 단계라 쓰지 않는다.

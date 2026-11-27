@@ -28,6 +28,9 @@
 2. 언덕 주변 잘못된 칸(경사로 옆선, 그림자)을 경로로 잡지 않기. 그림 `docs/report_img/hill_errors_v0_v3.png`.
 3. 가짜 길 맵(decoy1000)에서 길 선택.
 
+## 처리 시간 (중요)
+Jetson에서 지금 판단 더미(`RulePlanner.replan`, `trace`)가 프레임당 **20 ms**(30 Hz 예산 33 ms의 62 %)를 쓴다. 인지·지도는 합쳐 6 ms다(`docs/architecture/NODE_SPLIT.md` 7장). 새 판단은 Jetson에서 p95 15 ms 안을 목표로 하고, 필요하면 **C++ 노드**로 만든다(토픽 계약만 지키면 된다). 측정은 `experiments/jetson/bench_stages.py`.
+
 ## 개발·시험 방법
 - 실행: `ros2 launch line_follower split.launch.py planning:=none` 후 네 노드를 따로 실행. 처음에는 더미(`planning:=dummy`)를 복사해 시작하는 것이 쉽다.
 - 지도 사본: `line_follower.split.codec.paste_patch(line_map, patch)`로 패치를 붙이면 지도 노드와 칸까지 같은 `LineMap`이 생긴다.

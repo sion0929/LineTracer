@@ -1,0 +1,48 @@
+{
+ "machine": {
+  "platform": "Linux-6.8.12-1029-tegra-aarch64-with-glibc2.39",
+  "machine": "aarch64",
+  "processor": "aarch64",
+  "cpu_count": 6,
+  "python": "3.12.3",
+  "numpy": "1.26.4",
+  "opencv": "4.6.0",
+  "opencv_threads": 6
+ },
+ "inputs": {
+  "frames": "frames",
+  "log": "log",
+  "max_frames": 300,
+  "frames_loaded": 40
+ },
+ "stages": {
+  "perception": {
+   "n": 40,
+   "mean_ms": 0.846607199855498,
+   "p50_ms": 0.8416480013693217,
+   "p95_ms": 0.8939840023231227,
+   "max_ms": 0.9058239957084879
+  },
+  "perception_total": {
+   "n": 40,
+   "mean_ms": 3.602327999215049,
+   "p50_ms": 3.5937600005127024,
+   "p95_ms": 3.6487151941400953,
+   "max_ms": 3.673439998237882
+  },
+  "map_update": {
+   "n": 300,
+   "mean_ms": 2.3047652266783794,
+   "p50_ms": 2.393759998085443,
+   "p95_ms": 2.4605215978226624,
+   "max_ms": 3.210687995306216
+  },
+  "planning": {
+   "n": 300,
+   "mean_ms": 18.050894826495398,
+   "p50_ms": 19.99833599620615,
+   "p95_ms": 20.372526395658497,
+   "max_ms": 20.837087999098003
+  }
+ }
+}
