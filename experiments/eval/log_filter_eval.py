@@ -21,6 +21,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
+UNION = False   # --union: score every cell ever written (as map_world.npz), not the final map
 sys.path.insert(0, str(ROOT / "experiments/eval"))
 
 from hill_zone_eval import ALL_ZONES, load_map, pool_metrics, run_key, score_map_cells  # noqa: E402
@@ -52,6 +53,17 @@ def make_filter(name):
             return out
 
         return hill_lateral
+    if name.startswith("slope_band_"):
+        limit = float(name[len("slope_band_"):])
+
+        def slope_band(line, slope, meta):     # climb (1) / descent (3) only, as slope_y_half
+            if slope not in (1, 3):
+                return line
+            out = line.copy()
+            out[:, np.abs(cell_y(meta)) > limit] = False
+            return out
+
+        return slope_band
     raise ValueError(f"Unknown filter {name!r}")
 
 
@@ -60,11 +72,20 @@ def rebuild(d, meta, filt, active):
     line_map = LineMap()
     line, valid, pose = d["line"], d["valid"], d["pose"]
     slope = d["slope"]
+    ever = np.zeros_like(line_map.grid, bool) if UNION else None
     for i in np.nonzero(active)[0]:
         filtered = filt(line[i], int(slope[i]), meta)
         line_map.update(filtered.astype(np.uint8) * 255,
                         valid[i].astype(np.uint8) * 255,
                         pose[i])
+        if UNION and line_map.last is not None:
+            # every cell that is line at any moment (as run_map_dump.py's map_world.npz)
+            ox, oy, _, seen = line_map.last
+            h, w = seen.shape
+            win = ever[oy:oy + h, ox:ox + w]
+            win |= seen & (line_map.grid[oy:oy + h, ox:ox + w] > 60)
+    if UNION:
+        line_map.grid = ever.astype(np.uint8) * 255
     return line_map
 
 
@@ -283,7 +304,11 @@ def main():
         "none", "hill_lateral_0.15", "hill_lateral_0.20",
         "hill_lateral_0.25", "hill_lateral_0.30"])
     parser.add_argument("--out", type=Path, required=True, help="markdown output path")
+    parser.add_argument("--union", action="store_true",
+                        help="score every cell ever written (as map_world.npz) instead of the final map")
     args = parser.parse_args()
+    global UNION
+    UNION = args.union
 
     filters = list(dict.fromkeys(args.filters))
     for name in filters:

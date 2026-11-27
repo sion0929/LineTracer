@@ -16,7 +16,7 @@ from ..line_map import LineMap
 from ..scanmatch import ScanMatcher
 from .base import PerceptionOutput
 from .log import PerceptionLog
-from .slope import SlopeTracker, middle_band
+from .slope import HillMemory, SlopeTracker, middle_band
 
 REST_PITCH = math.radians(0.33)   # nose-up tilt of the robot standing on flat ground
 
@@ -32,6 +32,10 @@ class PerceptionStage:
         path = node.get_parameter('perception_log').value if node.has_parameter('perception_log') else ''
         self.log = PerceptionLog(node, path)   # off unless perception_log / LF_PERCEPTION_LOG is set
         self.slope = SlopeTracker()
+        self.hill_memory = HillMemory()
+        xs = vision.X_FAR - (np.arange(vision.BH) + 0.5) * vision.RES
+        ys = vision.Y_HALF - (np.arange(vision.BW) + 0.5) * vision.RES
+        self.bev_x, self.bev_y = np.meshgrid(xs, ys, indexing='ij')   # forward / left of each BEV cell
         self.prev_travel = None
 
     def process(self, msg):
@@ -45,6 +49,7 @@ class PerceptionStage:
         ds = max(0.0, travel - self.prev_travel)
         self.prev_travel = travel
         node.slope_state = self.slope.update(ds, node.pitch_f, getattr(node, 'elev', 0.0))
+        self.hill_memory.update(node.slope_state, node.pose, self.slope.up_len)
         if msg.encoding in ('rgb8', 'bgr8'):
             img = np.frombuffer(msg.data, np.uint8).reshape(msg.height, msg.width, 3)
             bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) if msg.encoding == 'rgb8' else img
@@ -160,6 +165,14 @@ class PerceptionStage:
             # on the ramp the route runs straight up/down its middle; the ramp's side edges and
             # its shadow (about 0.33 m to each side) look like lines -> keep only the middle band
             out = PerceptionOutput(line=middle_band(out.line, half), valid=out.valid, obstacle=out.obstacle)
+        if (gp('hill_memory').value and node.slope_state == 'flat' and self.hill_memory.hills
+                and node.pose is not None):
+            # seen from flat ground, a hill already climbed shows its edges / shadow as lines
+            hide = self.hill_memory.mask(node.pose_at(ts) or node.pose, self.bev_x, self.bev_y)
+            if hide.any():
+                line = out.line.copy()
+                line[hide] = 0
+                out = PerceptionOutput(line=line, valid=out.valid, obstacle=out.obstacle)
         node.last_obstacle = out.obstacle
         out.pitch = node.pitch_at(ts)
         node.last_observation = out

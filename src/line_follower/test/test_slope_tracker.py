@@ -133,3 +133,16 @@ def test_middle_band_keeps_centre_and_clears_ramp_edges():
     out = middle_band(line, 0.22)
     assert out[:, col(0.0)].all() and out[:, col(0.15)].all()
     assert not out[:, col(0.33)].any() and not out[:, col(-0.33)].any()
+
+
+def test_hill_memory_masks_the_climbed_ramp_only():
+    from line_follower.perception.slope import HillMemory
+    mem = HillMemory()
+    mem.update('flat', (0.0, 0.0, 0.0))
+    mem.update('climb', (1.0, 2.0, 0.0))           # ramp starts at (1, 2) heading +x
+    mem.update('deck', (1.5, 2.0, 0.0), up_len=0.44)
+    assert mem.hills[0][3] == pytest.approx(3 * 0.44 + 0.08)
+    bx = np.array([[0.5, 0.5, 0.5, 2.0]])
+    by = np.array([[0.0, 0.30, 0.50, 0.0]])
+    m = mem.mask((1.2, 2.0, 0.0), bx, by)         # robot back on flat ground looking along the ramp
+    assert m[0, 0] and m[0, 1] and not m[0, 2] and not m[0, 3]

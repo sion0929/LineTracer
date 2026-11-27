@@ -117,3 +117,36 @@ def middle_band(line, half):
     out = line.copy()
     out[:, np.abs(ys) > half] = 0
     return out
+
+
+class HillMemory:
+    """Footprints of hills already climbed (odom). A ramp's side faces, edges and shadow look like
+    lines when the camera sees the hill from flat ground beside or behind it; those frames must not
+    write line cells there. Anchor = pose where the climb was noticed; length = up + deck + down."""
+
+    def __init__(self, half_width=0.38, length=1.40):
+        self.half_width, self.length = half_width, length
+        self.hills = []            # (x, y, heading, length)
+        self._prev = 'flat'
+
+    def update(self, state, pose, up_len=0.0):
+        if state == 'climb' and self._prev != 'climb':
+            self.hills.append([pose[0], pose[1], pose[2], self.length])
+        if state == 'deck' and self._prev == 'climb' and self.hills and up_len > 0.0:
+            self.hills[-1][3] = max(self.length, 3.0 * up_len + 0.08)
+        self._prev = state
+
+    def mask(self, pose, bx, by):
+        """bool (BH, BW): BEV cells (forward bx, left by) that fall on a remembered hill."""
+        out = np.zeros(bx.shape, bool)
+        if not self.hills:
+            return out
+        c, s = math.cos(pose[2]), math.sin(pose[2])
+        wx = pose[0] + c * bx - s * by
+        wy = pose[1] + s * bx + c * by
+        for x0, y0, h, length in self.hills:
+            ch, sh = math.cos(h), math.sin(h)
+            along = (wx - x0) * ch + (wy - y0) * sh
+            across = -(wx - x0) * sh + (wy - y0) * ch
+            out |= (along > -0.05) & (along < length) & (np.abs(across) < self.half_width)
+        return out
